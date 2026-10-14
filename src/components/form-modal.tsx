@@ -62,7 +62,9 @@ function Entrada({ c, v }: { c: Campo; v: unknown }) {
   else if (t === 'bool') el = <select name={c.nome} defaultValue={v ? '1' : '0'}><option value="0">Não</option><option value="1">Sim</option></select>
   else if (t === 'data') el = <input type="date" name={c.nome} defaultValue={val} />
   else if (t === 'area') el = <textarea name={c.nome} defaultValue={val} rows={3} placeholder={c.placeholder} />
-  else if (t === 'senha') el = <input type="password" name={c.nome} autoComplete="new-password" placeholder={c.placeholder} inputMode={c.nome.toLowerCase().includes('pin') ? 'numeric' : undefined} />
+  // PIN do motorista: campo de texto mascarado, para o navegador não oferecer salvar nem alertar como "senha vazada".
+  else if (t === 'senha' && c.nome.toLowerCase().includes('pin')) el = <input type="text" name={c.nome} autoComplete="off" inputMode="numeric" maxLength={4} placeholder={c.placeholder} data-1p-ignore data-lpignore="true" style={{ WebkitTextSecurity: 'disc' } as React.CSSProperties} />
+  else if (t === 'senha') el = <input type="password" name={c.nome} autoComplete="new-password" placeholder={c.placeholder} />
   else if (t === 'dinheiro') el = <input name={c.nome} inputMode="decimal" defaultValue={v == null || v === '' ? '' : (Number(v) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} placeholder={c.placeholder ?? '0,00'} />
   else if (t === 'num') el = <input name={c.nome} inputMode="decimal" defaultValue={val === '' ? '' : String(v).replace('.', ',')} placeholder={c.placeholder} />
   else el = <input name={c.nome} type={t === 'tel' ? 'tel' : 'text'} defaultValue={val} placeholder={c.placeholder} autoComplete="off" />
