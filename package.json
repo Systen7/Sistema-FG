@@ -9,11 +9,11 @@
     "start": "next start",
     "lint": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx --env-file-if-exists=.env scripts/migrate.ts",
-    "db:seed": "tsx --env-file-if-exists=.env scripts/seed.ts",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
     "test": "vitest run",
     "e2e": "playwright test",
-    "db:admin": "tsx --env-file-if-exists=.env scripts/criar-admin.ts",
+    "db:admin": "tsx scripts/criar-admin.ts",
     "icones": "node scripts/icones.mjs"
   },
   "dependencies": {
@@ -42,6 +42,6 @@
     "vitest": "^5.0.4"
   },
   "engines": {
-    "node": ">=20.9"
+    "node": "22.x"
   }
 }

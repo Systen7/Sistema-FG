@@ -1,6 +1,8 @@
 // Cria (ou redefine a senha de) um acesso do escritório. Uso: npm run db:admin -- usuario "Nome Completo" senha
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
+// Carrega o .env quando existe (no computador); na Vercel as variáveis já vêm do painel.
+try { process.loadEnvFile() } catch {}
 import bcrypt from 'bcryptjs'
 import * as s from '../src/db/schema'
 

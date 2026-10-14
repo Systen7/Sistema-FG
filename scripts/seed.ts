@@ -3,6 +3,8 @@
 //      npm run db:seed -- --limpar (apaga tudo e recria)
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
+// Carrega o .env quando existe (no computador); na Vercel as variáveis já vêm do painel.
+try { process.loadEnvFile() } catch {}
 import bcrypt from 'bcryptjs'
 import { sql } from 'drizzle-orm'
 import * as s from '../src/db/schema'

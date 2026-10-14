@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { connection } from 'next/server'
 import { sql } from 'drizzle-orm'
 import { db, schema as s } from '@/db'
 import { PrimeiroAcesso } from './form'
@@ -8,6 +9,7 @@ export const metadata: Metadata = { title: 'Primeiro acesso' }
 
 // Só existe enquanto não há nenhum acesso do escritório: cria o primeiro administrador pelo navegador.
 export default async function Configurar() {
+  await connection() // sempre consulta o banco na hora, nunca durante a publicação
   const [{ n }] = await db.select({ n: sql<number>`count(*)::int` }).from(s.administradores)
   if (n > 0) redirect('/entrar')
   return (
