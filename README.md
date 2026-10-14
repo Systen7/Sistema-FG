@@ -22,6 +22,18 @@ Pensado para a estrada:
 - **Conferência antes de errar.** O app avisa sobre preço por litro fora do normal, km rodado alto demais e km final menor que o inicial.
 - **Instalável como aplicativo (PWA)** no Android e no iPhone, sem loja de apps.
 
+## CT-e e MDF-e
+
+O sistema não emite documentos fiscais: eles continuam sendo emitidos no seu emissor, com o seu certificado. O sistema **controla** esses documentos:
+
+- **Importar:** em **CT-e e MDF-e**, ou dentro de uma viagem, solte os XML (o arquivo "proc", com protocolo). Ele lê chave, número, rota, carga, peso, valor e placa.
+- **Ligar à viagem:** o MDF-e é ligado sozinho à viagem do caminhão com a mesma placa naquela data e leva junto os CT-e que cita. Também dá para escolher a viagem manualmente ou **criar a viagem a partir do XML**, já preenchida.
+- **PDF:** o DACTE/DAMDFE é anexado automaticamente quando a chave está no nome do arquivo, ou pelo botão "+ PDF" na linha do documento.
+- **Motorista:** vê no celular o MDF-e e os CT-e da viagem atual, com a chave para mostrar na fiscalização e o PDF.
+- **Encerramento:** importe o XML do evento de encerramento (ou clique em "Encerrado"). Um MDF-e aberto com a viagem já terminada, ou aberto há mais de 30 dias, vira **alerta urgente**. O XML do evento de cancelamento marca o documento como cancelado.
+- **Conferência:** avisa quando o frete da viagem é diferente da soma dos CT-e (com um botão para corrigir), quando a placa do MDF-e não é a do caminhão da viagem e quando uma viagem encerrada está sem CT-e.
+- **Planilha:** em Relatórios, a lista de documentos com chave, situação e viagem.
+
 ## Regras de cálculo
 
 Todo cálculo é feito no servidor. Os valores ficam em centavos, sem erro de arredondamento.
@@ -129,6 +141,6 @@ public/sw.js       service worker (abrir sem sinal)
 
 - **Rastreamento real:** integração com a API do rastreador dos caminhões.
 - **WhatsApp:** número oficial da empresa (WhatsApp Business API) e avisos automáticos.
-- **Fiscal e pagamentos:** CT-e, MDF-e, CIOT, vale-pedágio, cartão combustível e tag de pedágio.
+- **Fiscal e pagamentos:** emissão de CT-e/MDF-e pelo próprio sistema (hoje só controla), CIOT, vale-pedágio, cartão combustível e tag de pedágio.
 - **Financeiro:** clientes, contas a receber, contas a pagar e fluxo de caixa.
 - **Notificações push** para o escritório quando chega gasto para aprovar.

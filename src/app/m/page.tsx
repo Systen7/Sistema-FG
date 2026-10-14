@@ -8,6 +8,8 @@ import { agregar, calcViagem } from '@/lib/calc'
 import { dias, hoje, mesAtual, nomeMes } from '@/lib/datas'
 import { dataCurta, dataLonga, num, primeiroNome, reais, reaisC } from '@/lib/format'
 import { ListaGastos } from './lista-gastos'
+import { DocumentosViagem } from './documentos'
+import { documentosDasViagens } from '@/lib/documentos'
 
 export default async function Viagem() {
   const m = await exigirMotorista()
@@ -62,7 +64,8 @@ export default async function Viagem() {
   )
 }
 
-function ViagemAtiva({ v, retorno }: { v: Awaited<ReturnType<typeof viagemAtiva>> & {}; retorno: number }) {
+async function ViagemAtiva({ v, retorno }: { v: Awaited<ReturnType<typeof viagemAtiva>> & {}; retorno: number }) {
+  const docs = await documentosDasViagens([v.id])
   const c = calcViagem(v, retorno)
   const semFrete = v.frete === 0
   return (
@@ -83,6 +86,8 @@ function ViagemAtiva({ v, retorno }: { v: Awaited<ReturnType<typeof viagemAtiva>
           <Link href="/m/encerrar" className="acao"><Flag className="ico" /><span>Encerrar viagem<small>Quando descarregar no destino</small></span></Link>
         </div>
       </section>
+
+      <DocumentosViagem docs={docs.map((d) => ({ id: d.id, tipo: d.tipo, numero: d.numero, chave: d.chave, situacao: d.situacao, temPdf: !!d.pdfId }))} />
 
       <section className="panel">
         <header>

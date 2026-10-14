@@ -10,6 +10,10 @@ import { dataCurta, dataLonga, num, reais, reaisC } from '@/lib/format'
 import { FormModal } from '@/components/form-modal'
 import { IconeTipo, NOME_TIPO, STATUS } from '@/components/tipos'
 import { Placas, Valor } from '../../ui'
+import { documentosDasViagens } from '@/lib/documentos'
+import { TabelaDocumentos } from '../../documentos/tabela'
+import { Importador } from '../../documentos/importador'
+import { importarDocumentos, usarFreteDosCte } from '../../documentos/actions'
 import { camposViagem, camposDespesa } from '../../campos'
 import { salvarViagem, excluirViagem, salvarDespesa, excluirDespesa, aprovarDespesa, aprovarVarias, recusarDespesa } from '../../actions'
 
@@ -31,6 +35,15 @@ export default async function DetalheViagem(props: PageProps<'/admin/viagens/[id
   const autor = (a: string) => a.startsWith('motorista:') ? ms.find((x) => x.id === Number(a.split(':')[1]))?.nome ?? 'Motorista' : 'Escritório'
   const editD = sp.despesa ? (sp.despesa === 'nova' ? 'nova' : v.despesas.find((d) => d.id === Number(sp.despesa))) : null
   const meta = cam?.metaConsumo ?? 0
+  const docs = await documentosDasViagens([v.id])
+  const validos = docs.filter((d) => d.situacao !== 'cancelado')
+  const freteCte = validos.filter((d) => d.tipo === 'cte').reduce((t, d) => t + (d.valor ?? 0), 0)
+  const avisosFiscais: string[] = []
+  for (const d of validos.filter((x) => x.tipo === 'mdfe')) {
+    if (d.placa && cam && d.placa !== cam.placa) avisosFiscais.push(`O MDF-e nº ${d.numero} foi emitido para a placa ${d.placa}, mas a viagem está com o ${cam.placa}.`)
+    if (d.situacao === 'autorizado' && v.status === 'encerrada') avisosFiscais.push(`O MDF-e nº ${d.numero} continua aberto e a viagem já terminou. Encerre no seu emissor e depois importe o XML do encerramento (ou clique em “Encerrado”).`)
+  }
+  if (v.status === 'encerrada' && !validos.some((d) => d.tipo === 'cte')) avisosFiscais.push('Nenhum CT-e importado para esta viagem.')
 
   return (
     <>
@@ -97,6 +110,19 @@ export default async function DetalheViagem(props: PageProps<'/admin/viagens/[id
             <tfoot><tr><td colSpan={5}>Total (sem recusadas)</td><td className="r">{reaisC(c.total)}</td><td colSpan={2} /></tr></tfoot>
           </table></div>
         )}
+      </section>
+
+      <section className="panel">
+        <header><h2>CT-e e MDF-e</h2><Link href="/admin/documentos" className="btn sm">Todos os documentos</Link></header>
+        {avisosFiscais.map((t, i) => <p key={i} className="aviso warn">{t}</p>)}
+        {freteCte > 0 && freteCte !== v.frete && (
+          <form action={usarFreteDosCte.bind(null, v.id, freteCte, aqui)} className="aviso warn row between">
+            <span>O frete da viagem ({reais(v.frete)}) é diferente do valor dos CT-e ({reais(freteCte)}).</span>
+            <button className="btn sm">Usar {reais(freteCte)} como frete</button>
+          </form>
+        )}
+        {docs.length > 0 && <TabelaDocumentos docs={docs} viagens={[v]} voltar={aqui} mostrarViagem={false} />}
+        <Importador acao={importarDocumentos.bind(null, v.id)} compacto />
       </section>
 
       {hist.length > 0 && (

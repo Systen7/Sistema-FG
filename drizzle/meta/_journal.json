@@ -15,6 +15,13 @@
       "when": 1792002579331,
       "tag": "0001_fotos_blob",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792006897711,
+      "tag": "0002_documentos_fiscais",
+      "breakpoints": true
     }
   ]
 }

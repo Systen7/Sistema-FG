@@ -10,6 +10,7 @@ const TIPOS = [
   ['despesas', 'Despesas', 'Todos os gastos lançados, com tipo, litros, quem pagou e situação.'],
   ['acerto', 'Acerto', 'Comissões, reembolsos, adiantamentos e saldo de cada motorista.'],
   ['manutencoes', 'Manutenções', 'Serviços e peças por caminhão.'],
+  ['documentos', 'CT-e e MDF-e', 'Documentos fiscais importados, com chave, situação e viagem.'],
 ] as const
 
 export default async function Relatorios() {

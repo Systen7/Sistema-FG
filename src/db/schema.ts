@@ -103,6 +103,36 @@ export const despesas = pgTable('despesas', {
   criadoEm: timestamp('criado_em', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => [index('despesas_viagem_idx').on(t.viagemId), index('despesas_status_idx').on(t.status)])
 
+export const tipoDocumento = pgEnum('tipo_documento', ['cte', 'mdfe'])
+export const situacaoDocumento = pgEnum('situacao_documento', ['autorizado', 'encerrado', 'cancelado', 'sem_protocolo'])
+
+// CT-e e MDF-e emitidos no emissor do usuário: o sistema guarda o XML, liga à viagem e controla o encerramento do MDF-e.
+export const documentos = pgTable('documentos', {
+  id: serial('id').primaryKey(),
+  viagemId: integer('viagem_id').references(() => viagens.id, { onDelete: 'set null' }),
+  tipo: tipoDocumento('tipo').notNull(),
+  chave: text('chave').notNull().unique(),
+  numero: integer('numero').notNull(),
+  serie: integer('serie').notNull(),
+  emitidoEm: timestamp('emitido_em', { withTimezone: true }).notNull(),
+  situacao: situacaoDocumento('situacao').notNull(),
+  protocolo: text('protocolo'),
+  emitente: text('emitente'),
+  remetente: text('remetente'),
+  destinatario: text('destinatario'),
+  origem: text('origem'),
+  destino: text('destino'),
+  produto: text('produto'),
+  pesoKg: decimal('peso_kg'),
+  valor: integer('valor'), // CT-e: valor da prestação; MDF-e: valor da carga (centavos)
+  placa: text('placa'),
+  chavesCte: jsonb('chaves_cte').$type<string[]>(),
+  encerradoEm: timestamp('encerrado_em', { withTimezone: true }),
+  xml: text('xml').notNull(),
+  pdfId: uuid('pdf_id').references(() => fotos.id, { onDelete: 'set null' }),
+  criadoEm: timestamp('criado_em', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [index('documentos_viagem_idx').on(t.viagemId)])
+
 export const manutencoes = pgTable('manutencoes', {
   id: serial('id').primaryKey(),
   caminhaoId: integer('caminhao_id').notNull().references(() => caminhoes.id),
@@ -205,3 +235,4 @@ export type Apolice = typeof apolices.$inferSelect
 export type CustoFixo = typeof custosFixos.$inferSelect
 export type Lembrete = typeof lembretes.$inferSelect
 export type Configuracao = typeof configuracao.$inferSelect
+export type Documento = typeof documentos.$inferSelect

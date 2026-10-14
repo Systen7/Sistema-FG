@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import { config, viagensDoMes, emAndamento, pendentes, motoristas, caminhoes, manutencoes, apolices, custosFixos, lembretes, pneus, dispensados, mesesDisponiveis } from '@/lib/dados'
+import { config, viagensDoMes, emAndamento, pendentes, motoristas, caminhoes, manutencoes, apolices, custosFixos, lembretes, pneus, dispensados, mesesDisponiveis, mdfeAbertos } from '@/lib/dados'
 import { agregar, calcViagem, resultadoGeral } from '@/lib/calc'
 import { calcAlertas } from '@/lib/alertas'
 import { hoje, mesAtual, mesValido, nomeMes, somaMeses } from '@/lib/datas'
@@ -16,12 +16,12 @@ export default async function Painel(props: PageProps<'/admin'>) {
   const sp = await props.searchParams
   const H = hoje(), atual = mesAtual()
   const mes = mesValido(sp.mes) && sp.mes <= atual ? sp.mes : atual
-  const [cfg, ms, cs, mn, ap, fx, lb, pn, ds, pe, and, meses] = await Promise.all([
-    config(), motoristas(), caminhoes(), manutencoes(), apolices(), custosFixos(), lembretes(), pneus(), dispensados(), pendentes(), emAndamento(), mesesDisponiveis(atual),
+  const [cfg, ms, cs, mn, ap, fx, lb, pn, ds, pe, and, meses, mdfes] = await Promise.all([
+    config(), motoristas(), caminhoes(), manutencoes(), apolices(), custosFixos(), lembretes(), pneus(), dispensados(), pendentes(), emAndamento(), mesesDisponiveis(atual), mdfeAbertos(),
   ])
   const vs = await viagensDoMes(mes)
   const g = resultadoGeral(mes, H, vs, mn, ap, fx, cfg.retornoPct)
-  const urg = calcAlertas(H, { motoristas: ms, caminhoes: cs, apolices: ap, lembretes: lb, pneus: pn, cfg }).filter((a) => a.urgente && !ds.has(a.chave))
+  const urg = calcAlertas(H, { motoristas: ms, caminhoes: cs, apolices: ap, lembretes: lb, pneus: pn, cfg, mdfes }).filter((a) => a.urgente && !ds.has(a.chave))
   const primeiro = meses[meses.length - 1] ?? mes
   const ult = [5, 4, 3, 2, 1, 0].map((i) => somaMeses(mes, -i)).filter((m) => m >= primeiro)
   const tend = await Promise.all(ult.map(async (m) => {

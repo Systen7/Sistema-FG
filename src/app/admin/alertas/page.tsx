@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
-import { config, motoristas, caminhoes, apolices, lembretes, pneus, dispensados } from '@/lib/dados'
+import { config, motoristas, caminhoes, apolices, lembretes, pneus, dispensados, mdfeAbertos } from '@/lib/dados'
 import { calcAlertas } from '@/lib/alertas'
 import { hoje } from '@/lib/datas'
 import { FormModal } from '@/components/form-modal'
@@ -14,8 +14,8 @@ export const metadata = { title: 'Alertas' }
 export default async function Alertas(props: PageProps<'/admin/alertas'>) {
   const sp = await props.searchParams
   const H = hoje()
-  const [cfg, ms, cs, ap, lb, pn, ds] = await Promise.all([config(), motoristas(), caminhoes(), apolices(), lembretes(), pneus(), dispensados()])
-  const todos = calcAlertas(H, { motoristas: ms, caminhoes: cs, apolices: ap, lembretes: lb, pneus: pn, cfg })
+  const [cfg, ms, cs, ap, lb, pn, ds, mdfes] = await Promise.all([config(), motoristas(), caminhoes(), apolices(), lembretes(), pneus(), dispensados(), mdfeAbertos()])
+  const todos = calcAlertas(H, { motoristas: ms, caminhoes: cs, apolices: ap, lembretes: lb, pneus: pn, cfg, mdfes })
   const ativos = todos.filter((a) => !ds.has(a.chave))
   const ocultos = todos.length - ativos.length
   const ed = sp.editar ? (sp.editar === 'novo' ? 'novo' : lb.find((l) => l.id === Number(sp.editar))) : null

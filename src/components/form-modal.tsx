@@ -13,9 +13,9 @@ export type Estado = { erro?: string } | undefined
 type Acao = (prev: Estado, f: FormData) => Promise<Estado>
 
 /** Janela de cadastro/edição. Aberta pela URL (?editar=… ou ?novo=…) para funcionar com o botão voltar. */
-export function FormModal({ titulo, campos, valores, acao, fechar, excluir, extra, rotuloSalvar = 'Salvar' }: {
+export function FormModal({ titulo, campos, valores, acao, fechar, excluir, extra, rotuloSalvar = 'Salvar', ocultos }: {
   titulo: string; campos: Campo[]; valores: Record<string, unknown>; acao: Acao; fechar: string
-  excluir?: Acao; extra?: React.ReactNode; rotuloSalvar?: string
+  excluir?: Acao; extra?: React.ReactNode; rotuloSalvar?: string; ocultos?: Record<string, string>
 }) {
   const router = useRouter()
   const [estado, enviar, pend] = useActionState(acao, undefined)
@@ -35,6 +35,7 @@ export function FormModal({ titulo, campos, valores, acao, fechar, excluir, extr
         <header><h2 id="dlg-t">{titulo}</h2><Link href={fechar} scroll={false} className="btn sm ghost" aria-label="Fechar"><X className="ico" /></Link></header>
         {extra}
         <form action={enviar} className="form" noValidate>
+          {ocultos && Object.entries(ocultos).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
           {campos.map((c) => <Entrada key={c.nome} c={c} v={valores[c.nome]} />)}
           {erro && <p className="aviso bad full" role="alert">{erro}</p>}
           <div className="row between full" style={{ marginTop: 4 }}>

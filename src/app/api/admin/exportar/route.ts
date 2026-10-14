@@ -47,6 +47,17 @@ export async function GET(req: Request) {
   } else if (tipo === 'manutencoes') {
     linhas = [['Data', 'Caminhão', 'Tipo', 'Descrição', 'Valor (R$)', 'Imprevisto']]
     for (const x of await manutencoes()) if (!mes || x.data.startsWith(mes)) linhas.push([x.data, pl(x.caminhaoId), x.tipo, x.descricao, rs(x.valor), x.imprevisto ? 'sim' : 'não'])
+  } else if (tipo === 'documentos') {
+    const { db, schema } = await import('@/db')
+    const { asc } = await import('drizzle-orm')
+    const { dataDe } = await import('@/lib/datas')
+    const docs = await db.select().from(schema.documentos).orderBy(asc(schema.documentos.emitidoEm))
+    linhas = [['Tipo', 'Número', 'Série', 'Chave', 'Emissão', 'Situação', 'Encerrado em', 'Viagem', 'Origem', 'Destino', 'Produto', 'Peso (kg)', 'Valor (R$)', 'Placa', 'Remetente', 'Destinatário']]
+    for (const d of docs) {
+      const em = dataDe(d.emitidoEm)
+      if (mes && !em.startsWith(mes)) continue
+      linhas.push([d.tipo === 'cte' ? 'CT-e' : 'MDF-e', d.numero, d.serie, '\u200b' + d.chave, em, d.situacao, d.encerradoEm ? dataDe(d.encerradoEm) : '', d.viagemId, d.origem, d.destino, d.produto, d.pesoKg, d.valor != null ? rs(d.valor) : null, d.placa, d.remetente, d.destinatario])
+    }
   } else return new Response('Tipo inválido', { status: 400 })
 
   const csv = '﻿' + linhas.map((l) => l.map(cel).join(';')).join('\r\n')

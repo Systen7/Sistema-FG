@@ -2,6 +2,8 @@ import type { Motorista, Caminhao, Apolice, Lembrete, Configuracao, Pneu } from 
 import { dias } from './datas'
 import { dataLonga, num } from './format'
 
+export type MdfeAberto = { id: number; numero: number; emitidoEm: string; viagemId: number | null; viagemEncerrada: boolean }
+
 export interface Alerta {
   chave: string; ordem: number; urgente: boolean; texto: string; detalhe: string
   link: string // onde corrigir
@@ -9,7 +11,7 @@ export interface Alerta {
 
 export function calcAlertas(
   hoje: string,
-  d: { motoristas: Motorista[]; caminhoes: Caminhao[]; apolices: Apolice[]; lembretes: Lembrete[]; pneus: Pneu[]; cfg: Configuracao },
+  d: { motoristas: Motorista[]; caminhoes: Caminhao[]; apolices: Apolice[]; lembretes: Lembrete[]; pneus: Pneu[]; cfg: Configuracao; mdfes?: MdfeAberto[] },
 ): Alerta[] {
   const { cfg } = d
   const out: Alerta[] = []
@@ -42,6 +44,15 @@ export function calcAlertas(
     if (gastos) out.push({
       chave: `pn${t.id}:${gastos}`, ordem: 5, urgente: true, texto: 'Pneus do ' + t.placa,
       detalhe: `${gastos} ${gastos === 1 ? 'pneu' : 'pneus'} com sulco abaixo de ${num(cfg.sulcoMinimo, 1)} mm`, link: '/admin/pneus?caminhao=' + t.id,
+    })
+  }
+  // MDF-e precisa ser encerrado na entrega; aberto com a viagem já encerrada (ou há mais de 30 dias) é pendência fiscal.
+  for (const m of d.mdfes ?? []) {
+    const idade = dias(m.emitidoEm, hoje)
+    if (m.viagemEncerrada || idade > 30) out.push({
+      chave: `mdfe${m.id}`, ordem: -1, urgente: true, texto: `MDF-e nº ${m.numero} ainda aberto`,
+      detalhe: m.viagemEncerrada ? `a viagem ${m.viagemId} já terminou; encerre no seu emissor` : `emitido há ${idade} dias; encerre no seu emissor`,
+      link: m.viagemId ? `/admin/viagens/${m.viagemId}` : '/admin/documentos?ver=abertos',
     })
   }
   return out.sort((a, b) => a.ordem - b.ordem)

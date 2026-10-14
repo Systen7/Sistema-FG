@@ -20,7 +20,7 @@ if (n > 0 && !limpar) {
   await client.end(); process.exit(0)
 }
 if (limpar) {
-  await db.execute(sql`TRUNCATE administradores, caminhoes, motoristas, viagens, despesas, fotos, manutencoes, pneus, apolices, custos_fixos, lembretes, configuracao, alertas_dispensados, acertos, links_acesso, tentativas_login, auditoria RESTART IDENTITY CASCADE`)
+  await db.execute(sql`TRUNCATE documentos, administradores, caminhoes, motoristas, viagens, despesas, fotos, manutencoes, pneus, apolices, custos_fixos, lembretes, configuracao, alertas_dispensados, acertos, links_acesso, tentativas_login, auditoria RESTART IDENTITY CASCADE`)
 }
 
 const H = hoje()

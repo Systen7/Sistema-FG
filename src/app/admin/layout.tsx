@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { LogOut } from 'lucide-react'
 import { exigirAdmin } from '@/lib/auth'
-import { config, pendentes, motoristas, caminhoes, apolices, lembretes, pneus, dispensados } from '@/lib/dados'
+import { config, pendentes, motoristas, caminhoes, apolices, lembretes, pneus, dispensados, mdfeAbertos } from '@/lib/dados'
 import { calcAlertas } from '@/lib/alertas'
 import { hoje } from '@/lib/datas'
 import { sair } from '@/app/entrar/actions'
@@ -14,8 +14,8 @@ export const metadata: Metadata = { title: { default: 'Escritório', template: '
 
 export default async function LayoutAdmin({ children }: { children: React.ReactNode }) {
   const adm = await exigirAdmin()
-  const [cfg, pe, ms, cs, ap, lb, pn, ds] = await Promise.all([config(), pendentes(), motoristas(), caminhoes(), apolices(), lembretes(), pneus(), dispensados()])
-  const urg = calcAlertas(hoje(), { motoristas: ms, caminhoes: cs, apolices: ap, lembretes: lb, pneus: pn, cfg }).filter((a) => a.urgente && !ds.has(a.chave)).length
+  const [cfg, pe, ms, cs, ap, lb, pn, ds, mdfes] = await Promise.all([config(), pendentes(), motoristas(), caminhoes(), apolices(), lembretes(), pneus(), dispensados(), mdfeAbertos()])
+  const urg = calcAlertas(hoje(), { motoristas: ms, caminhoes: cs, apolices: ap, lembretes: lb, pneus: pn, cfg, mdfes }).filter((a) => a.urgente && !ds.has(a.chave)).length
   return (
     <>
       <header className="top">
@@ -25,7 +25,7 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
         <form action={sair}><button className="btn sm"><LogOut className="ico" />Sair</button></form>
       </header>
       <div className="shell">
-        <Nav pendentes={pe.length} urgentes={urg} />
+        <Nav pendentes={pe.length} urgentes={urg} mdfeAbertos={mdfes.length} />
         <main className="main" id="conteudo">{children}</main>
       </div>
       <Suspense><Toast /></Suspense>

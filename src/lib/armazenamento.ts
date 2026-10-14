@@ -5,10 +5,18 @@ import { put, get } from '@vercel/blob'
 // Fotos dos comprovantes: no Vercel Blob (privado) quando ele está ligado ao projeto; senão, no próprio banco.
 export const usaBlob = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID)
 
-export async function guardarNoBlob(dados: Buffer, mime: string): Promise<string> {
-  const ext = mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : 'jpg'
-  const r = await put(`comprovantes/${randomUUID()}.${ext}`, dados, { access: 'private', contentType: mime, addRandomSuffix: false })
+export async function guardarNoBlob(dados: Buffer, mime: string, pasta = 'comprovantes'): Promise<string> {
+  const ext = mime === 'application/pdf' ? 'pdf' : mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : 'jpg'
+  const r = await put(`${pasta}/${randomUUID()}.${ext}`, dados, { access: 'private', contentType: mime, addRandomSuffix: false })
   return r.pathname
+}
+
+/** Guarda um arquivo (foto ou PDF) e devolve o id do registro em "fotos". */
+export async function guardarArquivo(dados: Buffer, mime: string, pasta = 'comprovantes'): Promise<string> {
+  const { db, schema: s } = await import('@/db')
+  const valores = usaBlob() ? { chave: await guardarNoBlob(dados, mime, pasta) } : { dados }
+  const [r] = await db.insert(s.fotos).values({ ...valores, mime, tamanho: dados.length }).returning({ id: s.fotos.id })
+  return r.id
 }
 
 export async function lerDoBlob(chave: string) {

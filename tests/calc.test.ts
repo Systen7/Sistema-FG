@@ -82,3 +82,17 @@ describe('alertas', () => {
     expect(a.every((x) => x.urgente)).toBe(true)
   })
 })
+
+describe('alerta de MDF-e aberto', () => {
+  const cfg = { id: 1, diasAviso: 60, diasUrgente: 20, kmAvisoRevisao: 5000, sulcoMinimo: 3, retornoPct: 60, nomeEmpresa: 'FG', whatsappEscritorio: null }
+  const base = { cfg, motoristas: [], caminhoes: [], apolices: [], lembretes: [], pneus: [] }
+  it('avisa quando a viagem terminou ou passou de 30 dias; não avisa em viagem em andamento', () => {
+    const a = calcAlertas('2026-10-14', { ...base, mdfes: [
+      { id: 1, numero: 10, emitidoEm: '2026-10-10', viagemId: 5, viagemEncerrada: true },
+      { id: 2, numero: 11, emitidoEm: '2026-10-12', viagemId: 6, viagemEncerrada: false },
+      { id: 3, numero: 12, emitidoEm: '2026-09-01', viagemId: null, viagemEncerrada: false },
+    ] })
+    expect(a.map((x) => x.texto)).toEqual(['MDF-e nº 10 ainda aberto', 'MDF-e nº 12 ainda aberto'])
+    expect(a.every((x) => x.urgente)).toBe(true)
+  })
+})

@@ -2,7 +2,7 @@ import 'server-only'
 import { and, asc, desc, eq, gte, inArray, lt, sql } from 'drizzle-orm'
 import { db, schema as s } from '@/db'
 import type { ViagemCompleta } from './calc'
-import { somaMeses } from './datas'
+import { dataDe, somaMeses } from './datas'
 
 export async function config() {
   const [c] = await db.select().from(s.configuracao).where(eq(s.configuracao.id, 1))
@@ -83,3 +83,11 @@ export async function sugestoes(motoristaId?: number) {
   return { cidades: conta(vs.flatMap((v) => [v.origem, v.destino])).slice(0, 30), cargas: conta(vs.map((v) => v.carga)).slice(0, 12), rotas }
 }
 
+
+/** MDF-e autorizados e ainda não encerrados, com a situação da viagem. */
+export async function mdfeAbertos() {
+  const r = await db.select({ d: s.documentos, st: s.viagens.status }).from(s.documentos)
+    .leftJoin(s.viagens, eq(s.documentos.viagemId, s.viagens.id))
+    .where(and(eq(s.documentos.tipo, 'mdfe'), eq(s.documentos.situacao, 'autorizado')))
+  return r.map(({ d, st }) => ({ id: d.id, numero: d.numero, emitidoEm: dataDe(d.emitidoEm), viagemId: d.viagemId, viagemEncerrada: st === 'encerrada' }))
+}

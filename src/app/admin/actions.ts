@@ -6,6 +6,7 @@ import { db, schema as s } from '@/db'
 import { exigirAdmin, hash, confere } from '@/lib/auth'
 import { novoLink } from '@/lib/acesso'
 import { apagarArquivos } from '@/lib/armazenamento'
+import { ligarDocumento } from '@/lib/documentos'
 import { registrar } from '@/lib/audit'
 import { gerarPneus, SULCO_NOVO, CUSTO_PNEU_NOVO } from '@/lib/pneus'
 import { soDigitos } from '@/lib/format'
@@ -162,6 +163,8 @@ export async function salvarViagem(id: number | null, voltar: string, _: Estado,
       await registrar(autor, 'alterou', 'viagem', id, dados)
     }
     if (kmFinal) await db.update(s.caminhoes).set({ km: sql`greatest(${s.caminhoes.km}, ${kmFinal})` }).where(eq(s.caminhoes.id, caminhaoId))
+    const docId = Number(f.get('docId'))
+    if (id == null && docId && vid) await ligarDocumento(docId, vid) // viagem criada a partir de um CT-e/MDF-e
     return comMsg(voltar === '#nova' ? `/admin/viagens/${vid}` : voltar, id == null ? 'Viagem criada' : 'Viagem salva')
   })
 }
