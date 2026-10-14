@@ -1,8 +1,10 @@
 import 'server-only'
 import { db, schema as s } from '@/db'
 import { TIPOS_DESPESA, lerNumero, lerReais } from './format'
+import { guardarNoBlob, usaBlob } from './armazenamento'
 
-export const MAX_FOTO = 6 * 1024 * 1024
+// A Vercel aceita até 4,5 MB por envio; a foto já chega reduzida pelo celular (cerca de 150 KB).
+export const MAX_FOTO = 4 * 1024 * 1024
 
 export type EntradaDespesa = {
   tipo: string; valor: number; litros: number | null; kmAbastecimento: number | null; obs: string | null; pagoPor: 'empresa' | 'motorista'; data: string | null
@@ -31,6 +33,7 @@ export async function salvarFoto(f: FormData): Promise<string | null | { erro: s
   if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(foto.type)) return { erro: 'A foto precisa ser uma imagem.' }
   if (foto.size > MAX_FOTO) return { erro: 'Foto muito grande.' }
   const dados = Buffer.from(await foto.arrayBuffer())
-  const [r] = await db.insert(s.fotos).values({ dados, mime: foto.type, tamanho: foto.size }).returning({ id: s.fotos.id })
+  const valores = usaBlob() ? { chave: await guardarNoBlob(dados, foto.type) } : { dados }
+  const [r] = await db.insert(s.fotos).values({ ...valores, mime: foto.type, tamanho: foto.size }).returning({ id: s.fotos.id })
   return r.id
 }

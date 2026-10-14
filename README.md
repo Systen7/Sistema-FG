@@ -61,7 +61,19 @@ Com os dados de exemplo:
 
 Para mostrar esses acessos na tela de entrada, rode com `DEMO=1`.
 
-## Colocar no ar
+## Colocar no ar (Vercel, grátis)
+
+O projeto já está preparado para a Vercel (`vercel.json`): a cada envio ao GitHub ela atualiza o banco e publica sozinha, na região de São Paulo.
+
+1. Na Vercel, importe o repositório `Sistema-FG`.
+2. Na aba **Storage** do projeto, crie um banco **Neon** (Postgres) e ligue ao projeto. As variáveis `DATABASE_URL` e `DATABASE_URL_UNPOOLED` são preenchidas sozinhas.
+3. Ainda em **Storage**, crie um **Blob** privado para as fotos dos comprovantes (variável `BLOB_READ_WRITE_TOKEN`).
+4. Em **Settings › Environment Variables**, defina `SESSION_SECRET` (texto aleatório longo) e `TZ_EMPRESA=America/Sao_Paulo`.
+5. Publique de novo (**Redeploy**) e abra o endereço: na primeira vez aparece a tela **Primeiro acesso**, onde você cria seu usuário de administrador.
+
+Sem o Blob, as fotos ficam no próprio banco; funciona, mas ocupa o espaço do plano grátis mais rápido.
+
+## Colocar no ar (outras opções)
 
 O sistema precisa de **HTTPS** para a câmera, a instalação no celular e o funcionamento offline.
 
@@ -79,7 +91,7 @@ Coloque um proxy com HTTPS na frente (Caddy, Nginx ou Cloudflare).
 
 1. Configure `DATABASE_URL`, `SESSION_SECRET`, `APP_URL` e `TZ_EMPRESA`.
 2. Defina o comando de build como `npm run build` e o de início como `npm run db:migrate && npm start`.
-3. Crie o primeiro acesso do escritório com `npm run db:admin -- usuario "Nome" senha`.
+3. Abra o endereço e crie o primeiro acesso do escritório na tela **Primeiro acesso** (ou rode `npm run db:admin -- usuario "Nome" senha`).
 
 As fotos dos comprovantes ficam no próprio banco (reduzidas para cerca de 150 KB cada), então não há outro serviço para configurar. **Faça cópia de segurança do banco** (`pg_dump`) com frequência.
 

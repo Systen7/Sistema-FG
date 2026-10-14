@@ -77,7 +77,9 @@ export const viagens = pgTable('viagens', {
 
 export const fotos = pgTable('fotos', {
   id: uuid('id').primaryKey().defaultRandom(),
-  dados: bytea('dados').notNull(),
+  // Foto guardada no próprio banco (instalação local) ou no Vercel Blob (chave = caminho do arquivo lá).
+  dados: bytea('dados'),
+  chave: text('chave'),
   mime: text('mime').notNull(),
   tamanho: integer('tamanho').notNull(),
   criadoEm: timestamp('criado_em', { withTimezone: true }).defaultNow().notNull(),

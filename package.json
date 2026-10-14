@@ -17,6 +17,7 @@
     "icones": "node scripts/icones.mjs"
   },
   "dependencies": {
+    "@vercel/blob": "^2.8.2",
     "bcryptjs": "^3.0.3",
     "drizzle-orm": "^0.45.4",
     "jose": "^6.2.12",

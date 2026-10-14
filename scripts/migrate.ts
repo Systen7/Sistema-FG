@@ -2,7 +2,10 @@ import { drizzle } from 'drizzle-orm/postgres-js'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import postgres from 'postgres'
 
-const client = postgres(process.env.DATABASE_URL ?? 'postgres://fg:fg@localhost:5432/fg', { max: 1 })
+// Migração usa a conexão direta (sem pooler) quando existe, como a DATABASE_URL_UNPOOLED que o Neon cria na Vercel.
+const url = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL
+if (!url && process.env.VERCEL) throw new Error('Banco não configurado: ligue o Neon ao projeto na aba Storage da Vercel.')
+const client = postgres(url ?? 'postgres://fg:fg@localhost:5432/fg', { max: 1, onnotice: () => {} })
 await migrate(drizzle(client), { migrationsFolder: './drizzle' })
 await client.end()
 console.log('Banco de dados atualizado.')

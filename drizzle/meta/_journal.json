@@ -8,6 +8,13 @@
       "when": 1791999098484,
       "tag": "0000_inicial",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792002579331,
+      "tag": "0001_fotos_blob",
+      "breakpoints": true
     }
   ]
 }
