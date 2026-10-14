@@ -8,13 +8,13 @@ import { dataCurta, lerReais, num, reaisC } from '@/lib/format'
 
 type G = { id: number; tipo: string; valor: number; litros: number | null; data: string; obs: string | null; status: string; motivo: string | null; foto: string | null; pagoPor: string }
 
-export function ListaGastos({ gastos }: { gastos: G[] }) {
+export function ListaGastos({ gastos, viagemId }: { gastos: G[]; viagemId: number }) {
   const [fila, setFila] = useState<ItemFila[]>([])
   useEffect(() => {
-    const c = async () => setFila(await listar())
+    const c = async () => setFila((await listar()).filter((i) => i.viagemId === viagemId))
     c()
     return aoMudar(c)
-  }, [])
+  }, [viagemId])
   if (!gastos.length && !fila.length) return <p className="muted">Nenhum gasto lançado ainda.</p>
   return (
     <div className="list">

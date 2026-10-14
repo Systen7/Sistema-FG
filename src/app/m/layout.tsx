@@ -8,14 +8,14 @@ import { Abas, Rede, RegistrarSW } from './shell'
 export const metadata: Metadata = { title: 'Motorista' }
 
 export default async function LayoutMotorista({ children }: { children: React.ReactNode }) {
-  await exigirMotorista()
+  const m = await exigirMotorista()
   const cfg = await config()
   return (
     <div className="m">
       <header className="m-top">
         <span className="brand"><i>FG</i>{cfg.nomeEmpresa}</span>
         <span className="sp" />
-        <Rede />
+        <Rede motoristaId={m.id} />
       </header>
       <main className="m-body">{children}</main>
       <Abas />

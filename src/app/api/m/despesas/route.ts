@@ -21,6 +21,7 @@ export async function POST(req: Request) {
   if (!v) return NextResponse.json({ erro: 'Viagem não encontrada.' }, { status: 404 })
   const e = lerDespesa(f)
   if ('erro' in e) return NextResponse.json(e, { status: 400 })
+  if (e.data && (e.data < v.inicio || e.data > hoje())) e.data = null // data fora da viagem: usa a de hoje
   const foto = await salvarFoto(f)
   if (foto && typeof foto === 'object') return NextResponse.json(foto, { status: 400 })
   try {

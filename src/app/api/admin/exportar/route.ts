@@ -8,7 +8,9 @@ import { nomeTipo } from '@/lib/format'
 const cel = (v: unknown) => {
   if (v == null) return ''
   if (typeof v === 'number') return String(Math.round(v * 100) / 100).replace('.', ',')
-  const s = String(v)
+  let s = String(v)
+  // Texto digitado por usuários começando com = + - @ viraria fórmula no Excel: neutraliza com apóstrofo.
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s
   return /[;"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
 }
 const rs = (c: number) => c / 100

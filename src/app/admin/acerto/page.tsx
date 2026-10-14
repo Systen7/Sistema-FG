@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { config, motoristas, viagensDoMes, acertosDoMes, mesesDisponiveis } from '@/lib/dados'
 import { acerto } from '@/lib/calc'
-import { mesAtual, mesValido, nomeMes } from '@/lib/datas'
+import { mesAtual, mesValido, nomeMes, dataDe } from '@/lib/datas'
 import { dataLonga, reaisC } from '@/lib/format'
 import { Cabecalho, Periodo } from '../ui'
 import { marcarPago, desfazerPago } from '../actions'
@@ -34,7 +34,8 @@ export default async function Acerto(props: PageProps<'/admin/acerto'>) {
                 <td className="r">{a.viagens}</td><td className="r">{reaisC(a.comissao)}</td><td className="r">{reaisC(a.reembolso)}</td><td className="r">{reaisC(-a.adiantamento)}</td>
                 <td className="r"><b style={{ color: a.saldo < 0 ? 'var(--bad)' : undefined }}>{reaisC(a.saldo)}</b>{a.saldo < 0 && <><br /><span className="small muted">motorista devolve</span></>}</td>
                 <td>{pago
-                  ? <span className="row" style={{ flexWrap: 'nowrap' }}><span className="chip ok">Pago em {dataLonga(pago.pagoEm.toISOString().slice(0, 10))}</span><form action={desfazerPago.bind(null, m.id, mes, aqui)}><button className="btn sm ghost">Desfazer</button></form></span>
+                  ? <span className="row" style={{ flexWrap: 'nowrap' }}><span className="chip ok">Pago em {dataLonga(dataDe(pago.pagoEm))}</span>
+                    {pago.valor !== a.saldo && <span className="chip warn" title="Algum valor mudou depois do pagamento (ex.: gasto aprovado depois). Desfaça e marque de novo, acertando a diferença.">pago {reaisC(pago.valor)} · agora {reaisC(a.saldo)}</span>}<form action={desfazerPago.bind(null, m.id, mes, aqui)}><button className="btn sm ghost">Desfazer</button></form></span>
                   : a.viagens ? <form action={marcarPago.bind(null, m.id, mes, a.saldo, aqui)}><button className="btn sm pri">Marcar como pago</button></form> : <span className="muted small">sem viagens</span>}</td>
               </tr>
             ))}

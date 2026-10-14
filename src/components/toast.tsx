@@ -20,7 +20,8 @@ export function Toast() {
   }, [sp, router, path])
   useEffect(() => {
     if (!msg) return
-    const t = setTimeout(() => setMsg(null), 3200)
+    // Avisos de problema ficam mais tempo na tela, para dar tempo de ler.
+    const t = setTimeout(() => setMsg(null), msg.tipo === 'bad' ? 9000 : 3200)
     return () => clearTimeout(t)
   }, [msg])
   useEffect(() => {

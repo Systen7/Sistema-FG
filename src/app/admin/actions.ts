@@ -5,6 +5,7 @@ import { and, eq, ne, sql } from 'drizzle-orm'
 import { db, schema as s } from '@/db'
 import { exigirAdmin, hash, confere } from '@/lib/auth'
 import { novoLink } from '@/lib/acesso'
+import { apagarArquivos } from '@/lib/armazenamento'
 import { registrar } from '@/lib/audit'
 import { gerarPneus, SULCO_NOVO, CUSTO_PNEU_NOVO } from '@/lib/pneus'
 import { soDigitos } from '@/lib/format'
@@ -167,7 +168,9 @@ export async function salvarViagem(id: number | null, voltar: string, _: Estado,
 export async function excluirViagem(id: number) {
   return gravar(async (autor) => {
     const [v] = await db.select().from(s.viagens).where(eq(s.viagens.id, id))
+    const fotos = (await db.select({ f: s.despesas.fotoId }).from(s.despesas).where(eq(s.despesas.viagemId, id))).map((x) => x.f)
     await db.delete(s.viagens).where(eq(s.viagens.id, id))
+    await apagarArquivos(fotos)
     await registrar(autor, 'excluiu', 'viagem', id, v)
     return comMsg('/admin/viagens', `Viagem ${id} excluída`)
   })
@@ -197,6 +200,7 @@ export async function excluirDespesa(id: number, voltar: string) {
   return gravar(async (autor) => {
     const [d] = await db.select().from(s.despesas).where(eq(s.despesas.id, id))
     await db.delete(s.despesas).where(eq(s.despesas.id, id))
+    await apagarArquivos([d?.fotoId])
     await registrar(autor, 'excluiu', 'despesa', id, d)
     return comMsg(voltar, 'Despesa excluída')
   })

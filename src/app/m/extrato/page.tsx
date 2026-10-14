@@ -4,7 +4,7 @@ import { db, schema as s } from '@/db'
 import { exigirMotorista } from '@/lib/auth'
 import { config, viagensDoMes } from '@/lib/dados'
 import { acerto, agregar, calcViagem } from '@/lib/calc'
-import { mesAtual, mesValido, nomeMes, somaMeses } from '@/lib/datas'
+import { mesAtual, mesValido, nomeMes, somaMeses, dataDe } from '@/lib/datas'
 import { dataCurta, dataLonga, num, reais, reaisC } from '@/lib/format'
 
 export const metadata = { title: 'Meu extrato' }
@@ -57,7 +57,7 @@ export default async function Extrato(props: PageProps<'/m/extrato'>) {
       <section className="panel">
         <header>
           <h2>Acerto do mês</h2>
-          {pago ? <span className="chip ok">Pago em {dataLonga(pago.pagoEm.toISOString().slice(0, 10))}</span> : enc.length ? <span className="chip warn">A receber</span> : null}
+          {pago ? <span className="chip ok">Pago em {dataLonga(dataDe(pago.pagoEm))}</span> : enc.length ? <span className="chip warn">A receber</span> : null}
         </header>
         <div className="list">
           <div><span>Comissões</span><span className="tnum">{reaisC(ac.comissao)}</span></div>

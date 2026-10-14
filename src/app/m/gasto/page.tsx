@@ -16,7 +16,7 @@ export default async function Gasto(props: PageProps<'/m/gasto'>) {
   if (id && !d) redirect('/m?erro=' + encodeURIComponent('Gasto não encontrado nesta viagem.'))
   return (
     <GastoForm
-      viagemId={v.id} rota={`${v.origem.split('/')[0]} → ${v.destino.split('/')[0]}`} hoje={hoje()} inicio={v.inicio}
+      motoristaId={m.id} viagemId={v.id} rota={`${v.origem.split('/')[0]} → ${v.destino.split('/')[0]}`} hoje={hoje()} inicio={v.inicio}
       editar={d ? { id: d.id, tipo: d.tipo, valor: d.valor, litros: d.litros, km: d.kmAbastecimento, obs: d.obs, pagoPor: d.pagoPor, data: d.data, foto: d.fotoId, status: d.status } : null}
     />
   )

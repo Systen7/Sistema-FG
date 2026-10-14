@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, Camera, Check, CloudOff, Trash2, X, CalendarDays } from 'lucide-react'
 import { CampoValor } from '@/components/valor'
 import { IconeTipo, NOME_TIPO } from '@/components/tipos'
-import { enviarGasto, novoId, reduzirFoto } from '@/lib/cliente/fila'
+import { enviarGasto, hojeLocal, novoId, reduzirFoto } from '@/lib/cliente/fila'
 import { dataLonga, num } from '@/lib/format'
 
 const TIPOS = ['Diesel', 'Pedágio', 'Alimentação', 'Borracharia', 'Chapa / descarga', 'Estadia', 'Arla 32', 'Outros']
@@ -17,7 +17,10 @@ const OBS: Record<string, [string, string]> = {
 
 type Editar = { id: number; tipo: string; valor: number; litros: number | null; km: number | null; obs: string | null; pagoPor: string; data: string; foto: string | null; status: string }
 
-export function GastoForm({ viagemId, rota, hoje, inicio, editar }: { viagemId: number; rota: string; hoje: string; inicio: string; editar: Editar | null }) {
+export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, inicio, editar }: { motoristaId: number; viagemId: number; rota: string; hoje: string; inicio: string; editar: Editar | null }) {
+  // A tela pode ter sido aberta sem sinal a partir de uma cópia guardada; a data vale a do celular agora.
+  const [hoje, setHoje] = useState(hojeServidor)
+  useEffect(() => { setHoje(hojeLocal()) }, [])
   const router = useRouter()
   const [tipo, setTipo] = useState<string | null>(editar?.tipo ?? null)
   const [valor, setValor] = useState(editar?.valor ?? 0)
@@ -25,7 +28,7 @@ export function GastoForm({ viagemId, rota, hoje, inicio, editar }: { viagemId: 
   const [km, setKm] = useState(editar?.km ? String(editar.km) : '')
   const [obs, setObs] = useState(editar?.obs ?? '')
   const [pago, setPago] = useState<'empresa' | 'motorista' | null>((editar?.pagoPor as 'empresa' | 'motorista') ?? null)
-  const [data, setData] = useState(editar?.data ?? hoje)
+  const [data, setData] = useState(editar?.data ?? hojeServidor)
   const [outroDia, setOutroDia] = useState(false)
   const [foto, setFoto] = useState<Blob | null>(null)
   const [fotoUrl, setFotoUrl] = useState<string | null>(editar?.foto ? `/api/fotos/${editar.foto}` : null)
@@ -81,8 +84,8 @@ export function GastoForm({ viagemId, rota, hoje, inicio, editar }: { viagemId: 
         return
       }
       const r = await enviarGasto({
-        clientId: novoId(), viagemId, tipo, valor: String(valor / 100), litros: tipo === 'Diesel' ? litros : undefined,
-        kmAbastecimento: tipo === 'Diesel' ? km : undefined, obs, pagoPor: pago, data, foto, criadoEm: Date.now(),
+        clientId: novoId(), motoristaId, viagemId, tipo, valor: String(valor / 100), litros: tipo === 'Diesel' ? litros : undefined,
+        kmAbastecimento: tipo === 'Diesel' ? km : undefined, obs, pagoPor: pago, data: outroDia ? data : hojeLocal(), foto, criadoEm: Date.now(),
       })
       if (r.estado === 'erro') return setErro(r.erro)
       navigator.vibrate?.(r.estado === 'enviado' ? 40 : [40, 60, 40])

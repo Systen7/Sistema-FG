@@ -32,3 +32,8 @@ export function nomeMes(mes: string, curto = false): string {
 export function mesValido(m: unknown): m is string {
   return typeof m === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(m)
 }
+
+/** Data (AAAA-MM-DD) de um momento, no fuso da empresa. Evita que um registro feito à noite apareça no dia seguinte. */
+export function dataDe(d: Date): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d)
+}

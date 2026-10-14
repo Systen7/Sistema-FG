@@ -90,7 +90,7 @@ function ViagemAtiva({ v, retorno }: { v: Awaited<ReturnType<typeof viagemAtiva>
           <b className="tnum" style={{ fontSize: 20 }}>{reaisC(c.total)}</b>
         </header>
         {c.litros > 0 && <p className="small muted" style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Fuel className="ico" />{num(c.litros)} litros abastecidos</p>}
-        <ListaGastos gastos={v.despesas.map((d) => ({ id: d.id, tipo: d.tipo, valor: d.valor, litros: d.litros, data: d.data, obs: d.obs, status: d.status, motivo: d.motivoRecusa, foto: d.fotoId, pagoPor: d.pagoPor }))} />
+        <ListaGastos viagemId={v.id} gastos={v.despesas.map((d) => ({ id: d.id, tipo: d.tipo, valor: d.valor, litros: d.litros, data: d.data, obs: d.obs, status: d.status, motivo: d.motivoRecusa, foto: d.fotoId, pagoPor: d.pagoPor }))} />
         <p className="small muted">Toque num gasto para corrigir. Gasto corrigido volta para o escritório aprovar.</p>
       </section>
     </>

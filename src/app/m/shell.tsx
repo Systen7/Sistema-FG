@@ -23,15 +23,17 @@ export function Abas() {
 }
 
 /** Mostra se há sinal e quantos gastos esperam envio; envia sozinho quando o sinal volta. */
-export function Rede() {
+export function Rede({ motoristaId }: { motoristaId: number }) {
   const router = useRouter()
   const [online, setOnline] = useState(true)
   const [fila, setFila] = useState(0)
   useEffect(() => {
-    const conta = async () => setFila((await listar()).length)
+    const conta = async () => setFila((await listar()).filter((i) => i.motoristaId == null || i.motoristaId === motoristaId).length)
     const sync = async () => {
-      const n = await sincronizar()
-      if (n) { toast(n === 1 ? '1 gasto guardado foi enviado' : `${n} gastos guardados foram enviados`); if (navigator.onLine) router.refresh() }
+      const { enviados: n, recusados } = await sincronizar(motoristaId)
+      if (n) toast(n === 1 ? '1 gasto guardado foi enviado' : `${n} gastos guardados foram enviados`)
+      if (recusados.length) toast('Não foi possível enviar: ' + recusados.join(' · ') + '. Fale com o escritório.', 'bad')
+      if ((n || recusados.length) && navigator.onLine) router.refresh()
     }
     const on = () => { setOnline(true); sync() }
     const off = () => setOnline(false)
@@ -44,7 +46,7 @@ export function Rede() {
     const t = setInterval(sync, 30000)
     const des = aoMudar(conta)
     return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); document.removeEventListener('visibilitychange', visivel); clearInterval(t); des() }
-  }, [router])
+  }, [router, motoristaId])
   if (!online) return <span className="net off" role="status"><CloudOff className="ico" />Sem sinal{fila ? ` · ${fila} guardado${fila > 1 ? 's' : ''}` : ''}</span>
   if (fila) return <span className="net fila" role="status"><CloudUpload className="ico" />Enviando {fila}</span>
   return <span className="net"><span className="dot" />Conectado</span>
