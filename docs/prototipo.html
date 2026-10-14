@@ -1,0 +1,743 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Sistema Empresa FG</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=Jost:wght@300;400;500;600&display=swap">
+<style>
+/* Layout: preto e azul, tema único escuro. Títulos e números em serifa de alto contraste, texto em sem-serifa geométrica; linhas finas, cantos discretos, um brilho azul só nos painéis de foco. */
+:root{
+  --bg:#04060a; --surface:#0a0f18; --surface2:#101826; --ink:#eef2f9; --muted:#8a96ab; --line:#1b2538;
+  --road:#060a12; --road2:#0e1626; --road3:#1d2a44; --road-ink:#eef2f9; --road-muted:#8a96ab;
+  --y:#2a62f5; --yt:#7ea6ff; --y-ink:#ffffff; --y-soft:#0e1d42; --run-ink:#a9c4ff;
+  --good:#5fd3a0; --good-soft:#0f2a20; --warn:#e8b45a; --warn-soft:#33270f; --bad:#ff7d7d; --bad-soft:#3a1717;
+  --k1:#f2994a; --k2:#f2c94c; --k3:#c58f6a; --k4:#4fc3f7; --k5:#eb5757; --k6:#b388ff; --k7:#90a0b7; --k8:#3ddc97;
+  --scrim:rgba(2,4,8,.72); --focus:#a9c4ff;
+  --display:"Bodoni Moda","Didot","Bodoni MT",Georgia,serif;
+  --body:"Jost","Century Gothic","Segoe UI",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.5}
+button,input,select{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--display);font-weight:500;margin:0;text-wrap:balance}
+h1{font-size:42px;line-height:1.02;letter-spacing:-.01em}
+h2{font-size:23px} p{margin:0}
+.num{font-variant-numeric:tabular-nums} .muted{color:var(--muted)} .small{font-size:13px}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);font-weight:500}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.top :focus-visible,.nav :focus-visible,.hero :focus-visible,.dark :focus-visible{outline-color:var(--y)}
+
+.top{border-bottom:1px solid var(--line);background:var(--road);color:var(--road-ink);display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:10px 16px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:500;font-size:18px;letter-spacing:.16em;text-transform:uppercase}
+.brand i{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--yt);color:var(--yt);font-style:normal;font-size:16px;letter-spacing:0}
+.sp{flex:1}
+.seg{display:inline-flex;background:var(--road2);border:1px solid var(--line);border-radius:3px;padding:3px;gap:3px}
+.seg button{border:0;background:transparent;color:var(--road-muted);padding:7px 14px;border-radius:2px;cursor:pointer;font-weight:500;letter-spacing:.04em}
+.seg button[aria-pressed="true"]{background:var(--y);color:var(--y-ink)}
+.top select{background:var(--road2);color:var(--road-ink);border:1px solid var(--road3);border-radius:6px;padding:7px 10px}
+.demo{background:var(--y-soft);color:var(--run-ink);font-size:13px;padding:6px 16px;font-weight:500;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:space-between}
+.demo button{border:0;background:transparent;text-decoration:underline;cursor:pointer;font-weight:600;color:inherit;padding:0}
+
+.shell{display:grid;grid-template-columns:216px minmax(0,1fr);align-items:start}
+.nav{border-right:1px solid var(--line);background:var(--road);padding:10px 8px 24px;display:flex;flex-direction:column;gap:2px;align-self:stretch;min-height:100vh}
+.nav button{display:flex;justify-content:space-between;align-items:center;gap:8px;border:0;background:transparent;color:var(--road-muted);text-align:left;padding:10px 12px;border-radius:5px;cursor:pointer;font-weight:500;white-space:nowrap}
+.nav button:hover{color:var(--road-ink);background:var(--road2)}
+.nav button[aria-current="page"]{background:var(--road2);color:var(--ink);font-weight:500;box-shadow:inset 2px 0 0 var(--yt)}
+.badge{background:var(--y);color:var(--y-ink);border-radius:10px;padding:0 7px;font-size:12px;font-weight:700}
+.badge.r{background:var(--bad);color:#2a0808}
+.main{padding:24px 24px 56px;display:flex;flex-direction:column;gap:20px;min-width:0}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.head p{color:var(--muted);max-width:62ch;margin-top:6px}
+.per{display:inline-flex;border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--surface)}
+.per button{border:0;background:transparent;padding:8px 12px;cursor:pointer;color:var(--muted);font-weight:500}
+.per button[aria-pressed="true"]{background:var(--y);color:var(--y-ink);font-weight:500}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel>header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 12px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px}
+
+/* painel de pista */
+.hero{background:radial-gradient(120% 150% at 100% 0%,#0f2760 0%,transparent 58%),var(--road);border:1px solid var(--road3);color:var(--road-ink);border-radius:4px;padding:26px 22px 20px;display:flex;flex-direction:column;gap:18px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--yt),transparent)}
+.hero .lbl{color:var(--road-muted)}
+.hero .top2{display:flex;flex-wrap:wrap;gap:18px 32px;justify-content:space-between;align-items:flex-end}
+.big{font-family:var(--display);font-weight:500;font-size:clamp(50px,8.5vw,88px);line-height:1;letter-spacing:-.02em;font-variant-numeric:lining-nums;color:var(--good);display:block;margin:6px 0 8px}
+.big.neg{color:var(--bad)}
+.minis{display:grid;grid-template-columns:repeat(3,minmax(110px,1fr));gap:8px;flex:1 1 360px;max-width:560px}
+.minis div{background:rgba(6,10,18,.55);border:1px solid var(--road3);border-radius:3px;padding:10px 12px;min-width:0}
+.minis b{display:block;font-family:var(--display);font-weight:500;font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums}
+.minis span.small{color:var(--road-muted)}
+.stack{display:flex;height:40px;gap:2px;border-radius:2px;overflow:hidden}
+.stack button{border:0;padding:0;min-width:3px;cursor:pointer;transform-origin:left}
+.stack.has button[aria-pressed="false"]{opacity:.3}
+.stack button:hover{filter:brightness(1.15)}
+.read{font-size:16px;min-height:1.5em} .read b{color:var(--yt);font-weight:500}
+.legend{display:flex;flex-wrap:wrap;gap:6px}
+.legend button{display:flex;align-items:center;gap:7px;border:1px solid var(--road3);background:transparent;color:var(--road-ink);border-radius:20px;padding:3px 11px;cursor:pointer;font-size:13.5px;font-variant-numeric:tabular-nums}
+.legend button[aria-pressed="true"]{background:var(--road3)}
+.legend i{width:10px;height:10px;border-radius:2px;flex:none}
+
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:500;text-align:left;padding:8px 10px;border-bottom:1px solid var(--road3);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap}
+tr:last-child>td{border-bottom:0}
+td.r,th.r{text-align:right} td.wrap{white-space:normal;min-width:200px}
+tr.click{cursor:pointer} tr.click:hover>td{background:var(--surface2)}
+tr.det>td{background:var(--surface2);white-space:normal}
+.pos{color:var(--good);font-weight:600} .negv{color:var(--bad);font-weight:600}
+
+.chip{display:inline-block;border-radius:2px;padding:1px 8px;font-size:12.5px;font-weight:500;letter-spacing:.02em;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.chip.ok{background:var(--good-soft);color:var(--good)} .chip.warn{background:var(--warn-soft);color:var(--warn)} .chip.bad{background:var(--bad-soft);color:var(--bad)} .chip.run{background:var(--y-soft);color:var(--run-ink)}
+.plate{display:inline-block;font-family:var(--mono);font-weight:700;font-size:12.5px;letter-spacing:.06em;background:#fff;color:#111a17;border:1px solid #111a17;border-top:4px solid #1d4fa3;border-radius:3px;padding:0 6px;line-height:1.5}
+
+.btn{border:1px solid var(--road3);background:var(--surface2);border-radius:3px;padding:7px 13px;cursor:pointer;font-weight:500;letter-spacing:.02em;white-space:nowrap}
+.btn:hover{border-color:var(--yt)}
+.btn.pri{background:var(--y);color:var(--y-ink);border-color:var(--y)}
+.btn.pri:hover{filter:brightness(1.06)}
+.btn.sm{padding:3px 10px;font-size:13px} .btn.big2{padding:15px;font-size:16px;width:100%;letter-spacing:.1em;text-transform:uppercase}
+.btn.del{color:var(--bad)} .btn.ghost{background:transparent;border-color:var(--road3);color:var(--road-ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bar{height:5px;background:var(--surface2);border-radius:4px;min-width:70px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--yt);transform-origin:left} .bar i.n{background:var(--bad)} .bar i.y{background:var(--y)}
+.dark .bar{background:var(--road3)}
+
+.list{display:flex;flex-direction:column}
+.list>div{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.list>div:last-child{border-bottom:0}
+.list>div>span:first-child{min-width:0;flex:1 1 180px}
+
+form.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted);font-weight:500;min-width:0}
+label.f input,label.f select{border:1px solid var(--road3);background:var(--bg);color:var(--ink);border-radius:3px;padding:9px;font-size:15px;width:100%;min-width:0}
+.err{color:var(--bad);font-weight:600}
+
+.rig{display:flex;flex-direction:column;gap:9px;align-items:center;padding:8px 0}
+.axle{display:flex;align-items:center;gap:6px} .axle .shaft{width:64px;height:5px;background:var(--line)} .axle.gap{margin-top:16px}
+.tyre{width:21px;height:46px;border-radius:5px;border:2px solid transparent;cursor:pointer;padding:0;background:var(--good)}
+.tyre.warn{background:var(--warn)} .tyre.bad{background:var(--bad)}
+.tyre:hover{transform:scale(1.1)} .tyre[aria-pressed="true"]{border-color:var(--ink);transform:scale(1.16)}
+.axn{width:74px;font-size:12px;color:var(--muted)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pair>div{background:var(--surface2);border:1px solid var(--line);border-radius:3px;padding:9px 11px;min-width:0}
+.pair b{display:block;font-family:var(--display);font-weight:500;font-size:26px;font-variant-numeric:tabular-nums;line-height:1.15}
+.dark .pair>div,.pair.dark>div{background:rgba(6,10,18,.55);border-color:var(--road3)}
+
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:16px}
+.mods ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+.mods li{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+
+/* mapa */
+.map{background:radial-gradient(90% 90% at 70% 20%,#0c1d47 0%,transparent 70%),var(--road);border:1px solid var(--road3);border-radius:4px;overflow:hidden;align-self:start}
+.map svg{display:block;width:100%;height:auto}
+.map .grid{stroke:var(--road2);stroke-width:1}
+.map .rt{stroke:var(--road3);stroke-width:2;fill:none}
+.map .trail{stroke:var(--yt);stroke-width:3;fill:none;stroke-dasharray:9 7}
+.map .city{fill:var(--road-muted)} .map text{fill:var(--road-muted);font-size:13px;font-family:var(--body)}
+.map text.pl{fill:var(--road-ink);font-weight:700;font-family:var(--mono);font-size:11px;paint-order:stroke;stroke:var(--road);stroke-width:3px}
+.map .tk{cursor:pointer} .map .tk circle.c{fill:var(--road-ink);stroke:var(--road);stroke-width:2}
+.map .tk.mov circle.c{fill:var(--yt)} .map .tk circle.s{stroke:none} .map .tk.sel circle.s{stroke:var(--yt);stroke-width:2}
+.map .pulse{fill:var(--y);opacity:.25}
+@media (prefers-reduced-motion:no-preference){ .map .pulse{animation:pulse 1.8s ease-out infinite;transform-box:fill-box;transform-origin:center}
+  @keyframes pulse{from{transform:scale(.6);opacity:.5}to{transform:scale(2.2);opacity:0}}
+  .enter .stack button,.enter .bar i{animation:grow .7s cubic-bezier(.2,.8,.2,1) both} @keyframes grow{from{transform:scaleX(0)}}
+  .tyre,.btn{transition:transform .12s,border-color .12s,filter .12s} .dlg{animation:pop .16s ease-out} @keyframes pop{from{transform:translateY(8px);opacity:.4}} }
+.tcard{border:1px solid var(--line);border-radius:4px;padding:12px;background:var(--surface);cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:6px;width:100%}
+.tcard[aria-pressed="true"]{border-color:var(--yt);background:var(--surface2)}
+
+/* motorista */
+.phone{max-width:480px;margin:0 auto;padding:16px 16px 56px;display:flex;flex-direction:column;gap:16px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--surface)}
+.tabs button{border:0;background:transparent;padding:12px 4px;cursor:pointer;color:var(--muted);font-weight:600}
+.tabs button[aria-pressed="true"]{background:var(--y);color:var(--y-ink)}
+.rtt{font-family:var(--display);font-size:32px;font-weight:500;line-height:1.1}
+.hero .list>div{border-color:var(--road3)} .hero label.f{color:var(--road-muted)}
+.hero label.f input,.hero label.f select{background:rgba(4,6,10,.6);border-color:var(--road3);color:var(--road-ink)}
+.chat{display:flex;flex-direction:column;gap:8px;height:380px;overflow-y:auto;background:var(--surface2);border-radius:8px;padding:12px}
+.msg{max-width:84%;padding:8px 11px;border-radius:10px;white-space:pre-line;background:var(--surface);border:1px solid var(--line);align-self:flex-start;overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;background:var(--y-soft);color:var(--run-ink);border-color:transparent}
+.quick{display:flex;flex-wrap:wrap;gap:6px}
+.login{max-width:440px;margin:0 auto;padding:40px 16px 56px;display:flex;flex-direction:column;gap:20px}
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:8px}
+.cats button{display:flex;flex-direction:column;gap:2px;text-align:left;background:rgba(6,10,18,.55);border:1px solid var(--road3);border-radius:3px;color:var(--road-ink);padding:11px 12px;cursor:pointer;min-width:0}
+.cats button:hover{border-color:var(--yt)} .cats button[aria-pressed="true"]{border-color:var(--yt);background:var(--y-soft)}
+.cats span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--road-muted)} .cats span.small{letter-spacing:0;text-transform:none}
+.cats b{font-family:var(--display);font-weight:500;font-size:22px;font-variant-numeric:lining-nums}
+.send{display:flex;gap:8px} .send input{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:10px 14px}
+
+.ov{position:fixed;inset:0;background:var(--scrim);display:grid;place-items:center;padding:16px;z-index:20}
+.dlg{background:var(--surface);border:1px solid var(--road3);border-radius:4px;border-top:1px solid var(--yt);padding:20px;width:min(100%,600px);max-height:92%;overflow:auto;display:flex;flex-direction:column;gap:14px}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--road);color:var(--road-ink);border:1px solid var(--yt);padding:10px 18px;border-radius:3px;font-weight:500;z-index:30;max-width:calc(100% - 32px)}
+
+@media (max-width:860px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .nav{flex-direction:row;overflow-x:auto;min-height:0;padding:6px 8px}
+  .nav button[aria-current="page"]{box-shadow:inset 0 -3px 0 var(--y)}
+  .main{padding:16px 16px 48px} h1{font-size:34px} .hero{padding:22px 16px 16px}
+  .minis{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+}
+</style>
+
+<div id="app"></div><div id="modal"></div><div id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+const HOJE='2026-10-06', DIESEL=6.19, KEY='fg-v3';
+const PERS=['drivers','trucks','trips','manut','apolices','fixos','pneus','lemb','cfg','sil','pagos','seq','uid','auth','adminPin'];
+const MES={'2026-09':'Setembro 2026','2026-10':'Outubro 2026 (até dia 6)'};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const R=v=>(v<0?'−':'')+'R$ '+Math.abs(Math.round(v)).toLocaleString('pt-BR');
+const N=(v,d=0)=>(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const D=s=>s?s.slice(8)+'/'+s.slice(5,7):'—';
+const DF=s=>s?s.slice(8)+'/'+s.slice(5,7)+'/'+s.slice(0,4):'—';
+const dias=(a,b)=>Math.round((new Date(b+'T12:00')-new Date(a+'T12:00'))/864e5);
+const mais=(s,n)=>{const d=new Date(s+'T12:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+const toNum=s=>{const v=parseFloat(String(s).replace(/[^\d,.]/g,'').replace(/\.(?=\d{3})/g,'').replace(',','.'));return isNaN(v)?null:v};
+
+/* ---------- dados de exemplo ---------- */
+const EIXOS=[['Direcional',1],['Tração 1',2],['Tração 2',2],['Carreta 1',2],['Carreta 2',2],['Carreta 3',2]];
+function geraPneus(tid,novo){let i=0;const a=[];EIXOS.forEach(([n,per],ax)=>['Esquerdo','Direito'].forEach(lado=>{for(let k=0;k<per;k++){
+  const sulco=novo?16:2+((tid*7+i*5)%13), rec=novo||!ax?0:((tid+i)%3), km=novo?0:(16-sulco)*9500+rec*60000;
+  a.push({id:i,ax,eixo:n,lado,pos:per>1?(k?'interno':'externo'):'',sulco,rec,km,custo:2900+rec*780});i++}}));return a}
+const fixT=d=>{const PC={1:'RLB8F45',2:'QTA3C18',3:'SFM6J02',4:'PKD1G73'};d.trucks.forEach(t=>{if(t.placaCarreta===undefined)t.placaCarreta=PC[t.id]||''});return d};
+function seed(){
+  const d={seq:100,uid:1000,sil:{},pagos:{},cfg:{dias:60,urg:20,kmRev:5000,sulco:3,retorno:60},
+   lemb:[{id:901,txt:'Renovar contrato com a seguradora de carga',data:'2026-10-15'}],
+   drivers:[{id:1,nome:'Valdir Nogueira',fone:'(66) 90000-0001',com:10,cnh:'2027-03-14',tox:'2026-11-02',truck:1},{id:2,nome:'Jeferson Prado',fone:'(64) 90000-0002',com:10,cnh:'2026-10-28',tox:'2028-01-20',truck:2},
+    {id:3,nome:'Edmilson Carvalho',fone:'(66) 90000-0003',com:12,cnh:'2029-06-01',tox:'2027-08-15',truck:3},{id:4,nome:'Rogério Batista',fone:'(34) 90000-0004',com:10,cnh:'2028-02-09',tox:'2027-04-30',truck:4}],
+   trucks:[{id:1,placa:'RKT4E21',mod:'Cavalo 6x4 + graneleira',ano:2021,km:404000,meta:2.4,rev:420000,tac:'2027-04-10',lic:'2027-06-30'},{id:2,placa:'QPM7B09',mod:'Cavalo 6x2 + graneleira',ano:2019,km:590000,meta:2.5,rev:600000,tac:'2027-01-22',lic:'2027-07-31'},
+    {id:3,placa:'SDA2H56',mod:'Cavalo 6x4 + graneleira',ano:2023,km:195000,meta:2.3,rev:210000,tac:'2027-09-05',lic:'2027-08-31'},{id:4,placa:'OXJ9C37',mod:'Cavalo 6x2 + sider',ano:2017,km:798000,meta:2.5,rev:810000,tac:'2026-10-30',lic:'2026-11-30'}],
+   trips:[],pneus:{},
+   manut:[[1,'2026-09-08','Preventiva','Troca de óleo e filtros',2350,0],[4,'2026-09-13','Pneus','Pneu estourado na BR-040: 1 pneu novo e socorro',3180,1],[2,'2026-09-18','Corretiva','Troca de lonas de freio da carreta',2900,0],[3,'2026-09-25','Peças','Jogo de molas e buchas para estoque',1840,0],[4,'2026-09-27','Corretiva','Reparo no turbo',3930,1],[1,'2026-10-04','Pneus','Recapagem de 4 pneus da carreta',2600,0]].map((m,i)=>({id:800+i,truck:m[0],data:m[1],tipo:m[2],desc:m[3],valor:m[4],imp:m[5]})),
+   apolices:[{id:701,nome:'Seguro casco',cob:'Colisão, incêndio e roubo dos 4 conjuntos',val:'2026-11-15',mes:6200,obr:0},{id:702,nome:'RC-V (terceiros)',cob:'Danos materiais e corporais a terceiros',val:'2027-02-01',mes:1150,obr:1},
+    {id:703,nome:'RCTR-C + RC-DC (carga)',cob:'Avaria, roubo e desvio da carga transportada',val:'2026-10-20',mes:2300,obr:1},{id:704,nome:'Vida dos motoristas',cob:'Morte e invalidez, 4 motoristas',val:'2027-05-30',mes:340,obr:0}],
+   fixos:[{id:601,nome:'Parcelas de financiamento',mes:11800},{id:602,nome:'IPVA e licenciamento (rateio mensal)',mes:2850},{id:603,nome:'Contabilidade e sistemas',mes:1300},{id:604,nome:'Rastreamento e gerenciamento de risco',mes:760}]};
+  const RT=[['Rondonópolis/MT','Santos/SP',1410],['Sorriso/MT','Paranaguá/PR',2180],['Rio Verde/GO','Santos/SP',1010],['Uberlândia/MG','Rio de Janeiro/RJ',990],['Dourados/MS','Paranaguá/PR',880],['Santos/SP','Rondonópolis/MT',1410]];
+  const RAW=[[1,0,'2026-09-01',3,'Soja 37 t',13800,0,598,1040,210,1500],[1,5,'2026-09-05',3,'Fertilizante 35 t',9400,0,580,1040,180,1000],[1,1,'2026-09-10',5,'Milho 37 t',21500,320,1065,1380,340,2500],[1,0,'2026-09-19',3,'Soja 37 t',13600,1410,1190,1040,220,1500],
+   [2,2,'2026-09-02',2,'Soja 32 t',9800,1010,790,820,160,1000],[2,2,'2026-09-08',2,'Milho 32 t',9500,1010,845,820,420,1000],[2,4,'2026-09-15',2,'Soja 32 t',8200,640,600,610,140,800],[2,2,'2026-09-22',2,'Soja 32 t',9900,0,400,820,150,1000],
+   [3,1,'2026-09-03',5,'Soja 37 t',21800,0,960,1380,300,2500],[3,5,'2026-09-11',3,'Fertilizante 36 t',9600,180,690,1040,200,1000],[3,0,'2026-09-16',3,'Soja 37 t',13900,0,615,1040,190,1500],[3,5,'2026-09-22',3,'Calcário 36 t',8900,0,612,1040,170,1000],
+   [4,3,'2026-09-04',2,'Café 28 t',8700,990,810,690,230,800],[4,3,'2026-09-12',2,'Bebidas 27 t',8100,990,865,690,610,800],[4,4,'2026-09-21',2,'Soja 32 t',8300,640,620,610,150,800],
+   [1,0,'2026-10-01',3,'Soja 37 t',14100,0,601,1040,205,1500],[2,2,'2026-10-02',2,'Soja 32 t',9900,1010,800,820,150,1000]];
+  const E=(tipo,valor,data,pago,status,litros)=>({id:++d.uid,tipo,valor,data,pago,status,litros:litros||null});
+  RAW.forEach(([dr,ro,ini,dd,carga,frete,vazio,lit,ped,out,adi])=>{const t=d.trucks[dr-1],r=RT[ro],fim=mais(ini,dd);
+    d.trips.push({id:++d.seq,driver:dr,truck:t.id,orig:r[0],dest:r[1],ini,fim,carga,frete,kmIni:t.km,kmFim:t.km+r[2]+vazio,kmVazio:vazio,adi,status:'encerrada',
+     desp:[E('Diesel',Math.round(lit*DIESEL),ini,'empresa','aprovada',lit),E('Pedágio',ped,ini,'empresa','aprovada'),E(out>400?'Borracharia':'Alimentação',out,fim,'motorista','aprovada')]});t.km+=r[2]+vazio});
+  d.trips.push({id:++d.seq,driver:3,truck:3,orig:'Sorriso/MT',dest:'Paranaguá/PR',ini:'2026-10-03',fim:null,carga:'Soja 37 t',frete:22000,kmIni:d.trucks[2].km,kmFim:null,kmVazio:0,adi:2500,status:'andamento',gps:.52,
+    desp:[E('Diesel',3404,'2026-10-03','empresa','aprovada',550),E('Pedágio',690,'2026-10-04','empresa','aprovada'),E('Alimentação',96,'2026-10-05','motorista','pendente')]});
+  d.trips.push({id:++d.seq,driver:4,truck:4,orig:'Uberlândia/MG',dest:'Rio de Janeiro/RJ',ini:'2026-10-05',fim:null,carga:'Café 28 t',frete:8800,kmIni:d.trucks[3].km,kmFim:null,kmVazio:0,adi:800,status:'andamento',gps:.3,
+    desp:[E('Diesel',1486,'2026-10-05','empresa','aprovada',240),E('Borracharia',380,'2026-10-06','motorista','pendente')]});
+  d.trucks.forEach(t=>d.pneus[t.id]=geraPneus(t.id));
+  d.drivers.forEach((x,i)=>{x.usuario=x.nome.split(' ')[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');x.pin=String(i+1).repeat(4)});d.adminPin='0000';d.auth=null;
+  return fixT(d);
+}
+const S={role:'admin',page:'painel',per:'2026-09',me:1,mtab:'inicio',open:null,fStatus:'',pneuTruck:1,pneuSel:null,formErr:'',showDesp:false,showFim:false,seg:null,gpsSel:null,ed:null,rst:false,zap:{},dEdit:null,lgTab:'motorista',lgErr:''};
+function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.trips&&j.cfg)return j}catch(e){}return null}
+function save(){try{const o={};PERS.forEach(k=>o[k]=S[k]);localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
+Object.assign(S,load()||seed());fixT(S);
+if(S.auth){S.role=S.auth.role;if(S.auth.id)S.me=S.auth.id}
+function entra(a){S.auth=a;S.role=a.role;if(a.id)S.me=a.id;S.page='painel';S.mtab='inicio';S.showDesp=S.showFim=false;S.dEdit=null;S.lgErr=''}
+const uid=()=>++S.uid;
+const drv=id=>S.drivers.find(d=>d.id==id), trk=id=>S.trucks.find(t=>t.id==id);
+const dn=id=>drv(id)?.nome??'Sem motorista';
+
+/* ---------- cálculos ---------- */
+function calc(t){
+  const com0=drv(t.driver)?.com??0, ok=t.desp.filter(e=>e.status!=='recusada');
+  const s=f=>ok.filter(f).reduce((a,e)=>a+e.valor,0);
+  const total=s(()=>1), diesel=s(e=>e.tipo==='Diesel'), ped=s(e=>e.tipo==='Pedágio');
+  const litros=ok.reduce((a,e)=>a+(e.litros||0),0), com=t.frete*com0/100;
+  const km=t.kmFim?t.kmFim-t.kmIni:null, cheio=km?km-t.kmVazio:null;
+  const perd=km&&t.kmVazio&&cheio>0?t.kmVazio*(t.frete/cheio)*S.cfg.retorno/100*com0/100:0;
+  const reemb=t.desp.filter(e=>e.pago==='motorista'&&e.status==='aprovada').reduce((a,e)=>a+e.valor,0);
+  return{total,diesel,ped,outros:total-diesel-ped,litros,com,km,perd,reemb,lucro:t.frete-total-com,media:km&&litros?km/litros:null};
+}
+function parte(per){if(per!==HOJE.slice(0,7))return 1;const[y,m,d]=HOJE.split('-').map(Number);return d/new Date(y,m,0).getDate()}
+function agg(per,f=()=>1){
+  const ts=S.trips.filter(t=>t.status==='encerrada'&&t.ini.startsWith(per)&&f(t));
+  const a={n:ts.length,frete:0,diesel:0,ped:0,outros:0,com:0,km:0,vazio:0,litros:0,perd:0,lucroV:0};
+  ts.forEach(t=>{const c=calc(t);a.frete+=t.frete;a.diesel+=c.diesel;a.ped+=c.ped;a.outros+=c.outros;a.com+=c.com;a.km+=c.km;a.vazio+=t.kmVazio;a.litros+=c.litros;a.perd+=c.perd;a.lucroV+=c.lucro});return a;
+}
+function geral(per){const a=agg(per),p=parte(per);
+  a.man=S.manut.filter(m=>m.data.startsWith(per)).reduce((s,m)=>s+m.valor,0);
+  a.seg=S.apolices.reduce((s,x)=>s+x.mes,0)*p;a.fix=S.fixos.reduce((s,x)=>s+x.mes,0)*p;
+  a.custo=a.diesel+a.ped+a.outros+a.com+a.man+a.seg+a.fix;a.lucro=a.frete-a.custo;return a}
+const ativa=id=>S.trips.find(t=>t.driver==id&&t.status==='andamento');
+const pend=()=>S.trips.flatMap(t=>t.desp.map(e=>({t,e}))).filter(x=>x.e.status==='pendente');
+const pcls=p=>p.sulco<S.cfg.sulco?'bad':p.sulco<S.cfg.sulco+3?'warn':'';
+function alertas(todos){
+  const c=S.cfg,a=[];
+  const dt=(key,nome,v,ed)=>{if(!v)return;const x=dias(HOJE,v);if(x<=c.dias)a.push({key:key+v,n:x,urg:x<=c.urg,txt:nome,q:x<0?'vencido há '+(-x)+' dias':x===0?'vence hoje':'vence em '+x+' dias ('+DF(v)+')',ed})};
+  S.drivers.forEach(d=>{dt('cnh'+d.id,'CNH de '+d.nome,d.cnh,['driver',d.id]);dt('tox'+d.id,'Exame toxicológico de '+d.nome,d.tox,['driver',d.id])});
+  S.apolices.forEach(p=>dt('ap'+p.id,'Apólice: '+p.nome,p.val,['apolice',p.id]));
+  S.lemb.forEach(l=>dt('lb'+l.id,l.txt,l.data,['lemb',l.id]));
+  S.trucks.forEach(t=>{dt('tac'+t.id,'Tacógrafo do '+t.placa,t.tac,['truck',t.id]);dt('lic'+t.id,'Licenciamento do '+t.placa,t.lic,['truck',t.id]);
+    const f=t.rev-t.km;if(f<=c.kmRev)a.push({key:'rev'+t.id+'-'+t.rev,n:f/200,urg:f<=c.kmRev/2.5,txt:'Revisão do '+t.placa,q:f<0?'passou '+N(-f)+' km':'faltam '+N(f)+' km',ed:['truck',t.id]});
+    const n=(S.pneus[t.id]||[]).filter(p=>p.sulco<c.sulco).length;if(n)a.push({key:'pn'+t.id+'-'+n,n:5,urg:true,txt:'Pneus do '+t.placa,q:n+' com sulco abaixo de '+N(c.sulco)+' mm',pneus:t.id})});
+  a.sort((x,y)=>x.n-y.n);return todos?a:a.filter(x=>!S.sil[x.key]);
+}
+
+/* ---------- rastreamento (simulado) ---------- */
+const CIDS=[['Sorriso',-12.55,-55.72,1],['Rondonópolis',-16.47,-54.64,1],['Rio Verde',-17.8,-50.92,1],['Uberlândia',-18.92,-48.28,1],['Dourados',-22.22,-54.81,1],['Santos',-23.96,-46.33,1],['Paranaguá',-25.52,-48.51,1],['Rio de Janeiro',-22.91,-43.17,1],['Cuiabá',-15.6,-56.1],['Goiânia',-16.69,-49.26],['Campo Grande',-20.45,-54.62],['Belo Horizonte',-19.92,-43.94],['Brasília',-15.79,-47.88],['São Paulo',-23.55,-46.63],['Curitiba',-25.43,-49.27]];
+const XY=(la,lo)=>[(lo+58)/16*600+20,(-la-11)/16*480+20];
+const ll=n=>{const k=String(n).split('/')[0].trim().toLowerCase(),c=CIDS.find(x=>x[0].toLowerCase()===k);return c?[c[1],c[2]]:null};
+const geo=n=>{const c=ll(n);return c?XY(c[0],c[1]):null};
+function kmEntre(a,b){const p=ll(a),q=ll(b);if(!p||!q)return 0;const r=x=>x*Math.PI/180,h=Math.sin(r(q[0]-p[0])/2)**2+Math.cos(r(p[0]))*Math.cos(r(q[0]))*Math.sin(r(q[1]-p[1])/2)**2;return 6371*2*Math.asin(Math.sqrt(h))*1.25}
+let tick=0;
+function posicao(tr){
+  const t=S.trips.find(x=>x.truck===tr.id&&x.status==='andamento');
+  if(t){const a=geo(t.orig),b=geo(t.dest);if(!a||!b)return{t,sem:1};const p=t.gps??(t.gps=.04);
+    return{t,mov:1,p,a,x:a[0]+(b[0]-a[0])*p,y:a[1]+(b[1]-a[1])*p,rest:Math.round(kmEntre(t.orig,t.dest)*(1-p)),vel:76+Math.round(7*Math.sin(tick/2+tr.id))}}
+  const l=S.trips.filter(x=>x.truck===tr.id&&x.status==='encerrada').sort((x,y)=>(y.fim||'').localeCompare(x.fim||''))[0];
+  if(!l)return{sem:1};const onde=l.kmVazio>0?l.orig:l.dest,g=geo(onde);return g?{x:g[0],y:g[1],onde}:{sem:1,onde};
+}
+function gpsBox(){
+  const ps=S.trucks.map(tr=>({tr,p:posicao(tr),d:S.drivers.find(d=>d.truck===tr.id)}));
+  const rts=[...new Set(S.trips.map(t=>t.orig+'|'+t.dest))].map(k=>k.split('|').map(geo)).filter(r=>r[0]&&r[1]);
+  const grid=[...Array(7)].map((_,i)=>`<line class="grid" x1="${20+i*100}" y1="10" x2="${20+i*100}" y2="510"/>`).join('')+[...Array(6)].map((_,i)=>`<line class="grid" x1="10" y1="${20+i*96}" x2="630" y2="${20+i*96}"/>`).join('');
+  return`<div class="cols" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))">
+   <div class="map"><svg viewBox="0 0 640 480" role="img" aria-label="Mapa esquemático com a posição dos caminhões">${grid}
+    ${rts.map(r=>`<path class="rt" d="M${r[0]}L${r[1]}"/>`).join('')}
+    ${ps.filter(x=>x.p.mov).map(x=>`<path class="trail" d="M${x.p.a}L${x.p.x.toFixed(1)},${x.p.y.toFixed(1)}"/>`).join('')}
+    ${CIDS.map(c=>{const[x,y]=XY(c[1],c[2]),e=x>500;return`<circle class="city" cx="${x}" cy="${y}" r="${c[3]?3.5:2}"/>${c[0]==='São Paulo'||c[0]==='Curitiba'?'':`<text x="${x+(e?-7:7)}" y="${y+4}" ${e?'text-anchor="end"':''}>${c[0]}</text>`}`}).join('')}
+    ${ps.filter(x=>!x.p.sem).map(x=>`<g class="tk ${x.p.mov?'mov':''} ${S.gpsSel===x.tr.id?'sel':''}" data-act="gps" data-v="${x.tr.id}" tabindex="0" role="button" aria-label="${esc(x.tr.placa)}">${x.p.mov?`<circle class="pulse" cx="${x.p.x}" cy="${x.p.y}" r="10"/>`:''}<circle class="s" cx="${x.p.x}" cy="${x.p.y}" r="14" fill="none"/><circle class="c" cx="${x.p.x}" cy="${x.p.y}" r="8"/><text class="pl" x="${x.p.x}" y="${x.p.y-14}" text-anchor="middle">${esc(x.tr.placa)}</text></g>`).join('')}
+   </svg></div>
+   <div style="display:flex;flex-direction:column;gap:10px">
+    ${ps.map(({tr,p,d})=>`<button class="tcard" data-act="gps" data-v="${tr.id}" aria-pressed="${S.gpsSel===tr.id}">
+      <span class="row" style="justify-content:space-between"><span class="row">${plate(tr.id)}<b>${esc(d?d.nome:'Sem motorista')}</b></span>${p.mov?`<span class="chip run">${p.vel} km/h</span>`:p.t?'<span class="chip warn">Em viagem, sem sinal</span>':'<span class="chip">Parado</span>'}</span>
+      ${p.mov?`<span>${esc(p.t.orig)} → ${esc(p.t.dest)}</span><span class="bar"><i class="y" style="width:${p.p*100}%"></i></span><span class="small muted">Faltam ${N(p.rest)} km · cerca de ${N(p.rest/62,0)} h de estrada</span>`
+       :`<span class="small muted">${p.sem?(p.t?'As cidades desta viagem não estão no mapa de exemplo':'Sem posição registrada'):'Em '+esc(p.onde)+' · ignição desligada'}</span>`}
+      ${S.gpsSel===tr.id&&p.mov?`<span class="small"><b>Hoje:</b> 05:50 ignição ligada · 09:40 parada de 25 min · 11:05 acima de 90 km/h por 3 min</span>`:''}
+    </button>`).join('')}
+    <p class="small muted">Posições simuladas, atualizadas a cada 2 segundos. No sistema real elas vêm do rastreador do caminhão.</p>
+   </div></div>`;
+}
+
+/* ---------- componentes ---------- */
+const plate=id=>`<span class="plate">${esc(trk(id)?.placa??'—')}</span>`;
+const plates=id=>plate(id)+(trk(id)?.placaCarreta?` <span class="plate">${esc(trk(id).placaCarreta)}</span>`:'');
+const st=t=>t.status==='andamento'?'<span class="chip run">Em viagem</span>':'<span class="chip">Encerrada</span>';
+const perSel=()=>`<div class="per" role="group" aria-label="Período">${Object.keys(MES).map(k=>`<button data-act="per" data-v="${k}" aria-pressed="${S.per===k}">${MES[k]}</button>`).join('')}</div>`;
+const head=(t,p,extra='')=>`<div class="head"><div><h1>${t}</h1><p>${p}</p></div><div class="row">${extra}</div></div>`;
+const val=v=>`<span class="${v<0?'negv':'pos'}">${R(v)}</span>`;
+const edB=(tipo,id,parent='')=>`<button class="btn sm" data-act="ed" data-tipo="${tipo}" data-id="${id}" data-parent="${parent}">Editar</button>`;
+const novoB=(tipo,txt,parent='')=>`<button class="btn pri" data-act="novo" data-tipo="${tipo}" data-parent="${parent}">${txt}</button>`;
+const venc=x=>{if(!x)return'—';const n=dias(HOJE,x);return`<span class="chip ${n<=S.cfg.urg?'bad':n<=S.cfg.dias?'warn':'ok'}">${DF(x)}</span>`};
+const alRow=x=>`<div><span>${esc(x.txt)}<br><span class="chip ${x.urg?'bad':'warn'}">${x.q}</span></span><span class="row">${x.ed?edB(x.ed[0],x.ed[1]):`<button class="btn sm" data-act="vpneus" data-v="${x.pneus}">Ver pneus</button>`}<button class="btn sm" data-act="sil" data-v="${esc(x.key)}">Dispensar</button></span></div>`;
+
+/* ---------- administrador ---------- */
+const PAGES=[['painel','Painel'],['gps','Rastreamento'],['viagens','Viagens'],['alertas','Alertas'],['motoristas','Motoristas'],['acerto','Acerto'],['frota','Frota e manutenção'],['pneus','Pneus'],['seguros','Seguros e custos fixos'],['rotas','Rotas'],['checkup','Checkup do sistema']];
+
+function pgPainel(){
+  const g=geral(S.per),al=alertas(),pe=pend(),urg=al.filter(x=>x.urg);
+  const segs=[['Combustível',g.diesel,'--k1'],['Pedágio',g.ped,'--k2'],['Outras despesas de viagem',g.outros,'--k3'],['Comissão dos motoristas',g.com,'--k4'],['Manutenção e pneus',g.man,'--k5'],['Seguros',g.seg,'--k6'],['Demais custos fixos',g.fix,'--k7']];
+  if(g.lucro>0)segs.push(['Lucro líquido',g.lucro,'--k8']);
+  const tot=segs.reduce((s,x)=>s+x[1],0)||1,sg=segs[S.seg];
+  const rk=S.drivers.map(d=>({d,a:agg(S.per,t=>t.driver===d.id)})).sort((x,y)=>y.a.lucroV-x.a.lucroV),mx=Math.max(1,...rk.map(x=>Math.abs(x.a.lucroV)));
+  const and=S.trips.filter(t=>t.status==='andamento');
+  return head('Painel','Resultado das viagens encerradas. Custos fixos de outubro entram proporcionais aos dias corridos.',perSel())+`
+  <section class="hero">
+   <div class="top2"><div><span class="lbl">Lucro líquido · ${MES[S.per]}</span><b class="big ${g.lucro<0?'neg':''}" data-n="${g.lucro}">${R(g.lucro)}</b><span>${g.frete?N(g.lucro/g.frete*100,1):0}% de ${R(g.frete)} faturados em ${g.n} viagens</span></div>
+    <div class="minis"><div><span class="lbl">Custo por km</span><b>R$ ${g.km?N(g.custo/g.km,2):'0,00'}</b><span class="small">receita R$ ${g.km?N(g.frete/g.km,2):'0,00'}</span></div><div><span class="lbl">Km rodado</span><b data-n="${g.km}" data-f="N">${N(g.km)}</b><span class="small">${g.km?N(g.vazio/g.km*100):0}% vazio</span></div><div><span class="lbl">Consumo</span><b>${g.litros?N(g.km/g.litros,2):'—'} km/l</b><span class="small">${N(g.litros)} litros</span></div></div></div>
+   <div><span class="lbl">Para onde vai cada R$ 100 de frete · toque numa faixa</span></div>
+   <div class="stack ${sg?'has':''}">${segs.map((s,i)=>`<button style="flex:${s[1]/tot};background:var(${s[2]})" data-act="seg" data-v="${i}" aria-pressed="${S.seg===i}" aria-label="${s[0]}: ${R(s[1])}" title="${s[0]}"></button>`).join('')}</div>
+   <p class="read">${sg?`<b>${sg[0]}:</b> ${R(sg[1])} no período, ou R$ ${N(sg[1]/tot*100,2)} de cada R$ 100 de frete.`:g.lucro<0?'Os custos passaram do faturamento neste período.':'De cada R$ 100 de frete, sobram <b>R$ '+N(g.lucro/tot*100,2)+'</b> de lucro.'}</p>
+   <div class="legend">${segs.map((s,i)=>`<button data-act="seg" data-v="${i}" aria-pressed="${S.seg===i}"><i style="background:var(${s[2]})"></i>${s[0]} · R$ ${N(s[1]/tot*100,1)}</button>`).join('')}</div>
+  </section>
+  <div class="cols">
+   <section class="panel"><header><h2>Precisa de você agora</h2><button class="btn sm" data-act="page" data-v="alertas">Ver todos os alertas</button></header>
+    <span class="lbl">Despesas para aprovar (${pe.length})</span>${pendList(pe)}
+    <span class="lbl">Alertas urgentes (${urg.length})</span><div class="list">${urg.slice(0,4).map(alRow).join('')||'<p class="muted">Nenhum alerta urgente.</p>'}</div></section>
+   <section class="panel"><header><h2>Na estrada agora</h2><button class="btn sm" data-act="page" data-v="gps">Abrir o mapa</button></header>
+    <div class="list">${and.map(t=>{const c=calc(t);return`<div><span><b>${esc(dn(t.driver))}</b> ${plate(t.truck)}<br>${esc(t.orig)} → ${esc(t.dest)}<br><span class="small muted">desde ${D(t.ini)} · frete ${R(t.frete)} · despesas ${R(c.total)}</span><span class="bar" style="display:block;margin-top:6px"><i class="y" style="width:${(t.gps||0)*100}%"></i></span></span>${edB('trip',t.id)}</div>`}).join('')||'<p class="muted">Nenhum caminhão em viagem.</p>'}</div></section>
+  </div>
+  <section class="panel"><header><h2>Resultado por motorista</h2><span class="small muted">lucro das viagens, antes de manutenção e custos fixos</span></header><div class="scroll"><table>
+   <tr><th>Motorista</th><th>Caminhão</th><th class="r">Viagens</th><th class="r">Frete</th><th class="r">Comissão</th><th class="r">Km/l</th><th class="r">Km vazio</th><th>Lucro das viagens</th></tr>
+   ${rk.map(({d,a})=>{const m=a.litros?a.km/a.litros:0,meta=trk(d.truck)?.meta??0;return`<tr><td>${esc(d.nome)}</td><td>${plate(d.truck)}</td><td class="r">${a.n}</td><td class="r">${R(a.frete)}</td><td class="r">${R(a.com)}</td><td class="r">${m?N(m,2):'—'} ${m&&m<meta?'<span class="chip warn">meta '+N(meta,1)+'</span>':''}</td><td class="r">${a.km?N(a.vazio/a.km*100):0}%</td><td><div class="row" style="flex-wrap:nowrap"><div class="bar" style="flex:1;min-width:90px"><i class="${a.lucroV<0?'n':''}" style="width:${Math.abs(a.lucroV)/mx*100}%"></i></div>${val(a.lucroV)}</div></td></tr>`}).join('')}
+  </table></div></section>`;
+}
+function pendList(pe){
+  if(!pe.length)return'<p class="muted">Nenhuma despesa pendente.</p>';
+  return`<div class="list">${pe.map(({t,e})=>`<div><span><b>${esc(tl(e.tipo))} · ${R(e.valor)}</b><br><span class="small muted">${esc(dn(t.driver))} · viagem ${t.id} · ${D(e.data)} · ${e.pago==='motorista'?'pago do bolso':'cartão da empresa'}</span></span>
+   <span class="row"><button class="btn sm pri" data-act="aprova" data-id="${e.id}">Aprovar</button><button class="btn sm" data-act="recusa" data-id="${e.id}">Recusar</button>${edB('desp',e.id,t.id)}</span></div>`).join('')}</div>`;
+}
+function pgGps(){return head('Rastreamento','Onde está cada caminhão. Só o administrador vê esta tela; ela não existe no acesso do motorista.')+`<div id="gpsbox">${gpsBox()}</div>`}
+function pgViagens(){
+  const ts=S.trips.filter(t=>!S.fStatus||t.status===S.fStatus).slice().sort((a,b)=>b.ini.localeCompare(a.ini)||b.id-a.id),pe=pend();
+  return head('Viagens','Clique numa linha para ver e editar as despesas da viagem.',
+   `<label class="f">Situação<select id="f-status" data-chg="fstatus"><option value="">Todas</option><option value="andamento" ${S.fStatus==='andamento'?'selected':''}>Em viagem</option><option value="encerrada" ${S.fStatus==='encerrada'?'selected':''}>Encerradas</option></select></label>${novoB('trip','Nova viagem')}`)+`
+  ${pe.length?`<section class="panel"><header><h2>Despesas para aprovar</h2></header>${pendList(pe)}</section>`:''}
+  <section class="panel"><div class="scroll"><table>
+   <tr><th>Nº</th><th>Motorista</th><th>Caminhão</th><th>Rota</th><th>Início</th><th class="r">Frete</th><th class="r">Despesas</th><th class="r">Comissão</th><th class="r">Lucro</th><th>Situação</th><th></th></tr>
+   ${ts.map(t=>{const c=calc(t);return`<tr class="click" data-act="open" data-t="${t.id}" tabindex="0"><td>${t.id}</td><td>${esc(dn(t.driver))}</td><td>${plate(t.truck)}</td><td>${esc(t.orig)} → ${esc(t.dest)}</td><td>${D(t.ini)}</td><td class="r">${R(t.frete)}</td><td class="r">${R(c.total)}</td><td class="r">${R(c.com)}</td><td class="r">${t.status==='encerrada'?val(c.lucro):'<span class="muted">em aberto</span>'}</td><td>${st(t)}</td><td>${edB('trip',t.id)}</td></tr>
+   ${S.open===t.id?`<tr class="det"><td colspan="11"><div class="cols"><div><p class="lbl">Viagem</p><p>${esc(t.carga)} · ${DF(t.ini)}${t.fim?' a '+DF(t.fim):''}</p><p>Km inicial ${N(t.kmIni)}${t.kmFim?' · km final '+N(t.kmFim)+' · '+N(c.km)+' km rodados, '+N(t.kmVazio)+' vazio':''}</p><p>${c.media?'Consumo '+N(c.media,2)+' km/l (meta '+N(trk(t.truck)?.meta,1)+')':''}</p><p>Adiantamento ao motorista: ${R(t.adi)}</p></div>
+    <div><div class="row" style="justify-content:space-between"><span class="lbl">Despesas lançadas</span><button class="btn sm" data-act="novo" data-tipo="desp" data-parent="${t.id}">Adicionar despesa</button></div><div class="list">${t.desp.map(e=>`<div><span>${esc(tl(e.tipo))}${e.litros?' · '+N(e.litros)+' L':''} <span class="small muted">${D(e.data)} · ${e.pago==='motorista'?'motorista':'empresa'}${e.obs?' · '+esc(e.obs):''}</span></span><span class="row">${R(e.valor)} <span class="chip ${e.status==='aprovada'?'ok':e.status==='pendente'?'warn':'bad'}">${e.status}</span>${edB('desp',e.id,t.id)}</span></div>`).join('')||'<p class="muted">Sem despesas.</p>'}</div></div></div></td></tr>`:''}`}).join('')}
+  </table></div></section>`;
+}
+function pgAlertas(){
+  const al=alertas(),tot=alertas(1).length,c=S.cfg;
+  return head('Alertas','Você define quando o sistema avisa, corrige a data na hora e dispensa o que já resolveu.',novoB('lemb','Novo lembrete'))+`
+  <div class="cols">
+   <section class="panel"><header><h2>Ativos (${al.length})</h2>${tot>al.length?`<button class="btn sm" data-act="resil">Restaurar ${tot-al.length} dispensados</button>`:''}</header>
+    <div class="list">${al.map(alRow).join('')||'<p class="muted">Nenhum alerta ativo.</p>'}</div></section>
+   <div style="display:flex;flex-direction:column;gap:20px">
+   <section class="panel"><header><h2>Regras de aviso</h2></header>
+    <form class="grid" data-form="cfg">
+     <label class="f">Avisar com quantos dias de antecedência<input id="c-dias" name="dias" inputmode="numeric" value="${c.dias}"></label>
+     <label class="f">Marcar como urgente com quantos dias<input id="c-urg" name="urg" inputmode="numeric" value="${c.urg}"></label>
+     <label class="f">Avisar revisão faltando quantos km<input id="c-km" name="kmRev" inputmode="numeric" value="${c.kmRev}"></label>
+     <label class="f">Sulco mínimo do pneu (mm)<input id="c-sulco" name="sulco" inputmode="decimal" value="${String(c.sulco).replace('.',',')}"></label>
+     <label class="f">Frete de retorno, % da ida (para o "deixou de ganhar")<input id="c-ret" name="retorno" inputmode="numeric" value="${c.retorno}"></label>
+     <button class="btn pri">Salvar regras</button></form>${S.formErr?`<p class="err">${S.formErr}</p>`:''}</section>
+   <section class="panel"><header><h2>Seus lembretes</h2></header><div class="list">${S.lemb.map(l=>`<div><span>${esc(l.txt)}</span><span class="row">${venc(l.data)}${edB('lemb',l.id)}</span></div>`).join('')||'<p class="muted">Nenhum lembrete criado.</p>'}</div></section></div>
+  </div>`;
+}
+function pgMotoristas(){
+  return head('Motoristas','Use Editar para trocar nome, usuário, PIN, comissão e caminhão de cada motorista.',perSel()+novoB('driver','Novo motorista'))+`
+  <section class="panel"><div class="scroll"><table>
+   <tr><th>Motorista</th><th>Cavalo e carreta</th><th class="r">Comissão</th><th>CNH</th><th>Toxicológico</th><th class="r">Viagens</th><th class="r">Frete</th><th class="r">Comissão ganha</th><th class="r">Deixou de ganhar</th><th></th></tr>
+   ${S.drivers.map(d=>{const a=agg(S.per,t=>t.driver===d.id);return`<tr><td><b>${esc(d.nome)}</b>${ativa(d.id)?' <span class="chip run">Em viagem</span>':''}<br><span class="small muted">${esc(d.fone||'sem WhatsApp')} · usuário ${esc(d.usuario||'—')}</span></td><td>${plates(d.truck)}</td><td class="r">${N(d.com,1)}%</td><td>${venc(d.cnh)}</td><td>${venc(d.tox)}</td><td class="r">${a.n}</td><td class="r">${R(a.frete)}</td><td class="r">${R(a.com)}</td><td class="r">${R(a.perd)}</td><td>${edB('driver',d.id)}</td></tr>`}).join('')}
+  </table></div><p class="small muted">Deixou de ganhar: comissão estimada sobre os km rodados vazios, com frete de retorno a ${S.cfg.retorno}% do valor por km da ida. O percentual é ajustável em Alertas, nas regras.</p></section>
+  <section class="panel"><header><h2>Acesso ao sistema</h2></header>
+   <p class="muted">Cada motorista entra com o usuário e o PIN do cadastro dele e só vê as próprias viagens. Para trocar um PIN, use Editar na linha do motorista.</p>
+   <form class="grid" data-form="senha"><label class="f">Nova senha do administrador<input id="s-nova" name="nova" type="password" autocomplete="new-password"></label><button class="btn pri">Trocar senha</button></form>${S.formErr?`<p class="err">${S.formErr}</p>`:''}</section>`;
+}
+function pgAcerto(){
+  return head('Acerto de motoristas','Comissões e reembolsos a favor do motorista, menos os adiantamentos já pagos. Para corrigir um valor, edite a viagem.',perSel())+`
+  <section class="panel"><div class="scroll"><table>
+   <tr><th>Motorista</th><th class="r">Viagens</th><th class="r">Comissões</th><th class="r">Reembolso de despesas</th><th class="r">Adiantamentos</th><th class="r">Saldo a pagar</th><th></th></tr>
+   ${S.drivers.map(d=>{const ts=S.trips.filter(t=>t.driver===d.id&&t.status==='encerrada'&&t.ini.startsWith(S.per));let com=0,re=0,ad=0;ts.forEach(t=>{const c=calc(t);com+=c.com;re+=c.reemb;ad+=t.adi});const k=S.per+'-'+d.id,pg=S.pagos[k];
+    return`<tr><td>${esc(d.nome)}</td><td class="r">${ts.length}</td><td class="r">${R(com)}</td><td class="r">${R(re)}</td><td class="r">${R(-ad)}</td><td class="r"><b>${R(com+re-ad)}</b></td><td>${pg?`<span class="chip ok">Pago</span> <button class="btn sm" data-act="pagar" data-k="${k}">Desfazer</button>`:`<button class="btn sm pri" data-act="pagar" data-k="${k}">Marcar como pago</button>`}</td></tr>`}).join('')}
+  </table></div></section>`;
+}
+function pgFrota(){
+  const ms=S.manut.slice().sort((a,b)=>b.data.localeCompare(a.data));
+  return head('Frota e manutenção','Use Editar para trocar as placas do cavalo e da carreta e os demais dados de cada conjunto.',perSel()+novoB('manut','Lançar manutenção')+`<button class="btn" data-act="novo" data-tipo="truck">Novo caminhão</button>`)+`
+  <section class="panel"><header><h2>Caminhões</h2></header><div class="scroll"><table>
+   <tr><th>Cavalo</th><th>Carreta</th><th>Conjunto</th><th class="r">Km atual</th><th class="r">Próxima revisão</th><th class="r">Consumo no período</th><th class="r">Manutenção no período</th><th class="r">Por km</th><th></th></tr>
+   ${S.trucks.map(t=>{const a=agg(S.per,x=>x.truck===t.id),m=S.manut.filter(x=>x.truck===t.id&&x.data.startsWith(S.per)).reduce((s,x)=>s+x.valor,0),md=a.litros?a.km/a.litros:0,f=t.rev-t.km;
+    return`<tr><td>${plate(t.id)}</td><td>${t.placaCarreta?`<span class="plate">${esc(t.placaCarreta)}</span>`:'—'}</td><td>${esc(t.mod)} · ${t.ano}</td><td class="r">${N(t.km)}</td><td class="r">${f<=S.cfg.kmRev?`<span class="chip ${f<=S.cfg.kmRev/2.5?'bad':'warn'}">${f<0?'passou '+N(-f):'faltam '+N(f)} km</span>`:'em '+N(f)+' km'}</td><td class="r">${md?N(md,2)+' km/l':'—'} ${md&&md<t.meta?'<span class="chip warn">meta '+N(t.meta,1)+'</span>':''}</td><td class="r">${R(m)}</td><td class="r">${a.km?'R$ '+N(m/a.km,2):'—'}</td><td>${edB('truck',t.id)}</td></tr>`}).join('')}
+  </table></div></section>
+  <section class="panel"><header><h2>Histórico de manutenção</h2></header><div class="scroll"><table>
+   <tr><th>Data</th><th>Caminhão</th><th>Tipo</th><th>Descrição</th><th class="r">Valor</th><th></th></tr>
+   ${ms.map(m=>`<tr><td>${DF(m.data)}</td><td>${plate(m.truck)}</td><td><span class="chip">${esc(m.tipo)}</span> ${m.imp?'<span class="chip bad">Imprevisto</span>':''}</td><td class="wrap">${esc(m.desc)}</td><td class="r">${R(m.valor)}</td><td>${edB('manut',m.id)}</td></tr>`).join('')}
+  </table></div></section>`;
+}
+function pgPneus(){
+  if(!trk(S.pneuTruck))S.pneuTruck=S.trucks[0].id;
+  const ps=S.pneus[S.pneuTruck]||[],sel=ps.find(p=>p.id===S.pneuSel),ck=p=>p.km?p.custo/p.km:0;
+  const side=(ax,l)=>ps.filter(p=>p.ax===ax&&p.lado===l).sort((a,b)=>l==='Esquerdo'?(a.pos==='externo'?-1:1):(a.pos==='interno'?-1:1)).map(p=>`<button class="tyre ${pcls(p)}" data-act="pneu" data-i="${p.id}" aria-pressed="${S.pneuSel===p.id}" aria-label="${p.eixo} ${p.lado} ${p.pos}, sulco ${p.sulco} mm"></button>`).join('');
+  return head('Pneus','Cada pneu por posição. Toque num pneu para ver, editar ou registrar a troca.',
+   `<label class="f">Caminhão<select id="p-truck" data-chg="pneutruck">${S.trucks.map(t=>`<option value="${t.id}" ${t.id===S.pneuTruck?'selected':''}>${esc(t.placa)}</option>`).join('')}</select></label>`)+`
+  <div class="cols">
+   <section class="panel"><header><h2>Mapa de posições</h2><span class="row small"><span class="chip ok">bom</span><span class="chip warn">atenção</span><span class="chip bad">abaixo de ${N(S.cfg.sulco)} mm</span></span></header>
+    <div class="rig">${EIXOS.map(([n],ax)=>`<div class="axle ${ax===3?'gap':''}"><span class="axn" style="text-align:right">${n}</span>${side(ax,'Esquerdo')}<span class="shaft"></span>${side(ax,'Direito')}<span class="axn"></span></div>`).join('')}</div>
+    <p class="small muted">Vista de cima, frente do caminhão para cima. 22 pneus: 10 no cavalo e 12 na carreta.</p></section>
+   <section class="panel"><header><h2>${sel?sel.eixo+' · '+sel.lado+' '+sel.pos:'Resumo do conjunto'}</h2>${sel?`<span class="row">${edB('pneu',sel.id,S.pneuTruck)}<button class="btn sm pri" data-act="troca">Trocar por pneu novo</button></span>`:''}</header>
+    ${sel?`<div class="pair"><div><span class="lbl">Sulco</span><b>${N(sel.sulco,sel.sulco%1?1:0)} mm</b></div><div><span class="lbl">Km rodado</span><b>${N(sel.km)}</b></div><div><span class="lbl">Recapagens</span><b>${sel.rec}</b></div><div><span class="lbl">Custo por km</span><b>R$ ${N(ck(sel),3)}</b></div></div>
+     <p class="${pcls(sel)==='bad'?'err':'muted'}">${pcls(sel)==='bad'?'Trocar ou recapar agora. O limite legal é 1,6 mm.':pcls(sel)==='warn'?'Programar recapagem na próxima parada.':'Em boas condições.'}</p><p class="small muted">Custo acumulado ${R(sel.custo)}.</p>`
+    :`<div class="pair"><div><span class="lbl">Críticos</span><b>${ps.filter(p=>pcls(p)==='bad').length}</b></div><div><span class="lbl">Atenção</span><b>${ps.filter(p=>pcls(p)==='warn').length}</b></div><div><span class="lbl">Sulco médio</span><b>${N(ps.reduce((s,p)=>s+p.sulco,0)/(ps.length||1),1)} mm</b></div><div><span class="lbl">Custo médio por km</span><b>R$ ${N(ps.reduce((s,p)=>s+ck(p),0)/(ps.length||1),3)}</b></div></div>`}
+   </section></div>`;
+}
+function pgSeguros(){
+  const ts=S.apolices.reduce((s,x)=>s+x.mes,0),tf=S.fixos.reduce((s,x)=>s+x.mes,0),g=geral('2026-09');
+  const docs=[...S.drivers.flatMap(d=>[['CNH',d.nome,d.cnh,'driver',d.id],['Exame toxicológico',d.nome,d.tox,'driver',d.id]]),...S.trucks.flatMap(t=>[['Tacógrafo',t.placa,t.tac,'truck',t.id],['Licenciamento',t.placa,t.lic,'truck',t.id]])].sort((a,b)=>(a[2]||'').localeCompare(b[2]||''));
+  return head('Seguros e custos fixos','Custos que existem mesmo com o caminhão parado. Entram no lucro líquido e no custo por km.',novoB('apolice','Nova apólice')+`<button class="btn" data-act="novo" data-tipo="fixo">Novo custo fixo</button>`)+`
+  <section class="hero dark"><div class="minis" style="max-width:none;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"><div><span class="lbl">Seguros por mês</span><b data-n="${ts}">${R(ts)}</b></div><div><span class="lbl">Demais fixos por mês</span><b data-n="${tf}">${R(tf)}</b></div><div><span class="lbl">Fixo por caminhão</span><b>${R((ts+tf)/(S.trucks.length||1))}</b></div><div><span class="lbl">Fixo por km em setembro</span><b>R$ ${g.km?N((ts+tf)/g.km,2):'—'}</b></div></div></section>
+  <section class="panel"><header><h2>Apólices</h2></header><div class="scroll"><table><tr><th>Seguro</th><th>Cobertura</th><th>Vigência até</th><th class="r">Custo mensal</th><th></th></tr>
+   ${S.apolices.map(p=>`<tr><td>${esc(p.nome)} ${p.obr?'<span class="chip run">Obrigatório</span>':''}</td><td class="wrap">${esc(p.cob)}</td><td>${venc(p.val)}</td><td class="r">${R(p.mes)}</td><td>${edB('apolice',p.id)}</td></tr>`).join('')}</table></div>
+   <p class="small muted">Valores e exigências são exemplos. Confirme com seu corretor quais seguros são obrigatórios para a sua operação.</p></section>
+  <div class="cols">
+   <section class="panel"><header><h2>Demais custos fixos</h2></header><div class="list">${S.fixos.map(f=>`<div><span>${esc(f.nome)}</span><span class="row"><b class="num">${R(f.mes)}</b>${edB('fixo',f.id)}</span></div>`).join('')}</div></section>
+   <section class="panel"><header><h2>Documentos e vencimentos</h2></header><div class="list">${docs.map(d=>`<div><span>${d[0]} · <span class="muted">${esc(d[1])}</span></span><span class="row">${venc(d[2])}${edB(d[3],d[4])}</span></div>`).join('')}</div></section>
+  </div>`;
+}
+function pgRotas(){
+  const m={};S.trips.filter(t=>t.status==='encerrada').forEach(t=>{const k=t.orig+' → '+t.dest,c=calc(t),r=m[k]||(m[k]={k,n:0,frete:0,km:0,vazio:0,lucro:0});r.n++;r.frete+=t.frete;r.km+=c.km;r.vazio+=t.kmVazio;r.lucro+=c.lucro});
+  const rs=Object.values(m).sort((a,b)=>b.lucro/b.frete-a.lucro/a.frete);
+  return head('Rotas','Quais rotas dão mais resultado, com todas as viagens encerradas. Margem antes de manutenção e custos fixos.')+`
+  <section class="panel"><div class="scroll"><table><tr><th>Rota</th><th class="r">Viagens</th><th class="r">Frete médio</th><th class="r">Receita por km rodado</th><th class="r">Km vazio</th><th class="r">Lucro médio</th><th>Margem</th></tr>
+   ${rs.map(r=>{const mg=r.lucro/r.frete*100;return`<tr><td>${esc(r.k)}</td><td class="r">${r.n}</td><td class="r">${R(r.frete/r.n)}</td><td class="r">R$ ${N(r.frete/r.km,2)}</td><td class="r">${N(r.vazio/r.km*100)}%</td><td class="r">${val(r.lucro/r.n)}</td><td><div class="row" style="flex-wrap:nowrap"><div class="bar" style="flex:1"><i class="${mg<0?'n':''}" style="width:${Math.min(100,Math.abs(mg)*1.6)}%"></i></div><span class="num">${N(mg)}%</span></div></td></tr>`}).join('')}
+  </table></div><p class="small muted">As rotas com retorno vazio ficam no fim da lista: o diesel da volta consome a margem da ida.</p></section>`;
+}
+function pgCheckup(){
+  const G=[
+   ['Cadastros',[['Motoristas, caminhões e comissão, com edição',1],['Clientes e embarcadores',2],['Fornecedores, postos e oficinas',2]]],
+   ['Viagens',[['Início e encerramento pelo motorista',1],['Criação e correção pelo administrador',1],['Lucro por viagem, motorista, caminhão e rota',1],['Tabela de fretes e cotação por rota',2],['Comprovante de entrega com foto',2]]],
+   ['Despesas de viagem',[['Diesel com litros e consumo km/l',1],['Pedágio, alimentação, borracharia, chapa, estadia',1],['Aprovação e edição pelo administrador',1],['Foto do comprovante',2]]],
+   ['Motoristas',[['Extrato individual com acesso restrito',1],['Quanto deixou de ganhar por viagem',1],['Acerto com adiantamentos e reembolsos',1],['Multas e descontos',2],['Controle de jornada e descanso',2]]],
+   ['Frota',[['Manutenção, peças e imprevistos',1],['Pneus por posição, com troca e recapagem',1],['Estoque de peças',2],['Sinistros e franquias',2]]],
+   ['Seguros e documentos',[['Casco, terceiros, carga e vida',1],['CNH, toxicológico, tacógrafo, licenciamento',1],['RNTRC/ANTT e licenças especiais',2]]],
+   ['Alertas',[['Regras de antecedência configuráveis',1],['Dispensar e restaurar alertas',1],['Lembretes próprios',1],['Aviso por WhatsApp ao administrador',2]]],
+   ['Rastreamento',[['Mapa com posição dos caminhões (simulado)',1],['Ligação com o rastreador real por API',3],['Cerca virtual e aviso de desvio de rota',3]]],
+   ['Financeiro',[['Custos fixos e custo por km',1],['Contas a receber dos clientes',2],['Contas a pagar e fluxo de caixa',2],['Relatórios em PDF e planilha',2]]],
+   ['Integrações',[['WhatsApp para os motoristas (simulado)',1],['WhatsApp real com número da empresa',3],['CT-e, MDF-e, CIOT e vale-pedágio',3],['Cartão combustível e tag de pedágio',3]]],
+   ['Acesso e segurança',[['Perfis de administrador e motorista',1],['Login individual por motorista (demonstração)',1],['Login protegido no servidor',2],['Dados em tempo real entre todos os aparelhos',2],['Histórico de alterações e cópia de segurança',2]]]];
+  const c=['','<span class="chip ok">No protótipo</span>','<span class="chip warn">Sistema real</span>','<span class="chip">Integração</span>'];
+  return head('Checkup do sistema','Tudo o que o sistema precisa cobrir, e em que etapa cada item entra.')+`
+  <div class="mods">${G.map(([t,its])=>`<section class="panel"><header><h2>${t}</h2></header><ul>${its.map(i=>`<li><span>${i[0]}</span>${c[i[1]]}</li>`).join('')}</ul></section>`).join('')}</div>`;
+}
+
+/* ---------- edição genérica ---------- */
+const TIPOS=['Diesel','Pedágio','Alimentação','Borracharia','Chapa / descarga','Estadia','Arla 32','Outros'],tl=x=>x==='Diesel'?'Combustível':x;
+const SC={
+ driver:{t:'motorista',arr:'drivers',novo:()=>({nome:'',fone:'',usuario:'',pin:'',com:10,truck:S.trucks[0].id,cnh:mais(HOJE,365),tox:mais(HOJE,365)}),
+  f:[['nome','Nome'],['fone','WhatsApp','text',0],['usuario','Usuário de acesso'],['pin','PIN de 4 dígitos'],['com','Comissão sobre o frete (%)','num'],['truck','Caminhão','truck'],['cnh','Validade da CNH','date'],['tox','Validade do exame toxicológico','date']],
+  ok:o=>o.com<0||o.com>50?'A comissão precisa ficar entre 0 e 50%.':!/^\d{4}$/.test(o.pin)?'O PIN precisa ter 4 números.':/\s/.test(o.usuario)?'O usuário não pode ter espaços.':S.drivers.some(x=>x.id!==o.id&&(x.usuario||'').toLowerCase()===o.usuario.toLowerCase())?'Já existe um motorista com este usuário.':'',pos:o=>{o.usuario=o.usuario.toLowerCase()},trava:o=>S.trips.some(t=>t.driver===o.id)?'Este motorista tem viagens lançadas e não pode ser excluído.':S.drivers.length<2?'O sistema precisa de pelo menos um motorista.':''},
+ truck:{t:'caminhão',arr:'trucks',novo:()=>({placa:'',placaCarreta:'',mod:'',ano:2024,km:0,meta:2.4,rev:20000,tac:mais(HOJE,365),lic:mais(HOJE,365)}),
+  f:[['placa','Placa do cavalo'],['placaCarreta','Placa da carreta','text',0],['mod','Descrição do conjunto'],['ano','Ano','num'],['km','Km atual','num'],['meta','Meta de consumo (km/l)','num'],['rev','Próxima revisão no km','num'],['tac','Tacógrafo aferido até','date'],['lic','Licenciamento válido até','date']],
+  pos:(o,nv)=>{o.placa=o.placa.toUpperCase();o.placaCarreta=(o.placaCarreta||'').toUpperCase();if(nv)S.pneus[o.id]=geraPneus(o.id,1)},trava:o=>S.trips.some(t=>t.truck===o.id)||S.drivers.some(d=>d.truck===o.id)?'Este caminhão está ligado a um motorista ou a viagens e não pode ser excluído.':''},
+ trip:{t:'viagem',arr:'trips',id:()=>++S.seq,novo:()=>({driver:S.drivers[0].id,truck:S.drivers[0].truck,orig:'',dest:'',carga:'',frete:'',ini:HOJE,fim:null,kmIni:'',kmFim:null,kmVazio:0,adi:0,status:'andamento',desp:[]}),
+  f:[['driver','Motorista','driver'],['truck','Caminhão','truck'],['orig','Origem'],['dest','Destino'],['carga','Carga'],['frete','Valor do frete (R$)','num'],['adi','Adiantamento (R$)','num'],['ini','Início','date'],['kmIni','Km inicial','num'],['status','Situação','sel',1,[['andamento','Em viagem'],['encerrada','Encerrada']]],['fim','Chegada','date',0],['kmFim','Km final','num',0],['kmVazio','Km rodado vazio','num']],
+  ok:o=>{if(o.frete<=0)return'Informe o valor do frete.';
+   if(o.status==='andamento'&&S.trips.some(t=>t.driver===o.driver&&t.status==='andamento'&&t.id!==o.id))return'Este motorista já tem uma viagem em andamento.';
+   if(o.status==='encerrada'){if(!o.fim)return'Informe a data de chegada.';if(o.fim<o.ini)return'A chegada não pode ser antes do início.';if(!o.kmFim||o.kmFim<=o.kmIni)return'O km final precisa ser maior que o km inicial.';if(o.kmVazio>=o.kmFim-o.kmIni)return'O km vazio precisa ser menor que o total rodado.'}return''},
+  pos:o=>{if(o.status==='andamento'){o.kmFim=null;o.fim=null}else{const t=trk(o.truck);if(t&&o.kmFim>t.km)t.km=o.kmFim}}},
+ desp:{t:'despesa',novo:()=>({tipo:'Diesel',valor:'',litros:null,data:HOJE,pago:'empresa',status:'aprovada'}),
+  f:[['tipo','Tipo','sel',1,TIPOS.map(x=>[x,tl(x)])],['valor','Valor (R$)','num'],['litros','Litros (se combustível)','num',0],['obs','Observação','text',0],['data','Data','date'],['pago','Quem pagou','sel',1,[['empresa','Empresa'],['motorista','Motorista']]],['status','Situação','sel',1,[['aprovada','Aprovada'],['pendente','Pendente'],['recusada','Recusada']]]]},
+ manut:{t:'manutenção',arr:'manut',novo:()=>({truck:S.trucks[0].id,data:HOJE,tipo:'Preventiva',desc:'',valor:'',imp:0}),
+  f:[['truck','Caminhão','truck'],['data','Data','date'],['tipo','Tipo','sel',1,['Preventiva','Corretiva','Pneus','Peças'].map(x=>[x,x])],['desc','Descrição'],['valor','Valor (R$)','num'],['imp','Foi imprevisto?','bool']]},
+ apolice:{t:'apólice',arr:'apolices',novo:()=>({nome:'',cob:'',val:mais(HOJE,365),mes:'',obr:0}),f:[['nome','Seguro'],['cob','Cobertura'],['val','Vigência até','date'],['mes','Custo mensal (R$)','num'],['obr','É obrigatório?','bool']]},
+ fixo:{t:'custo fixo',arr:'fixos',novo:()=>({nome:'',mes:''}),f:[['nome','Custo'],['mes','Valor mensal (R$)','num']]},
+ lemb:{t:'lembrete',arr:'lemb',novo:()=>({txt:'',data:mais(HOJE,30)}),f:[['txt','Lembrete'],['data','Data limite','date']]},
+ pneu:{t:'pneu',semDel:1,f:[['sulco','Sulco (mm)','num'],['rec','Recapagens','num'],['km','Km rodado','num'],['custo','Custo acumulado (R$)','num']]}
+};
+const lista=e=>e.tipo==='desp'?S.trips.find(t=>t.id==e.parent).desp:e.tipo==='pneu'?S.pneus[e.parent]:S[SC[e.tipo].arr];
+function modal(){
+  const e=S.ed;if(!e)return'';const sc=SC[e.tipo],o=e.id!=null?lista(e).find(x=>x.id==e.id):sc.novo();if(!o){S.ed=null;return''}
+  const inp=([k,lb,tp='text',req=1,ops])=>{const v=o[k],id='ed-'+k;let h;
+   if(tp==='truck')h=`<select id="${id}" name="${k}">${S.trucks.map(t=>`<option value="${t.id}" ${t.id==v?'selected':''}>${esc(t.placa)}</option>`).join('')}</select>`;
+   else if(tp==='driver')h=`<select id="${id}" name="${k}">${S.drivers.map(t=>`<option value="${t.id}" ${t.id==v?'selected':''}>${esc(t.nome)}</option>`).join('')}</select>`;
+   else if(tp==='sel'){const op=ops.some(x=>x[0]===v)||v==null?ops:[[v,v],...ops];h=`<select id="${id}" name="${k}">${op.map(x=>`<option value="${esc(x[0])}" ${x[0]===v?'selected':''}>${esc(x[1])}</option>`).join('')}</select>`}
+   else if(tp==='bool')h=`<select id="${id}" name="${k}"><option value="0">Não</option><option value="1" ${v?'selected':''}>Sim</option></select>`;
+   else if(tp==='date')h=`<input id="${id}" name="${k}" type="date" value="${esc(v||'')}">`;
+   else if(tp==='num')h=`<input id="${id}" name="${k}" inputmode="decimal" value="${v==null?'':esc(String(v).replace('.',','))}">`;
+   else h=`<input id="${id}" name="${k}" value="${esc(v)}">`;
+   return`<label class="f" ${tp==='text'&&!['placa','placaCarreta','fone','usuario','pin'].includes(k)?'style="grid-column:span 2"':''}>${lb}${req?'':' (opcional)'}${h}</label>`};
+  return`<div class="ov" data-act="fecha"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dlg-t">
+   <h2 id="dlg-t">${e.id!=null?'Editar ':'Cadastrar '}${sc.t}</h2>
+   <form class="grid" data-form="ed">${sc.f.map(inp).join('')}
+    <div class="row" style="grid-column:1/-1;justify-content:space-between;margin-top:6px"><span class="row"><button class="btn pri">Salvar</button><button type="button" class="btn" data-act="fecha2">Cancelar</button></span>
+    ${e.id!=null&&!sc.semDel?`<button type="button" class="btn del" data-act="del">${e.conf?'Confirmar exclusão':'Excluir'}</button>`:''}</div></form>
+   ${e.err?`<p class="err">${esc(e.err)}</p>`:''}</div></div>`;
+}
+function salvaEd(f){
+  const e=S.ed,sc=SC[e.tipo],arr=lista(e),nv=e.id==null,o=nv?sc.novo():arr.find(x=>x.id==e.id),tmp={};
+  for(const[k,lb,tp='text',req=1]of sc.f){let v=f[k];
+   if(tp==='num'){v=v===''||v==null?null:toNum(v);if(v===null&&req){e.err='Preencha "'+lb+'" com um número.';return}}
+   else if(tp==='truck'||tp==='driver')v=+v;else if(tp==='bool')v=v==='1'?1:0;
+   else{v=(v||'').trim();if(!v&&req){e.err='Preencha "'+lb+'".';return}if(!v&&tp==='date')v=null}
+   tmp[k]=v}
+  const er=sc.ok&&sc.ok({...o,...tmp});if(er){e.err=er;return}
+  Object.assign(o,tmp);if(nv){o.id=sc.id?sc.id():uid();arr.push(o)}sc.pos&&sc.pos(o,nv);S.ed=null;toast(nv?'Cadastrado':'Alterações salvas');
+}
+let tt;function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,2400)}
+
+/* ---------- motorista ---------- */
+const CATS=[['Diesel','Combustível'],['Pedágio','Pedágio'],['Alimentação','Alimentação'],['Borracharia','Borracharia'],['Chapa / descarga','Chapa e descarga'],['Outros','Outros']];
+function gastos(t){
+  const ok=t.desp.filter(e=>e.status!=='recusada'),base=CATS.slice(0,5).map(c=>c[0]),tot=k=>ok.filter(e=>k==='Outros'?!base.includes(e.tipo):e.tipo===k).reduce((s,e)=>s+e.valor,0),c=S.showDesp,lit=ok.reduce((s,e)=>s+(e.litros||0),0);
+  const ed=S.dEdit&&c?t.desp.find(e=>e.id===S.dEdit):null,tp=ed?ed.tipo:c,V=x=>x==null||x===''?'':esc(String(x).replace('.',','));
+  const pago=def=>{const m=ed?ed.pago==='motorista':def;return`<label class="f">Quem pagou<select id="d-pago" name="pago"><option value="empresa">Cartão ou tag da empresa</option><option value="motorista" ${m?'selected':''}>Do meu bolso</option></select></label>`};
+  const valor=lb=>`<label class="f">${lb}<input id="d-valor" name="valor" inputmode="decimal" value="${ed?V(ed.valor):''}" required></label>`,obs=(lb,ph='')=>`<label class="f">${lb}<input id="d-obs" name="obs" value="${ed?esc(ed.obs||''):''}" placeholder="${ph}"></label>`;
+  const form=!c?'':`<form class="grid" data-form="desp"><p class="lbl" style="grid-column:1/-1">${ed?'Editar lançamento':'Novo lançamento'} · ${esc(tl(tp))}</p>
+    ${tp==='Diesel'?`<label class="f">Litros<input id="d-litros" name="litros" inputmode="decimal" value="${ed?V(ed.litros):''}" required></label><label class="f">Preço por litro (R$)<input id="d-preco" name="preco" inputmode="decimal" value="${ed&&ed.litros?V((ed.valor/ed.litros).toFixed(2)):''}" placeholder="Ex.: 6,19"></label>${valor('Valor total (R$)')}<label class="f">Km no abastecimento<input id="d-kmab" name="kmAb" inputmode="numeric" value="${ed?V(ed.kmAb):''}"></label>${pago()}${obs('Posto')}`
+    :tp==='Pedágio'?`${valor('Valor (R$)')}${obs('Praça ou rodovia','Ex.: BR-163, km 94')}${pago()}`
+    :`${valor('Valor (R$)')}${obs('Observação')}${pago(1)}`}
+    <label class="f" style="grid-column:1/-1">Foto do comprovante<input id="d-foto" type="file" accept="image/*"></label>
+    <button class="btn pri" style="grid-column:1/-1">${ed?'Salvar alteração':'Enviar '+esc(tl(tp)).toLowerCase()}</button>
+    ${ed?`<div class="row" style="grid-column:1/-1;justify-content:space-between"><button type="button" class="btn" data-act="dcancel">Cancelar</button><button type="button" class="btn del" data-act="ddel">Excluir lançamento</button></div>`:''}</form>`;
+  return`<div><span class="lbl">Lançar gasto da viagem · toque na categoria</span></div>
+    <div class="cats">${CATS.map(([k,n])=>`<button data-act="cat" data-v="${k}" aria-pressed="${c===k}"><span>${n}</span><b>${R(tot(k))}</b>${k==='Diesel'&&lit?`<span class="small">${N(lit)} litros</span>`:''}</button>`).join('')}</div>
+    ${form}
+    <div class="list">${t.desp.map(e=>`<div><span>${esc(tl(e.tipo))}${e.litros?' · '+N(e.litros)+' L':''}<br><span class="small" style="color:var(--road-muted)">${D(e.data)}${e.obs?' · '+esc(e.obs):''}</span></span><span class="row"><span class="num">${R(e.valor)}</span><span class="chip ${e.status==='aprovada'?'ok':e.status==='pendente'?'warn':'bad'}">${e.status}</span><button class="btn sm" data-act="dedit" data-id="${e.id}">Editar</button></span></div>`).join('')}<div><span><b>Total de gastos</b></span><b class="num">${R(ok.reduce((s,e)=>s+e.valor,0))}</b></div></div>
+    <p class="small" style="color:var(--road-muted)">Você pode editar qualquer gasto enquanto a viagem está em andamento. Um gasto já aprovado que for editado volta para aprovação.</p>`;
+}
+function mInicio(){
+  const d=drv(S.me),t=ativa(d.id),tr=trk(d.truck),a=agg(HOJE.slice(0,7),x=>x.driver===d.id);
+  let h=`<div><span class="lbl">Motorista</span><h1>Olá, ${esc(d.nome.split(' ')[0])}</h1><p class="muted" style="margin-top:6px">${plates(d.truck)} · comissão de ${N(d.com,1)}% sobre o frete</p></div>`;
+  if(t){const c=calc(t);
+   h+=`<section class="hero"><div class="row" style="justify-content:space-between"><span class="chip run">Viagem ${t.id} em andamento</span><span class="small" style="color:var(--road-muted)">desde ${D(t.ini)}</span></div>
+    <p class="rtt">${esc(t.orig)}<br><span style="color:var(--yt)">→ ${esc(t.dest)}</span></p><p style="color:var(--road-muted)">${esc(t.carga)} · km inicial ${N(t.kmIni)}</p>
+    <div class="pair dark"><div><span class="lbl">Frete</span><b>${R(t.frete)}</b></div><div><span class="lbl">Sua comissão</span><b style="color:var(--yt)">${R(c.com)}</b></div></div>
+    ${gastos(t)}
+    <button class="btn big2 ghost" data-act="tog" data-k="showFim">Encerrar viagem</button>
+    ${S.showFim?`<form class="grid" data-form="fim">
+      <label class="f">Km final<input id="e-km" name="kmFim" inputmode="numeric" required placeholder="maior que ${N(t.kmIni)}"></label>
+      <label class="f">Km rodado vazio<input id="e-vazio" name="vazio" inputmode="numeric" value="0"></label>
+      <label class="f">Data de chegada<input id="e-data" name="fim" type="date" value="${HOJE}" required></label>
+      <button class="btn pri" style="grid-column:1/-1">Confirmar encerramento</button></form>`:''}
+    ${S.formErr?`<p class="err">${S.formErr}</p>`:''}</section>`;
+  }else{
+   h+=`<section class="hero"><h2>Iniciar nova viagem</h2>
+    <form class="grid" data-form="nova">
+     <label class="f">Data de início<input id="n-ini" name="ini" type="date" value="${HOJE}" required></label>
+     <label class="f">Km do veículo<input id="n-km" name="kmIni" inputmode="numeric" value="${tr?tr.km:''}" required></label>
+     <label class="f">Origem<input id="n-orig" name="orig" required placeholder="Cidade/UF"></label>
+     <label class="f">Destino<input id="n-dest" name="dest" required placeholder="Cidade/UF"></label>
+     <label class="f">Carga<input id="n-carga" name="carga" required placeholder="Ex.: soja 37 t"></label>
+     <label class="f">Valor do frete (R$)<input id="n-frete" name="frete" inputmode="decimal" required></label>
+     <button class="btn big2 pri" style="grid-column:1/-1">Iniciar viagem</button></form>
+    ${S.formErr?`<p class="err">${S.formErr}</p>`:''}</section>`;
+  }
+  return h+`<section class="panel"><header><h2>Outubro até agora</h2></header><div class="pair"><div><span class="lbl">Fretes feitos</span><b>${a.n}</b></div><div><span class="lbl">Comissão ganha</span><b data-n="${a.com}">${R(a.com)}</b></div></div></section>`;
+}
+function mExtrato(){
+  const d=drv(S.me),a=agg(S.per,x=>x.driver===d.id),ts=S.trips.filter(t=>t.driver===d.id&&t.status==='encerrada'&&t.ini.startsWith(S.per)).sort((x,y)=>y.ini.localeCompare(x.ini));
+  return`<div><h1>Meu extrato</h1><p class="muted" style="margin-top:6px">Só as suas viagens. Viagem encerrada não pode ser alterada por você.</p></div>${perSel()}
+   <section class="hero"><div><span class="lbl">Você ganhou</span><b class="big" data-n="${a.com}">${R(a.com)}</b></div>
+    <div class="minis"><div><span class="lbl">Fretes</span><b>${a.n}</b></div><div><span class="lbl">Km rodado</span><b>${N(a.km)}</b></div><div><span class="lbl">Deixou de ganhar</span><b style="color:var(--warn)">${R(a.perd)}</b></div></div>
+    <p class="small" style="color:var(--road-muted)">Deixou de ganhar: comissão estimada sobre os ${N(a.vazio)} km rodados vazios.</p></section>
+   ${ts.map(t=>{const c=calc(t),meta=trk(t.truck)?.meta??0;return`<section class="panel"><header><b>${esc(t.orig)} → ${esc(t.dest)}</b><span class="small muted">${D(t.ini)} a ${D(t.fim)}</span></header>
+    <p class="small muted">${esc(t.carga)} · ${N(c.km)} km${t.kmVazio?' ('+N(t.kmVazio)+' vazio)':''}${c.media?' · '+N(c.media,2)+' km/l'+(c.media<meta?' <span class="chip warn">meta '+N(meta,1)+'</span>':''):''}</p>
+    <div class="list"><div><span>Frete</span><b class="num">${R(t.frete)}</b></div><div><span>Sua comissão (${N(d.com,1)}%)</span><b class="num pos">${R(c.com)}</b></div>${c.perd?`<div><span>Deixou de ganhar</span><b class="num" style="color:var(--warn)">${R(c.perd)}</b></div>`:''}<div><span>Combustível${c.litros?' · '+N(c.litros)+' L':''}</span><span class="num">${R(c.diesel)}</span></div><div><span>Pedágio</span><span class="num">${R(c.ped)}</span></div><div><span>Outros gastos</span><span class="num">${R(c.outros)}</span></div><div><span>Adiantamento recebido</span><span class="num">${R(t.adi)}</span></div></div></section>`}).join('')||'<p class="muted">Nenhuma viagem encerrada neste período.</p>'}`;
+}
+function zapOf(id){return S.zap[id]||(S.zap[id]={step:null,tmp:{},msgs:[{b:1,t:'Olá! Sou o assistente da empresa. O que você quer fazer?\n1 Iniciar viagem\n2 Lançar despesa\n3 Encerrar viagem\n4 Meu extrato'}]})}
+function mZap(){
+  const z=zapOf(S.me),q=z.step==='dtipo'?['Combustível','Pedágio','Alimentação','Borracharia','Outros']:z.step==='dpago'?['Empresa','Do meu bolso']:z.step?['Cancelar']:['Iniciar viagem','Lançar despesa','Encerrar viagem','Meu extrato'];
+  return`<div><h1>Pelo WhatsApp</h1><p class="muted" style="margin-top:6px">Simulação: o motorista conversa com o número da empresa e o sistema registra tudo. O que for lançado aqui aparece no painel do administrador.</p></div>
+   <div class="chat" id="chat">${z.msgs.map(m=>`<div class="msg ${m.b?'':'me'}">${esc(m.t)}</div>`).join('')}</div>
+   <div class="quick">${q.map(x=>`<button class="btn sm" data-act="zq" data-v="${x}">${x}</button>`).join('')}</div>
+   <form class="send" data-form="zap"><input id="z-in" name="t" autocomplete="off" placeholder="Digite uma mensagem" aria-label="Mensagem"><button class="btn pri">Enviar</button></form>`;
+}
+function zapIn(txt){
+  const z=zapOf(S.me),d=drv(S.me),tr=trk(d.truck),s=txt.trim(),l=s.toLowerCase(),bot=t=>z.msgs.push({b:1,t});
+  if(!s)return;z.msgs.push({t:s});const act=ativa(d.id);
+  if(l==='cancelar'){z.step=null;return bot('Cancelado. Envie 1, 2, 3 ou 4 quando quiser.')}
+  switch(z.step){
+   case'orig':z.tmp.orig=s;z.step='dest';return bot('Qual a cidade de destino?');
+   case'dest':z.tmp.dest=s;z.step='carga';return bot('Qual a carga? Ex.: soja 37 t');
+   case'carga':z.tmp.carga=s;z.step='km';return bot('Qual o km do veículo agora? O último registrado é '+N(tr.km)+'.');
+   case'km':{const v=toNum(s);if(!v||v<tr.km)return bot('O km precisa ser igual ou maior que '+N(tr.km)+'. Envie só o número.');z.tmp.kmIni=v;z.step='frete';return bot('Qual o valor do frete em reais?')}
+   case'frete':{const v=toNum(s);if(!v)return bot('Não entendi o valor. Envie só o número, por exemplo 12500.');const t=novaViagem({...z.tmp,frete:v,ini:HOJE},d);z.step=null;return bot('Viagem '+t.id+' iniciada.\n'+t.orig+' → '+t.dest+'\nFrete '+R(v)+'\nSua comissão: '+R(v*d.com/100)+'\nBoa viagem!')}
+   case'dtipo':z.tmp.tipo=l.startsWith('comb')?'Diesel':TIPOS.find(x=>x.toLowerCase().startsWith(l.slice(0,4)))||s;z.step='dvalor';return bot('Qual o valor em reais?');
+   case'dvalor':{const v=toNum(s);if(!v)return bot('Não entendi o valor. Envie só o número.');z.tmp.valor=v;if(z.tmp.tipo==='Diesel'){z.step='dlit';return bot('Quantos litros abasteceu?')}z.step='dpago';return bot('Quem pagou? Empresa (cartão ou tag) ou do seu bolso?')}
+   case'dlit':{const v=toNum(s);if(!v)return bot('Envie só o número de litros.');z.tmp.litros=v;z.step='dpago';return bot('Quem pagou? Empresa (cartão ou tag) ou do seu bolso?')}
+   case'dpago':act.desp.push({id:uid(),tipo:z.tmp.tipo,valor:z.tmp.valor,litros:z.tmp.litros||null,data:HOJE,pago:l.startsWith('emp')?'empresa':'motorista',status:'pendente'});z.step=null;return bot(tl(z.tmp.tipo)+' de '+R(z.tmp.valor)+(z.tmp.litros?' ('+N(z.tmp.litros)+' L)':'')+' registrado na viagem '+act.id+'. Envie a foto do comprovante por aqui. Aguardando aprovação.');
+   case'kmfim':{const v=toNum(s);if(!v||v<=act.kmIni)return bot('O km final precisa ser maior que '+N(act.kmIni)+'.');z.tmp.kmFim=v;z.step='vazio';return bot('Quantos km rodou vazio nessa viagem? Envie 0 se nenhum.')}
+   case'vazio':{const v=toNum(s)||0,km=z.tmp.kmFim-act.kmIni;if(v>=km)return bot('O km vazio precisa ser menor que os '+N(km)+' km da viagem.');encerra(act,z.tmp.kmFim,v,HOJE);z.step=null;const c=calc(act);return bot('Viagem '+act.id+' encerrada.\n'+N(c.km)+' km rodados\nSua comissão: '+R(c.com))}
+  }
+  z.tmp={};
+  if(/^1$|inici/.test(l)){if(act)return bot('Você já tem a viagem '+act.id+' em andamento. Encerre antes de iniciar outra.');if(!tr)return bot('Você está sem caminhão cadastrado. Fale com o escritório.');z.step='orig';return bot('Qual a cidade de origem?')}
+  if(/^2$|desp/.test(l)){if(!act)return bot('Você não tem viagem em andamento. Envie 1 para iniciar.');z.step='dtipo';return bot('Qual o tipo da despesa?')}
+  if(/^3$|encerr/.test(l)){if(!act)return bot('Você não tem viagem em andamento.');z.step='kmfim';return bot('Qual o km final? O inicial foi '+N(act.kmIni)+'.')}
+  if(/^4$|extra/.test(l)){const a=agg(HOJE.slice(0,7),x=>x.driver===d.id);return bot('Outubro até agora:\n'+a.n+' fretes encerrados\nComissão ganha: '+R(a.com)+'\nDeixou de ganhar: '+R(a.perd)+(act?'\nViagem '+act.id+' em andamento.':''))}
+  bot('Envie:\n1 Iniciar viagem\n2 Lançar despesa\n3 Encerrar viagem\n4 Meu extrato');
+}
+function novaViagem(f,d){const t={id:++S.seq,driver:d.id,truck:d.truck,orig:f.orig,dest:f.dest,ini:f.ini,fim:null,carga:f.carga,frete:f.frete,kmIni:f.kmIni,kmFim:null,kmVazio:0,adi:0,status:'andamento',desp:[]};S.trips.push(t);trk(d.truck).km=f.kmIni;return t}
+function encerra(t,kmFim,vazio,fim){t.kmFim=kmFim;t.kmVazio=vazio;t.fim=fim;t.status='encerrada';const k=trk(t.truck);if(k)k.km=kmFim}
+
+/* ---------- moldura e eventos ---------- */
+function loginView(){
+  const m=S.lgTab==='motorista';
+  return`<main class="login"><div class="brand" style="justify-content:center"><i>FG</i>Sistema Empresa FG</div>
+   <section class="hero"><h1 style="font-size:34px">Entrar</h1>
+    <div class="tabs" style="grid-template-columns:1fr 1fr"><button data-act="lgtab" data-v="motorista" aria-pressed="${m}">Motorista</button><button data-act="lgtab" data-v="admin" aria-pressed="${!m}">Administrador</button></div>
+    <form class="grid" data-form="login" style="grid-template-columns:minmax(0,1fr)">
+     ${m?`<label class="f">Usuário<input id="l-user" name="user" autocomplete="username" autocapitalize="none" required></label><label class="f">PIN de 4 dígitos<input id="l-pin" name="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" required></label>`
+       :`<label class="f">Senha do administrador<input id="l-pin" name="pin" type="password" autocomplete="current-password" required></label>`}
+     <button class="btn big2 pri">Entrar</button></form>
+    ${S.lgErr?`<p class="err">${S.lgErr}</p>`:''}</section>
+   <section class="panel"><span class="lbl">Acessos de exemplo para testar</span><div class="list">
+     <div><span>Administrador <span class="small muted">senha ${esc(S.adminPin)}</span></span><button class="btn sm" data-act="demo" data-v="admin">Entrar</button></div>
+     ${S.drivers.map(d=>`<div><span>${esc(d.nome)} <span class="small muted">usuário ${esc(d.usuario)} · PIN ${esc(d.pin)}</span></span><button class="btn sm" data-act="demo" data-v="${d.id}">Entrar</button></div>`).join('')}</div>
+    <p class="small muted">Esta lista só existe no protótipo. No sistema definitivo cada motorista recebe o próprio usuário e PIN, e o servidor só entrega a ele as viagens dele.</p></section></main>`;
+}
+function render(anim){
+  if(!S.auth||(S.auth.id&&!drv(S.auth.id))){S.auth=null;$('#app').innerHTML=loginView();$('#modal').innerHTML='';return}
+  if(!drv(S.me))S.me=S.drivers[0].id;
+  const adm=S.role==='admin',np=pend().length,nu=alertas().filter(x=>x.urg).length;
+  const pg={painel:pgPainel,gps:pgGps,viagens:pgViagens,alertas:pgAlertas,motoristas:pgMotoristas,acerto:pgAcerto,frota:pgFrota,pneus:pgPneus,seguros:pgSeguros,rotas:pgRotas,checkup:pgCheckup};
+  const bd={viagens:np?`<span class="badge">${np}</span>`:'',alertas:nu?`<span class="badge r">${nu}</span>`:''};
+  $('#app').innerHTML=`<div class="top"><div class="brand"><i>FG</i>Sistema Empresa FG</div><span class="sp"></span>
+    <span class="small" style="color:var(--road-muted)">${adm?'Administrador':esc(drv(S.me).nome)}</span><button class="btn sm" data-act="sair">Sair</button></div>
+   <div class="demo"><span>Protótipo com dados de exemplo. O login aqui é uma demonstração: a proteção real dos dados vem com o banco de dados do sistema definitivo.</span>${adm?`<button data-act="reset">${S.rst?'Confirmar: apagar alterações':'Restaurar dados de exemplo'}</button>`:''}</div>
+   ${adm?`<div class="shell"><nav class="nav" aria-label="Menu">${PAGES.map(p=>`<button data-act="page" data-v="${p[0]}" ${S.page===p[0]?'aria-current="page"':''}>${p[1]}${bd[p[0]]||''}</button>`).join('')}</nav><main class="main ${anim?'enter':''}">${pg[S.page]()}</main></div>`
+   :`<main class="phone"><div class="tabs">${[['inicio','Viagem'],['extrato','Extrato'],['zap','WhatsApp']].map(t=>`<button data-act="mtab" data-v="${t[0]}" aria-pressed="${S.mtab===t[0]}">${t[1]}</button>`).join('')}</div>${{inicio:mInicio,extrato:mExtrato,zap:mZap}[S.mtab]()}</main>`}`;
+  $('#modal').innerHTML=modal();
+  const c=$('#chat');if(c)c.scrollTop=c.scrollHeight;
+  if(anim)anima();
+}
+function anima(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  document.querySelectorAll('[data-n]').forEach(el=>{const v=+el.dataset.n,txt=el.textContent,f=el.dataset.f==='N'?N:R,t0=performance.now();
+   const step=now=>{const p=Math.min(1,(now-t0)/650),e=1-Math.pow(1-p,3);el.textContent=p<1?f(v*e):txt;if(p<1)requestAnimationFrame(step)};requestAnimationFrame(step)});
+}
+const findDesp=id=>{for(const t of S.trips){const e=t.desp.find(x=>x.id==id);if(e)return e}};
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,v=b.dataset.v;
+  if(a==='fecha'){if(e.target!==b)return;S.ed=null}
+  else if(a==='fecha2')S.ed=null;
+  S.formErr='';if(a!=='reset')S.rst=false;let anim=false;
+  if(a==='lgtab'){S.lgTab=v;S.lgErr=''}
+  else if(a==='demo'){entra(v==='admin'?{role:'admin'}:{role:'motorista',id:+v});anim=true}
+  else if(a==='sair'){S.auth=null;S.ed=null;S.lgErr=''}
+  else if(a==='dedit'){const x=findDesp(b.dataset.id);S.dEdit=x.id;S.showDesp=CATS.slice(0,5).some(c=>c[0]===x.tipo)?x.tipo:'Outros';S.showFim=false}
+  else if(a==='dcancel'){S.dEdit=null;S.showDesp=false}
+  else if(a==='ddel'){const t=ativa(S.me),x=t.desp.findIndex(e=>e.id===S.dEdit);if(x>=0)t.desp.splice(x,1);S.dEdit=null;S.showDesp=false;toast('Lançamento excluído')}
+  else if(a==='page'){S.page=v;S.open=null;S.seg=null;anim=true}
+  else if(a==='per'){S.per=v;S.seg=null;anim=true}
+  else if(a==='mtab'){S.mtab=v;anim=true}
+  else if(a==='open')S.open=S.open==b.dataset.t?null:+b.dataset.t;
+  else if(a==='aprova'||a==='recusa'){findDesp(b.dataset.id).status=a==='aprova'?'aprovada':'recusada';toast(a==='aprova'?'Despesa aprovada':'Despesa recusada')}
+  else if(a==='pagar'){const k=b.dataset.k;if(S.pagos[k])delete S.pagos[k];else{S.pagos[k]=1;toast('Acerto marcado como pago')}}
+  else if(a==='pneu')S.pneuSel=S.pneuSel==b.dataset.i?null:+b.dataset.i;
+  else if(a==='troca'){const p=S.pneus[S.pneuTruck].find(x=>x.id===S.pneuSel);Object.assign(p,{sulco:16,rec:0,km:0,custo:2900});toast('Pneu novo registrado')}
+  else if(a==='cat'){S.showDesp=S.showDesp===v&&!S.dEdit?false:v;S.dEdit=null;S.showFim=false}
+  else if(a==='tog'){const k=b.dataset.k,on=!S[k];S.showDesp=S.showFim=false;S.dEdit=null;S[k]=on}
+  else if(a==='zq')zapIn(v);
+  else if(a==='seg')S.seg=S.seg==v?null:+v;
+  else if(a==='gps')S.gpsSel=S.gpsSel==v?null:+v;
+  else if(a==='vpneus'){S.page='pneus';S.pneuTruck=+v;S.pneuSel=null;anim=true}
+  else if(a==='sil'){S.sil[v]=1;toast('Alerta dispensado')}
+  else if(a==='resil'){S.sil={};toast('Alertas restaurados')}
+  else if(a==='ed')S.ed={tipo:b.dataset.tipo,id:+b.dataset.id,parent:b.dataset.parent||null};
+  else if(a==='novo')S.ed={tipo:b.dataset.tipo,id:null,parent:b.dataset.parent||null};
+  else if(a==='del'){const ed=S.ed,sc=SC[ed.tipo],arr=lista(ed),o=arr.find(x=>x.id==ed.id),tv=sc.trava&&sc.trava(o);
+    if(tv)ed.err=tv;else if(!ed.conf)ed.conf=true;else{arr.splice(arr.indexOf(o),1);S.ed=null;toast('Excluído')}}
+  else if(a==='reset'){if(!S.rst)S.rst=true;else{Object.assign(S,seed(),{rst:false,zap:{},ed:null,open:null,auth:S.auth});toast('Dados de exemplo restaurados')}}
+  render(anim);save();
+  if(a==='zq'){const i=$('#z-in');if(i)i.focus()}
+  if(a==='dedit'){const f=$('[data-form="desp"]');if(f)f.scrollIntoView({block:'center'})}
+  if(a==='ed'||a==='novo'){const i=$('#modal input,#modal select');if(i)i.focus()}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&S.ed){S.ed=null;render()}
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches('tr.click,.tk')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}
+});
+document.addEventListener('input',e=>{if(e.target.id==='d-litros'||e.target.id==='d-preco'){const l=toNum($('#d-litros').value),p=toNum($('#d-preco').value);if(l&&p)$('#d-valor').value=(l*p).toFixed(2).replace('.',',')}});
+document.addEventListener('change',e=>{
+  const c=e.target.dataset.chg;if(!c)return;const v=e.target.value;
+  if(c==='me'){S.me=+v;S.showDesp=S.showFim=false}
+  else if(c==='fstatus')S.fStatus=v;
+  else if(c==='pneutruck'){S.pneuTruck=+v;S.pneuSel=null}
+  render();
+});
+document.addEventListener('submit',e=>{
+  e.preventDefault();const f=Object.fromEntries(new FormData(e.target)),k=e.target.dataset.form,d=drv(S.me);S.formErr='';
+  if(k==='login'){if(S.lgTab==='admin'){if(f.pin===S.adminPin)entra({role:'admin'});else S.lgErr='Senha incorreta.'}
+    else{const u=(f.user||'').trim().toLowerCase(),x=S.drivers.find(x=>(x.usuario||'').toLowerCase()===u&&x.pin===f.pin);if(x)entra({role:'motorista',id:x.id});else S.lgErr='Usuário ou PIN incorretos.'}
+    render(true);save();return}
+  else if(k==='senha'){const n=(f.nova||'').trim();if(n.length<4)S.formErr='A senha precisa de pelo menos 4 caracteres.';else{S.adminPin=n;toast('Senha do administrador alterada')}}
+  else if(k==='zap')zapIn(f.t);
+  else if(k==='ed')salvaEd(f);
+  else if(k==='cfg'){const o={};for(const x of['dias','urg','kmRev','sulco','retorno']){const n=toNum(f[x]);if(n===null||n<0){S.formErr='Preencha todas as regras com números.';break}o[x]=n}
+    if(!S.formErr){if(o.urg>o.dias)S.formErr='O prazo urgente precisa ser menor ou igual ao prazo de aviso.';else{S.cfg=o;toast('Regras salvas')}}}
+  else if(k==='nova'){const km=toNum(f.kmIni),fr=toNum(f.frete),tr=trk(d.truck);
+    if(!tr)S.formErr='Você está sem caminhão cadastrado.';
+    else if(!km||km<tr.km)S.formErr='O km do veículo precisa ser igual ou maior que '+N(tr.km)+', o último registrado.';
+    else if(!fr)S.formErr='Informe o valor do frete em reais.';
+    else{novaViagem({...f,kmIni:km,frete:fr},d);toast('Viagem iniciada')}}
+  else if(k==='desp'){const t0=ativa(d.id),x=S.dEdit?t0.desp.find(e=>e.id===S.dEdit):null,tp=x?x.tipo:S.showDesp,v=toNum(f.valor),l=toNum(f.litros);if(!v)S.formErr='Informe o valor.';else if(tp==='Diesel'&&!l)S.formErr='Informe os litros abastecidos.';else if(x){Object.assign(x,{valor:v,litros:tp==='Diesel'?l:null,obs:(f.obs||'').trim(),kmAb:toNum(f.kmAb),pago:f.pago,status:'pendente'});S.dEdit=null;S.showDesp=false;toast('Alteração enviada para aprovação')}else{ativa(d.id).desp.push({id:uid(),tipo:tp,valor:v,litros:tp==='Diesel'?l:null,obs:(f.obs||'').trim(),kmAb:toNum(f.kmAb),data:HOJE,pago:f.pago,status:'pendente'});S.showDesp=false;toast(tl(tp)+': enviado para aprovação')}}
+  else if(k==='fim'){const t=ativa(d.id),km=toNum(f.kmFim),vz=toNum(f.vazio)||0;
+    if(!km||km<=t.kmIni)S.formErr='O km final precisa ser maior que o km inicial ('+N(t.kmIni)+').';
+    else if(vz>=km-t.kmIni)S.formErr='O km vazio precisa ser menor que o total rodado.';
+    else if(f.fim<t.ini)S.formErr='A chegada não pode ser antes do início da viagem.';
+    else{encerra(t,km,vz,f.fim);S.showFim=false;toast('Viagem encerrada')}}
+  render();save();if(k==='zap'){const i=$('#z-in');if(i)i.focus()}
+});
+setInterval(()=>{tick++;S.trips.forEach(t=>{if(t.status==='andamento'&&t.gps!=null)t.gps=Math.min(.97,t.gps+.0012)});
+  const g=$('#gpsbox');if(g&&!S.ed&&!g.contains(document.activeElement))g.innerHTML=gpsBox()},2000);
+render(true);
+</script>
+
+</body></html>

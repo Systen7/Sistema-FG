@@ -1,0 +1,23 @@
+# Sistema completo num servidor: banco PostgreSQL + aplicação.
+# Uso: copie .env.example para .env, ajuste SESSION_SECRET e APP_URL, e rode: docker compose up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fg
+      POSTGRES_PASSWORD: ${DB_SENHA:-fg}
+      POSTGRES_DB: fg
+    volumes:
+      - dados:/var/lib/postgresql/data
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on: [db]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://fg:${DB_SENHA:-fg}@db:5432/fg
+    ports:
+      - "3000:3000"
+volumes:
+  dados:
