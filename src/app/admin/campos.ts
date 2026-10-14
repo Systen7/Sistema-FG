@@ -7,7 +7,10 @@ export const camposMotorista = (caminhoes: [string, string][], novo: boolean): C
   { nome: 'telefone', rotulo: 'Celular (WhatsApp) com DDD', tipo: 'tel', placeholder: '(66) 99999-0000', dica: 'O motorista entra com este número.' },
   { nome: 'pin', rotulo: novo ? 'PIN de 4 números' : 'Novo PIN', tipo: 'senha', obrig: novo, placeholder: novo ? '' : 'deixe vazio para manter', dica: novo ? 'Ou envie o link de acesso e ele não precisa decorar.' : undefined },
   { nome: 'comissaoPct', rotulo: 'Comissão sobre o frete (%)', tipo: 'num', dica: 'Vale para as próximas viagens; as já iniciadas mantêm o percentual delas.' },
-  { nome: 'caminhaoId', rotulo: 'Caminhão', tipo: 'select', opcoes: [['', 'Sem caminhão'], ...caminhoes] },
+  {
+    nome: 'caminhaoId', rotulo: 'Caminhão', tipo: 'select', opcoes: [['', caminhoes.length ? 'Sem caminhão' : 'Nenhum caminhão cadastrado'], ...caminhoes],
+    dica: caminhoes.length ? 'Sem caminhão, ele não consegue iniciar viagem no app.' : 'Cadastre o caminhão em Frota e manutenção e depois volte aqui para escolher.',
+  },
   { nome: 'cnhAte', rotulo: 'Validade da CNH', tipo: 'data', obrig: false },
   { nome: 'toxicologicoAte', rotulo: 'Validade do exame toxicológico', tipo: 'data', obrig: false },
   { nome: 'ativo', rotulo: 'Ativo', tipo: 'bool', dica: 'Inativo não consegue entrar, mas o histórico fica.' },
