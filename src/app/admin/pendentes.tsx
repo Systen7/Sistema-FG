@@ -4,6 +4,8 @@ import type { Despesa, Viagem, Motorista } from '@/db/schema'
 import { IconeTipo, NOME_TIPO } from '@/components/tipos'
 import { dataCurta, num, reaisC } from '@/lib/format'
 import { aprovarDespesa, recusarDespesa } from './actions'
+import { Enviar } from '@/components/enviar'
+import { Foto } from '@/components/foto'
 
 /** Despesas aguardando aprovação, com foto, aprovar e recusar com motivo. */
 export function Pendentes({ itens, motoristas, voltar, limite }: { itens: { d: Despesa; v: Viagem }[]; motoristas: Motorista[]; voltar: string; limite?: number }) {
@@ -16,7 +18,7 @@ export function Pendentes({ itens, motoristas, voltar, limite }: { itens: { d: D
         <div key={d.id}>
           <span className="row" style={{ flexWrap: 'nowrap', gap: 12, alignItems: 'flex-start' }}>
             {d.fotoId
-              ? <a href={`/api/fotos/${d.fotoId}`} target="_blank" rel="noreferrer" aria-label="Abrir foto do comprovante">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={`/api/fotos/${d.fotoId}`} alt="" className="foto-mini" loading="lazy" /></a>
+              ? <a href={`/api/fotos/${d.fotoId}`} target="_blank" rel="noreferrer" aria-label="Abrir foto do comprovante"><Foto src={`/api/fotos/${d.fotoId}`} className="foto-mini" /></a>
               : <span className="foto-mini" style={{ display: 'grid', placeItems: 'center', color: 'var(--muted)' }} title="Sem foto"><IconeTipo tipo={d.tipo} /></span>}
             <span>
               <b>{NOME_TIPO[d.tipo] ?? d.tipo} · {reaisC(d.valor)}</b>{d.litros ? <span className="muted"> · {num(d.litros)} L (R$ {num(d.valor / 100 / d.litros, 2)}/L)</span> : null}<br />
@@ -27,12 +29,12 @@ export function Pendentes({ itens, motoristas, voltar, limite }: { itens: { d: D
             </span>
           </span>
           <span className="row">
-            <form action={aprovarDespesa.bind(null, d.id, voltar)}><button className="btn sm ok"><Check className="ico" />Aprovar</button></form>
+            <form action={aprovarDespesa.bind(null, d.id, voltar)}><Enviar className="btn sm ok"><Check className="ico" />Aprovar</Enviar></form>
             <details style={{ position: 'relative' }}>
               <summary className="btn sm" style={{ listStyle: 'none' }}><X className="ico" />Recusar</summary>
               <form action={recusarDespesa.bind(null, d.id, voltar)} className="panel" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 5, width: 280, boxShadow: '0 10px 30px rgba(0,0,0,.5)' }}>
                 <label className="campo">Motivo (o motorista vê)<input name="motivo" placeholder="Ex.: valor diferente do comprovante" /></label>
-                <button className="btn sm del solid">Confirmar recusa</button>
+                <Enviar className="btn sm del solid">Confirmar recusa</Enviar>
               </form>
             </details>
           </span>

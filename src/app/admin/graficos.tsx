@@ -64,6 +64,7 @@ export function Tendencia({ meses }: { meses: Mes[] }) {
             <text x={padL - 8} y={y(t) + 4} textAnchor="end" fontSize={13} fill="var(--muted)">{abrev(t)}</text>
           </g>
         ))}
+        <g className="grafico-barras">
         {meses.map((d, i) => {
           const cx = padL + col * i + col / 2
           return (
@@ -75,6 +76,7 @@ export function Tendencia({ meses }: { meses: Mes[] }) {
             </g>
           )
         })}
+        </g>
       </svg>
       {m && (
         <div role="status" style={{ position: 'absolute', top: 30, left: `clamp(8px, calc(${((padL + col * hover! + col / 2) / W) * 100}% - 90px), calc(100% - 190px))`, width: 180, background: 'var(--road)', border: '1px solid var(--road3)', borderRadius: 8, padding: '8px 10px', fontSize: 13, pointerEvents: 'none', boxShadow: '0 8px 24px rgba(0,0,0,.5)' }}>

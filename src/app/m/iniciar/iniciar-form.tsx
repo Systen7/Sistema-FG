@@ -104,8 +104,8 @@ export function IniciarForm({ hoje, km, placa, comissao, rotas, cidades, cargas 
             <button type="button" className="linkbtn" onClick={() => setOutroDia(true)}>saiu em outro dia?</button></p>
         )}
 
-        {erro && <p className="aviso bad" role="alert">{erro.t}</p>}
-        <button className="btn xl pri" disabled={pend}>{pend ? <span className="spin" /> : <Play className="ico" />}Iniciar viagem</button>
+        {erro && <p key={erro.t} className="aviso bad" role="alert">{erro.t}</p>}
+        <button className="btn xl pri" disabled={pend} aria-busy={pend}>{pend ? <span className="spin" /> : <Play className="ico" />}{pend ? 'Iniciando…' : 'Iniciar viagem'}</button>
       </form>
     </>
   )

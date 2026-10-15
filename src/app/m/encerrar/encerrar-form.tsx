@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { ArrowLeft, Flag, CalendarDays, Info } from 'lucide-react'
 import { dataLonga, num, reais } from '@/lib/format'
 import { encerrarViagem } from '../actions'
+import { useSaida } from '@/components/saida'
 
 export function EncerrarForm(p: {
   id: number; origem: string; destino: string; kmInicial: number; inicio: string; hoje: string; frete: number; comissao: number; gastos: number; pendentes: number
@@ -16,6 +17,8 @@ export function EncerrarForm(p: {
   const [confirmar, setConfirmar] = useState(false)
   const [erro, setErro] = useState('')
   const [pend, start] = useTransition()
+  const { saindo, sair } = useSaida(220)
+  const fecharConfirmacao = () => sair(() => setConfirmar(false))
   const kf = Number(kmFinal) || 0
   const rodado = kf > p.kmInicial ? kf - p.kmInicial : 0
 
@@ -82,12 +85,12 @@ export function EncerrarForm(p: {
           <p className="small muted">Lembrou de algum gasto? <Link href="/m/gasto">Lance antes de encerrar</Link>.</p>
         </section>
 
-        {erro && <p className="aviso bad" role="alert">{erro}</p>}
+        {erro && <p key={erro} className="aviso bad" role="alert">{erro}</p>}
         <button className="btn xl pri"><Flag className="ico" />Encerrar viagem</button>
       </form>
 
       {confirmar && (
-        <div className="sheet-ov" onClick={(e) => e.target === e.currentTarget && setConfirmar(false)}>
+        <div className={'sheet-ov' + (saindo ? ' saindo' : '')} onClick={(e) => e.target === e.currentTarget && fecharConfirmacao()}>
           <div className="sheet" role="dialog" aria-modal="true" aria-labelledby="conf-t">
             <span className="alca" />
             <h2 id="conf-t">Confere os números?</h2>
@@ -100,8 +103,8 @@ export function EncerrarForm(p: {
             {rodado > 4000 && <p className="aviso warn">{num(rodado)} km é bastante para uma viagem. Confira se o km final está certo.</p>}
             <p className="small muted">Depois de encerrada, só o escritório pode corrigir a viagem.</p>
             <div className="duas">
-              <button type="button" className="btn xl" onClick={() => setConfirmar(false)}>Corrigir</button>
-              <button type="button" className="btn xl pri" onClick={enviar} disabled={pend}>{pend ? <span className="spin" /> : null}Confirmar</button>
+              <button type="button" className="btn xl" onClick={fecharConfirmacao}>Corrigir</button>
+              <button type="button" className="btn xl pri" onClick={enviar} disabled={pend} aria-busy={pend}>{pend ? <span className="spin" /> : null}{pend ? 'Encerrando…' : 'Confirmar'}</button>
             </div>
           </div>
         </div>

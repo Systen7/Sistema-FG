@@ -8,6 +8,7 @@ import { Cabecalho, Vence } from '../ui'
 import { camposLembrete } from '../campos'
 import { dispensarAlerta, restaurarAlertas, salvarLembrete, excluirLembrete } from '../actions'
 import { Regras } from './regras'
+import { Enviar } from '@/components/enviar'
 
 export const metadata = { title: 'Alertas' }
 
@@ -28,7 +29,7 @@ export default async function Alertas(props: PageProps<'/admin/alertas'>) {
         <section className="panel">
           <header>
             <h2>Ativos ({ativos.length})</h2>
-            {ocultos > 0 && <form action={restaurarAlertas.bind(null, '/admin/alertas')}><button className="btn sm">Mostrar {ocultos} dispensado{ocultos > 1 ? 's' : ''}</button></form>}
+            {ocultos > 0 && <form action={restaurarAlertas.bind(null, '/admin/alertas')}><Enviar className="btn sm">Mostrar {ocultos} dispensado{ocultos > 1 ? 's' : ''}</Enviar></form>}
           </header>
           {ativos.length ? (
             <div className="list">
@@ -37,7 +38,7 @@ export default async function Alertas(props: PageProps<'/admin/alertas'>) {
                   <span>{a.texto}<br /><span className={'chip ' + (a.urgente ? 'bad' : 'warn')}>{a.detalhe}</span></span>
                   <span className="row">
                     <Link href={a.link} className="btn sm">Resolver</Link>
-                    <form action={dispensarAlerta.bind(null, a.chave, '/admin/alertas')}><button className="btn sm ghost">Dispensar</button></form>
+                    <form action={dispensarAlerta.bind(null, a.chave, '/admin/alertas')}><Enviar className="btn sm ghost">Dispensar</Enviar></form>
                   </span>
                 </div>
               ))}

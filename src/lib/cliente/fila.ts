@@ -7,6 +7,8 @@ export type ItemFila = {
   obs?: string; pagoPor: string; data: string; foto?: Blob | null; criadoEm: number
 }
 
+import { enviarComProgresso } from './envio'
+
 const DB = 'fg-motorista', STORE = 'fila', EVENTO = 'fg:fila'
 
 function abrir(): Promise<IDBDatabase> {
@@ -46,17 +48,12 @@ function formData(i: ItemFila) {
 export type Resultado = { estado: 'enviado' } | { estado: 'na-fila' } | { estado: 'erro'; erro: string }
 
 /** Tenta enviar agora; sem sinal, guarda no aparelho e envia depois sozinho. */
-export async function enviarGasto(i: ItemFila): Promise<Resultado> {
+export async function enviarGasto(i: ItemFila, aoProgredir?: (fracao: number) => void): Promise<Resultado> {
   if (!navigator.onLine) { await guardar(i); avisar(); return { estado: 'na-fila' } }
-  try {
-    const r = await fetch('/api/m/despesas', { method: 'POST', body: formData(i) })
-    if (r.ok) return { estado: 'enviado' }
-    const j = await r.json().catch(() => ({}))
-    if (r.status >= 500) { await guardar(i); avisar(); return { estado: 'na-fila' } }
-    return { estado: 'erro', erro: j.erro ?? 'Não foi possível enviar.' }
-  } catch {
-    await guardar(i); avisar(); return { estado: 'na-fila' }
-  }
+  const r = await enviarComProgresso('/api/m/despesas', formData(i), aoProgredir)
+  if (r.rede || r.status >= 500 || r.status === 0) { await guardar(i); avisar(); return { estado: 'na-fila' } }
+  if (r.status < 300) return { estado: 'enviado' }
+  return { estado: 'erro', erro: typeof r.json.erro === 'string' ? r.json.erro : 'Não foi possível enviar.' }
 }
 
 let rodando = false

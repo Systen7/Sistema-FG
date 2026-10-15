@@ -7,6 +7,7 @@ import type { Pneu } from '@/db/schema'
 import { Cabecalho } from '../ui'
 import { camposPneu } from '../campos'
 import { salvarPneu, trocarPneu } from '../actions'
+import { Enviar } from '@/components/enviar'
 
 export const metadata = { title: 'Pneus' }
 
@@ -67,8 +68,8 @@ export default async function Pneus(props: PageProps<'/admin/pneus'>) {
               </p>
               <p className="small muted">Custo acumulado {reais(sel.custo)}.</p>
               <div className="row">
-                <form action={trocarPneu.bind(null, sel.id, `${aqui}&pneu=${sel.id}`)}><input type="hidden" name="modo" value="recapar" /><button className="btn">Registrar recapagem</button></form>
-                <form action={trocarPneu.bind(null, sel.id, `${aqui}&pneu=${sel.id}`)}><input type="hidden" name="modo" value="novo" /><button className="btn pri">Trocar por pneu novo</button></form>
+                <form action={trocarPneu.bind(null, sel.id, `${aqui}&pneu=${sel.id}`)}><input type="hidden" name="modo" value="recapar" /><Enviar className="btn">Registrar recapagem</Enviar></form>
+                <form action={trocarPneu.bind(null, sel.id, `${aqui}&pneu=${sel.id}`)}><input type="hidden" name="modo" value="novo" /><Enviar className="btn pri">Trocar por pneu novo</Enviar></form>
               </div>
             </>
           ) : (

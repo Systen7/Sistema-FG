@@ -83,7 +83,7 @@ function Motorista({ ajuda }: { ajuda: string | null }) {
   })
 
   if (etapa === 'tel') return (
-    <section className="hero" style={{ gap: 18 }}>
+    <section key="tel" className="hero surge" style={{ gap: 18 }}>
       <div>
         <h1 style={{ fontSize: 30 }}>Entrar</h1>
         <p className="muted" style={{ marginTop: 6, fontSize: 16 }}>Use o número de celular cadastrado no escritório.</p>
@@ -101,7 +101,7 @@ function Motorista({ ajuda }: { ajuda: string | null }) {
   )
 
   return (
-    <section className="hero" style={{ gap: 18 }}>
+    <section key="pin" className="hero surge" style={{ gap: 18 }}>
       <div className="row between">
         <div>
           <p className="lbl">Celular</p>
@@ -141,7 +141,7 @@ function Admin() {
         <label className="campo">Usuário<input name="usuario" autoComplete="username" autoCapitalize="none" required /></label>
         <label className="campo">Senha<input name="senha" type="password" autoComplete="current-password" required /></label>
         {erro && <p className="err" role="alert">{erro}</p>}
-        <button className="btn lg pri" disabled={pend}>{pend ? <span className="spin" /> : <ShieldCheck className="ico" />}Entrar</button>
+        <button className="btn lg pri" disabled={pend} aria-busy={pend}>{pend ? <span className="spin" /> : <ShieldCheck className="ico" />}{pend ? 'Entrando…' : 'Entrar'}</button>
       </form>
     </section>
   )

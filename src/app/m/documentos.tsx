@@ -11,7 +11,7 @@ export function DocumentosViagem({ docs }: { docs: D[] }) {
   const lista = docs.filter((d) => d.situacao !== 'cancelado').sort((a, b) => (a.tipo === 'mdfe' ? -1 : 1) - (b.tipo === 'mdfe' ? -1 : 1))
   if (!lista.length) return null
   return (
-    <section className="panel">
+    <section className="panel surge">
       <header><h2 className="row" style={{ gap: 8 }}><ShieldCheck className="ico" style={{ color: 'var(--yt)' }} />Documentos da viagem</h2></header>
       <p className="small muted">Mostre para a fiscalização, se pedirem.</p>
       <div>

@@ -6,6 +6,7 @@ import { ArrowLeft, Camera, Check, CloudOff, Trash2, X, CalendarDays } from 'luc
 import { CampoValor } from '@/components/valor'
 import { IconeTipo, NOME_TIPO } from '@/components/tipos'
 import { enviarGasto, hojeLocal, novoId, reduzirFoto } from '@/lib/cliente/fila'
+import { enviarComProgresso } from '@/lib/cliente/envio'
 import { dataLonga, num } from '@/lib/format'
 
 const TIPOS = ['Diesel', 'Pedágio', 'Alimentação', 'Borracharia', 'Chapa / descarga', 'Estadia', 'Arla 32', 'Outros']
@@ -35,6 +36,7 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
   const [semFoto, setSemFoto] = useState(false)
   const [erro, setErro] = useState('')
   const [enviando, setEnviando] = useState(false)
+  const [progresso, setProgresso] = useState<number | null>(null)
   const [feito, setFeito] = useState<null | 'enviado' | 'na-fila'>(null)
   const [apagar, setApagar] = useState(false)
   const valorRef = useRef<HTMLInputElement>(null)
@@ -67,6 +69,8 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
     }
     if (!pago) return setErro('Diga quem pagou.')
     setEnviando(true)
+    // Só mostra porcentagem quando há foto: sem ela o envio é instantâneo.
+    const aoProgredir = foto ? (p: number) => setProgresso(p) : undefined
     try {
       if (editar) {
         const f = new FormData()
@@ -74,10 +78,9 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
         if (tipo === 'Diesel') { f.set('litros', litros); f.set('kmAbastecimento', km) }
         if (foto) f.set('foto', foto, 'comprovante.jpg')
         if (semFoto) f.set('semFoto', '1')
-        const r = await fetch(`/api/m/despesas/${editar.id}`, { method: 'PATCH', body: f }).catch(() => null)
-        if (!r) return setErro('Sem sinal agora. A correção precisa de internet; tente de novo daqui a pouco.')
-        const j = await r.json().catch(() => ({}))
-        if (!r.ok) return setErro(j.erro ?? 'Não foi possível salvar.')
+        const r = await enviarComProgresso(`/api/m/despesas/${editar.id}`, f, aoProgredir, 'PATCH')
+        if (r.rede) return setErro('Sem sinal agora. A correção precisa de internet; tente de novo daqui a pouco.')
+        if (r.status >= 300) return setErro(typeof r.json.erro === 'string' ? r.json.erro : 'Não foi possível salvar.')
         navigator.vibrate?.(40)
         router.push('/m?ok=' + encodeURIComponent('Correção enviada para aprovação'))
         router.refresh()
@@ -86,14 +89,14 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
       const r = await enviarGasto({
         clientId: novoId(), motoristaId, viagemId, tipo, valor: String(valor / 100), litros: tipo === 'Diesel' ? litros : undefined,
         kmAbastecimento: tipo === 'Diesel' ? km : undefined, obs, pagoPor: pago, data: outroDia ? data : hojeLocal(), foto, criadoEm: Date.now(),
-      })
+      }, aoProgredir)
       if (r.estado === 'erro') return setErro(r.erro)
       navigator.vibrate?.(r.estado === 'enviado' ? 40 : [40, 60, 40])
       setFeito(r.estado)
       // Sem sinal, não recarrega a tela: a tentativa falharia e o navegador mostraria a página de erro.
       if (r.estado === 'enviado') router.refresh()
     } finally {
-      setEnviando(false)
+      setEnviando(false); setProgresso(null)
     }
   }
 
@@ -116,7 +119,7 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
   }
 
   if (feito) return (
-    <div className="ok-grande">
+    <div className="ok-grande surge">
       <div className="circ" style={feito === 'na-fila' ? { background: 'var(--y-soft)', color: 'var(--run-ink)' } : undefined}>
         {feito === 'enviado' ? <Check className="ico" /> : <CloudOff className="ico" />}
       </div>
@@ -144,7 +147,7 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
       </div>
 
       {!tipo ? (
-        <section className="stack">
+        <section className="stack surge">
           <h2>Que tipo de gasto?</h2>
           <div className="tiles">
             {TIPOS.map((t) => (
@@ -155,7 +158,7 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
           </div>
         </section>
       ) : (
-        <form className="stack" style={{ gap: 18 }} onSubmit={(e) => { e.preventDefault(); enviar() }} noValidate>
+        <form className="stack surge" style={{ gap: 18 }} onSubmit={(e) => { e.preventDefault(); enviar() }} noValidate>
           <button type="button" className="tile" aria-pressed="true" onClick={() => !editar && setTipo(null)} style={{ minHeight: 0, flexDirection: 'row', alignItems: 'center' }} disabled={!!editar}>
             <IconeTipo tipo={tipo} /><span className="grow">{NOME_TIPO[tipo]}</span>{!editar && <span className="small muted" style={{ fontWeight: 500 }}>Trocar</span>}
           </button>
@@ -215,13 +218,17 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
               <button type="button" className="linkbtn" onClick={() => setOutroDia(true)}>foi em outro dia?</button></p>
           )}
 
-          {erro && <p className="aviso bad" role="alert">{erro}</p>}
+          {erro && <p key={erro} className="aviso bad" role="alert">{erro}</p>}
 
-          <button className="btn xl pri" disabled={enviando}>{enviando ? <span className="spin" /> : <Check className="ico" />}{editar ? 'Salvar correção' : 'Enviar gasto'}</button>
+          <button className="btn xl pri" disabled={enviando} aria-busy={enviando}>
+            {enviando ? <span className="spin" /> : <Check className="ico" />}
+            {progresso != null ? `Enviando foto ${Math.round(progresso * 100)}%` : enviando ? 'Enviando…' : editar ? 'Salvar correção' : 'Enviar gasto'}
+            {progresso != null && <span className="progresso" role="progressbar" aria-label="Envio da foto" aria-valuenow={Math.round(progresso * 100)} aria-valuemin={0} aria-valuemax={100}><i style={{ transform: `scaleX(${progresso})` }} /></span>}
+          </button>
 
           {editar && editar.status !== 'aprovada' && (
             apagar
-              ? <div className="duas"><button type="button" className="btn lg" onClick={() => setApagar(false)}>Cancelar</button><button type="button" className="btn lg del solid" onClick={excluir} disabled={enviando}>Apagar mesmo</button></div>
+              ? <div className="duas"><button type="button" className="btn lg" onClick={() => setApagar(false)}>Cancelar</button><button type="button" className="btn lg del solid" onClick={excluir} disabled={enviando} aria-busy={enviando}>{enviando && <span className="spin" />}{enviando ? 'Apagando…' : 'Apagar mesmo'}</button></div>
               : <button type="button" className="btn lg del ghost" onClick={() => setApagar(true)}><Trash2 className="ico" />Apagar este gasto</button>
           )}
         </form>

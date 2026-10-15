@@ -54,10 +54,9 @@ p { margin: 0 }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--road3); background: var(--surface2);
   border-radius: 6px; padding: 9px 15px; font-weight: 500; letter-spacing: .01em; white-space: nowrap; text-decoration: none; color: var(--ink);
-  min-height: 40px; transition: border-color .12s, background .12s, transform .08s, filter .12s;
+  min-height: 40px;
 }
 .btn:hover { border-color: var(--yt) }
-.btn:active { transform: scale(.98) }
 .btn[disabled], .btn[aria-disabled="true"] { opacity: .5; pointer-events: none }
 .btn.pri { background: var(--y); color: var(--y-ink); border-color: var(--y) }
 .btn.pri:hover { background: var(--y-hover) }
@@ -145,10 +144,10 @@ tfoot td { font-weight: 600; border-top: 1px solid var(--road3) }
 .seg [aria-pressed="true"], .seg [aria-current="page"] { background: var(--y); color: var(--y-ink) }
 
 /* ---------- diálogo e aviso flutuante ---------- */
-.ov { position: fixed; inset: 0; background: var(--scrim); display: grid; place-items: center; padding: 16px; z-index: 50; animation: fade .15s ease-out }
+.ov { position: fixed; inset: 0; background: var(--scrim); display: grid; place-items: center; padding: 16px; z-index: 50 }
 .dlg {
   background: var(--surface); border: 1px solid var(--road3); border-top: 1px solid var(--yt); border-radius: 10px; padding: 22px; width: min(100%, 620px);
-  max-height: calc(100dvh - 32px); overflow: auto; display: flex; flex-direction: column; gap: 16px; animation: pop .18s ease-out
+  max-height: calc(100dvh - 32px); overflow: auto; display: flex; flex-direction: column; gap: 16px
 }
 .dlg > header { display: flex; justify-content: space-between; align-items: center; gap: 12px }
 @keyframes fade { from { opacity: 0 } }
@@ -156,7 +155,7 @@ tfoot td { font-weight: 600; border-top: 1px solid var(--road3) }
 .toast {
   position: fixed; left: 50%; bottom: calc(20px + var(--safe-b)); transform: translateX(-50%); background: var(--road); color: var(--ink); border: 1px solid var(--yt);
   padding: 12px 18px; border-radius: 10px; font-weight: 500; z-index: 60; max-width: calc(100% - 32px); display: flex; gap: 10px; align-items: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .5); animation: pop .2s ease-out
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5)
 }
 .toast.ok { border-color: var(--good) }
 .toast.bad { border-color: var(--bad) }
@@ -254,7 +253,6 @@ tfoot td { font-weight: 600; border-top: 1px solid var(--road3) }
 .acao small { display: block; font-size: 14px; font-weight: 400; color: var(--muted); margin-top: 1px }
 .acao.pri { background: var(--y); border-color: var(--y); color: #fff }
 .acao.pri .ico, .acao.pri small { color: #dbe6ff }
-.acao:active { transform: scale(.985) }
 .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px }
 .tile {
   display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 10px; min-height: 104px; padding: 14px; border-radius: 14px;
@@ -262,7 +260,6 @@ tfoot td { font-weight: 600; border-top: 1px solid var(--road3) }
 }
 .tile .ico { width: 32px; height: 32px; color: var(--yt) }
 .tile[aria-pressed="true"] { border-color: var(--yt); background: var(--y-soft); box-shadow: 0 0 0 1px var(--yt) inset }
-.tile:active { transform: scale(.98) }
 .valor { display: flex; align-items: baseline; gap: 8px; border: 1px solid var(--road3); background: var(--bg); border-radius: 12px; padding: 10px 16px; min-height: 76px }
 .valor:focus-within { border-color: var(--yt); box-shadow: 0 0 0 3px rgba(126, 166, 255, .18) }
 .valor span { font-size: 22px; color: var(--muted); font-weight: 500 }
@@ -295,12 +292,11 @@ tfoot td { font-weight: 600; border-top: 1px solid var(--road3) }
 .pins i.on { background: var(--yt); border-color: var(--yt) }
 .pins.erro { animation: shake .35s }
 @keyframes shake { 25% { transform: translateX(-8px) } 50% { transform: translateX(8px) } 75% { transform: translateX(-4px) } }
-.sheet-ov { position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: flex; align-items: flex-end; justify-content: center; animation: fade .15s ease-out }
-.sheet { width: min(100%, 560px); max-height: 94dvh; overflow: auto; background: var(--surface); border-top: 1px solid var(--yt); border-radius: 18px 18px 0 0; padding: 10px 16px calc(20px + var(--safe-b)); display: flex; flex-direction: column; gap: 16px; animation: up .22s cubic-bezier(.2, .8, .2, 1) }
+.sheet-ov { position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: flex; align-items: flex-end; justify-content: center }
+.sheet { width: min(100%, 560px); max-height: 94dvh; overflow: auto; background: var(--surface); border-top: 1px solid var(--yt); border-radius: 18px 18px 0 0; padding: 10px 16px calc(20px + var(--safe-b)); display: flex; flex-direction: column; gap: 16px }
 .sheet .alca { width: 44px; height: 5px; border-radius: 3px; background: var(--line2); margin: 2px auto 0 }
-@keyframes up { from { transform: translateY(40%); opacity: .4 } }
 .ok-grande { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding: 24px 8px }
-.ok-grande .circ { width: 84px; height: 84px; border-radius: 50%; background: var(--good-soft); color: var(--good); display: grid; place-items: center; animation: pop .3s ease-out }
+.ok-grande .circ { width: 84px; height: 84px; border-radius: 50%; background: var(--good-soft); color: var(--good); display: grid; place-items: center; animation: dlg-entra 320ms var(--ease-out) both }
 .ok-grande .circ .ico { width: 44px; height: 44px; stroke-width: 2.4 }
 
 /* login */

@@ -9,6 +9,7 @@ import { sair } from '@/app/entrar/actions'
 import { Toast } from '@/components/toast'
 import { Nav } from './nav'
 import { AutoSubmit } from './autosubmit'
+import { Enviar } from '@/components/enviar'
 
 export const metadata: Metadata = { title: { default: 'Escritório', template: '%s · Escritório FG' } }
 
@@ -22,7 +23,7 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
         <a href="/admin" className="brand"><i>FG</i>{cfg.nomeEmpresa}</a>
         <span className="sp" />
         <span className="small muted">{adm.nome}</span>
-        <form action={sair}><button className="btn sm"><LogOut className="ico" />Sair</button></form>
+        <form action={sair}><Enviar className="btn sm"><LogOut className="ico" />Sair</Enviar></form>
       </header>
       <div className="shell">
         <Nav pendentes={pe.length} urgentes={urg} mdfeAbertos={mdfes.length} />

@@ -21,7 +21,7 @@ export default async function Rotas() {
       <Cabecalho titulo="Rotas" texto="Quais rotas dão mais resultado, com todas as viagens encerradas. Margem antes de manutenção e custos fixos." />
       <section className="panel">
         {rs.length === 0 ? <Vazio>Ainda não há viagens encerradas.</Vazio> : (
-          <div className="scroll"><table>
+          <div className="scroll"><table className="tabela-longa">
             <thead><tr><th>Rota</th><th className="r">Viagens</th><th className="r">Frete médio</th><th className="r">Receita por km</th><th className="r">Km/l</th><th className="r">Km vazio</th><th className="r">Lucro médio</th><th>Margem</th></tr></thead>
             <tbody>{rs.map((r) => {
               const mg = r.frete ? (r.lucro / r.frete) * 100 : 0

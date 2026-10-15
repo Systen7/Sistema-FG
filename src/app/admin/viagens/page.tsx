@@ -67,7 +67,7 @@ export default async function Viagens(props: PageProps<'/admin/viagens'>) {
 
       <section className="panel">
         {vs.length === 0 ? <Vazio>Nenhuma viagem com estes filtros.</Vazio> : (
-          <div className="scroll"><table>
+          <div className="scroll"><table className="tabela-longa">
             <thead><tr><th>Nº</th><th>Motorista</th><th>Caminhão</th><th>Rota e carga</th><th>Início</th><th className="r">Km</th><th className="r">Frete</th><th className="r">Despesas</th><th className="r">Comissão</th><th className="r">Lucro</th><th>Situação</th><th>CT-e / MDF-e</th></tr></thead>
             <tbody>
               {vs.map((v) => {

@@ -1,5 +1,7 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
+import { Lista as EsqLista } from '@/components/esqueleto'
 import { and, desc, eq, inArray, or } from 'drizzle-orm'
 import { ArrowLeft, Pencil, Plus, CheckCheck, Camera } from 'lucide-react'
 import { db, schema as s } from '@/db'
@@ -13,9 +15,11 @@ import { Placas, Valor } from '../../ui'
 import { documentosDasViagens } from '@/lib/documentos'
 import { TabelaDocumentos } from '../../documentos/tabela'
 import { Importador } from '../../documentos/importador'
-import { importarDocumentos, usarFreteDosCte } from '../../documentos/actions'
+import { usarFreteDosCte } from '../../documentos/actions'
 import { camposViagem, camposDespesa } from '../../campos'
 import { salvarViagem, excluirViagem, salvarDespesa, excluirDespesa, aprovarDespesa, aprovarVarias, recusarDespesa } from '../../actions'
+import { Enviar } from '@/components/enviar'
+import { Foto } from '@/components/foto'
 
 export default async function DetalheViagem(props: PageProps<'/admin/viagens/[id]'>) {
   const { id } = await props.params
@@ -27,23 +31,8 @@ export default async function DetalheViagem(props: PageProps<'/admin/viagens/[id
   const m = ms.find((x) => x.id === v.motoristaId), cam = cs.find((x) => x.id === v.caminhaoId)
   const aqui = `/admin/viagens/${v.id}`
   const pend = v.despesas.filter((d) => d.status === 'pendente')
-  const ids = v.despesas.map((d) => String(d.id))
-  const hist = await db.select().from(s.auditoria).where(or(
-    and(eq(s.auditoria.entidade, 'viagem'), eq(s.auditoria.entidadeId, String(v.id))),
-    ids.length ? and(eq(s.auditoria.entidade, 'despesa'), inArray(s.auditoria.entidadeId, ids)) : undefined,
-  )).orderBy(desc(s.auditoria.em)).limit(30)
-  const autor = (a: string) => a.startsWith('motorista:') ? ms.find((x) => x.id === Number(a.split(':')[1]))?.nome ?? 'Motorista' : 'Escritório'
   const editD = sp.despesa ? (sp.despesa === 'nova' ? 'nova' : v.despesas.find((d) => d.id === Number(sp.despesa))) : null
   const meta = cam?.metaConsumo ?? 0
-  const docs = await documentosDasViagens([v.id])
-  const validos = docs.filter((d) => d.situacao !== 'cancelado')
-  const freteCte = validos.filter((d) => d.tipo === 'cte').reduce((t, d) => t + (d.valor ?? 0), 0)
-  const avisosFiscais: string[] = []
-  for (const d of validos.filter((x) => x.tipo === 'mdfe')) {
-    if (d.placa && cam && d.placa !== cam.placa) avisosFiscais.push(`O MDF-e nº ${d.numero} foi emitido para a placa ${d.placa}, mas a viagem está com o ${cam.placa}.`)
-    if (d.situacao === 'autorizado' && v.status === 'encerrada') avisosFiscais.push(`O MDF-e nº ${d.numero} continua aberto e a viagem já terminou. Encerre no seu emissor e depois importe o XML do encerramento (ou clique em “Encerrado”).`)
-  }
-  if (v.status === 'encerrada' && !validos.some((d) => d.tipo === 'cte')) avisosFiscais.push('Nenhum CT-e importado para esta viagem.')
 
   return (
     <>
@@ -78,7 +67,7 @@ export default async function DetalheViagem(props: PageProps<'/admin/viagens/[id
         <header>
           <h2>Despesas ({v.despesas.length})</h2>
           <span className="row">
-            {pend.length > 1 && <form action={aprovarVarias.bind(null, pend.map((d) => d.id), aqui)}><button className="btn ok"><CheckCheck className="ico" />Aprovar as {pend.length} pendentes</button></form>}
+            {pend.length > 1 && <form action={aprovarVarias.bind(null, pend.map((d) => d.id), aqui)}><Enviar className="btn ok"><CheckCheck className="ico" />Aprovar as {pend.length} pendentes</Enviar></form>}
             <Link href={`${aqui}?despesa=nova`} scroll={false} className="btn pri"><Plus className="ico" />Lançar despesa</Link>
           </span>
         </header>
@@ -88,7 +77,7 @@ export default async function DetalheViagem(props: PageProps<'/admin/viagens/[id
             <tbody>
               {v.despesas.map((d) => (
                 <tr key={d.id}>
-                  <td>{d.fotoId ? <a href={`/api/fotos/${d.fotoId}`} target="_blank" rel="noreferrer">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={`/api/fotos/${d.fotoId}`} alt="Comprovante" className="foto-mini" loading="lazy" /></a> : <span className="small muted row" style={{ gap: 4 }}><Camera className="ico" />sem foto</span>}</td>
+                  <td>{d.fotoId ? <a href={`/api/fotos/${d.fotoId}`} target="_blank" rel="noreferrer"><Foto src={`/api/fotos/${d.fotoId}`} alt="Comprovante" className="foto-mini" /></a> : <span className="small muted row" style={{ gap: 4 }}><Camera className="ico" />sem foto</span>}</td>
                   <td><span className="row" style={{ flexWrap: 'nowrap' }}><IconeTipo tipo={d.tipo} />{NOME_TIPO[d.tipo] ?? d.tipo}{d.litros ? <span className="muted"> · {num(d.litros)} L · R$ {num(d.valor / 100 / d.litros, 2)}/L</span> : ''}</span></td>
                   <td>{dataCurta(d.data)}</td>
                   <td>{d.pagoPor === 'motorista' ? 'Motorista' : 'Empresa'}</td>
@@ -99,8 +88,8 @@ export default async function DetalheViagem(props: PageProps<'/admin/viagens/[id
                     <span className="row" style={{ flexWrap: 'nowrap' }}>
                       <Link href={`${aqui}?despesa=${d.id}`} scroll={false} className="btn sm">Editar</Link>
                       {d.status === 'pendente' && <>
-                        <form action={aprovarDespesa.bind(null, d.id, aqui)}><button className="btn sm ok">Aprovar</button></form>
-                        <form action={recusarDespesa.bind(null, d.id, aqui)}><button className="btn sm">Recusar</button></form>
+                        <form action={aprovarDespesa.bind(null, d.id, aqui)}><Enviar className="btn sm ok">Aprovar</Enviar></form>
+                        <form action={recusarDespesa.bind(null, d.id, aqui)}><Enviar className="btn sm">Recusar</Enviar></form>
                       </>}
                     </span>
                   </td>
@@ -112,30 +101,13 @@ export default async function DetalheViagem(props: PageProps<'/admin/viagens/[id
         )}
       </section>
 
-      <section className="panel">
-        <header><h2>CT-e e MDF-e</h2><Link href="/admin/documentos" className="btn sm">Todos os documentos</Link></header>
-        {avisosFiscais.map((t, i) => <p key={i} className="aviso warn">{t}</p>)}
-        {freteCte > 0 && freteCte !== v.frete && (
-          <form action={usarFreteDosCte.bind(null, v.id, freteCte, aqui)} className="aviso warn row between">
-            <span>O frete da viagem ({reais(v.frete)}) é diferente do valor dos CT-e ({reais(freteCte)}).</span>
-            <button className="btn sm">Usar {reais(freteCte)} como frete</button>
-          </form>
-        )}
-        {docs.length > 0 && <TabelaDocumentos docs={docs} viagens={[v]} voltar={aqui} mostrarViagem={false} />}
-        <Importador acao={importarDocumentos.bind(null, v.id)} compacto />
-      </section>
-
-      {hist.length > 0 && (
-        <section className="panel">
-          <header><h2>Histórico</h2><span className="small muted">quem fez o quê nesta viagem</span></header>
-          <div className="list">
-            {hist.map((h) => (
-              <div key={h.id}><span><b>{autor(h.autor)}</b> {h.acao} {h.entidade === 'despesa' ? 'despesa' : 'a viagem'}{h.entidade === 'despesa' && h.dados && typeof h.dados === 'object' && 'valor' in h.dados ? ` de ${reaisC(Number((h.dados as { valor: number }).valor))}` : ''}</span>
-                <span className="small muted">{h.em.toLocaleString('pt-BR', { timeZone: process.env.TZ_EMPRESA || 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' })}</span></div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* Documentos e histórico chegam depois (carregamento sob demanda), com esqueleto no lugar. */}
+      <Suspense fallback={<EsqLista itens={2} />}>
+        <SecaoDocumentos v={v} placa={cam?.placa ?? null} aqui={aqui} />
+      </Suspense>
+      <Suspense fallback={<EsqLista itens={3} botoes={0} />}>
+        <SecaoHistorico v={v} ms={ms} />
+      </Suspense>
 
       {sp.editar && (
         <FormModal titulo={`Editar viagem ${v.id}`} campos={camposViagem(ms.map((x) => [String(x.id), x.nome]), cs.map((x) => [String(x.id), x.placa]))}
@@ -149,5 +121,54 @@ export default async function DetalheViagem(props: PageProps<'/admin/viagens/[id
           excluir={editD === 'nova' ? undefined : excluirDespesa.bind(null, editD.id, aqui)} />
       )}
     </>
+  )
+}
+
+type ViagemC = NonNullable<Awaited<ReturnType<typeof viagem>>>
+
+async function SecaoDocumentos({ v, placa, aqui }: { v: ViagemC; placa: string | null; aqui: string }) {
+  const docs = await documentosDasViagens([v.id])
+  const validos = docs.filter((d) => d.situacao !== 'cancelado')
+  const freteCte = validos.filter((d) => d.tipo === 'cte').reduce((t, d) => t + (d.valor ?? 0), 0)
+  const avisosFiscais: string[] = []
+  for (const d of validos.filter((x) => x.tipo === 'mdfe')) {
+    if (d.placa && placa && d.placa !== placa) avisosFiscais.push(`O MDF-e nº ${d.numero} foi emitido para a placa ${d.placa}, mas a viagem está com o ${placa}.`)
+    if (d.situacao === 'autorizado' && v.status === 'encerrada') avisosFiscais.push(`O MDF-e nº ${d.numero} continua aberto e a viagem já terminou. Encerre no seu emissor e depois importe o XML do encerramento (ou clique em “Encerrado”).`)
+  }
+  if (v.status === 'encerrada' && !validos.some((d) => d.tipo === 'cte')) avisosFiscais.push('Nenhum CT-e importado para esta viagem.')
+  return (
+    <section className="panel entra">
+      <header><h2>CT-e e MDF-e</h2><Link href="/admin/documentos" className="btn sm">Todos os documentos</Link></header>
+      {avisosFiscais.map((t, i) => <p key={i} className="aviso warn">{t}</p>)}
+      {freteCte > 0 && freteCte !== v.frete && (
+        <form action={usarFreteDosCte.bind(null, v.id, freteCte, aqui)} className="aviso warn row between">
+          <span>O frete da viagem ({reais(v.frete)}) é diferente do valor dos CT-e ({reais(freteCte)}).</span>
+          <Enviar className="btn sm">Usar {reais(freteCte)} como frete</Enviar>
+        </form>
+      )}
+      {docs.length > 0 && <TabelaDocumentos docs={docs} viagens={[v]} voltar={aqui} mostrarViagem={false} />}
+      <Importador viagemId={v.id} compacto />
+    </section>
+  )
+}
+
+async function SecaoHistorico({ v, ms }: { v: ViagemC; ms: { id: number; nome: string }[] }) {
+  const ids = v.despesas.map((d) => String(d.id))
+  const hist = await db.select().from(s.auditoria).where(or(
+    and(eq(s.auditoria.entidade, 'viagem'), eq(s.auditoria.entidadeId, String(v.id))),
+    ids.length ? and(eq(s.auditoria.entidade, 'despesa'), inArray(s.auditoria.entidadeId, ids)) : undefined,
+  )).orderBy(desc(s.auditoria.em)).limit(30)
+  if (!hist.length) return null
+  const autor = (a: string) => a.startsWith('motorista:') ? ms.find((x) => x.id === Number(a.split(':')[1]))?.nome ?? 'Motorista' : 'Escritório'
+  return (
+    <section className="panel entra">
+      <header><h2>Histórico</h2><span className="small muted">quem fez o quê nesta viagem</span></header>
+      <div className="list">
+        {hist.map((h) => (
+          <div key={h.id}><span><b>{autor(h.autor)}</b> {h.acao} {h.entidade === 'despesa' ? 'despesa' : 'a viagem'}{h.entidade === 'despesa' && h.dados && typeof h.dados === 'object' && 'valor' in h.dados ? ` de ${reaisC(Number((h.dados as { valor: number }).valor))}` : ''}</span>
+            <span className="small muted">{h.em.toLocaleString('pt-BR', { timeZone: process.env.TZ_EMPRESA || 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' })}</span></div>
+        ))}
+      </div>
+    </section>
   )
 }

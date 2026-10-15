@@ -16,8 +16,8 @@ export function Regras({ cfg }: { cfg: C }) {
       <label className="campo">Avisar revisão faltando quantos km<input name="kmAvisoRevisao" inputMode="numeric" defaultValue={cfg.kmAvisoRevisao} /></label>
       <label className="campo">Sulco mínimo do pneu (mm)<input name="sulcoMinimo" inputMode="decimal" defaultValue={String(cfg.sulcoMinimo).replace('.', ',')} /></label>
       <label className="campo full">Frete de retorno, em % da ida (para o “deixou de ganhar”)<input name="retornoPct" inputMode="numeric" defaultValue={cfg.retornoPct} /></label>
-      {st?.erro && <p className="err full" role="alert">{st.erro}</p>}
-      <div className="full"><button className="btn pri" disabled={pend}>Salvar regras</button></div>
+      {st?.erro && <p key={st.erro} className="err full" role="alert">{st.erro}</p>}
+      <div className="full"><button className="btn pri" disabled={pend} aria-busy={pend}>{pend && <span className="spin" />}Salvar regras</button></div>
     </form>
   )
 }
