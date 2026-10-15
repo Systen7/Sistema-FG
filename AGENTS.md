@@ -44,7 +44,7 @@ Repositório: `Systen7/Sistema-FG`. Produção: https://sistema-fg.vercel.app (V
 
 8. **Depois do merge** (se o dono pedir), o agente confere se a publicação ficou **Ready** na Vercel e se a Issue foi fechada.
 
-A `main` é protegida no GitHub: só aceita mudanças por Pull Request com as duas verificações aprovadas (`Tipos, testes e compilação` e `Testes de navegador`).
+A `main` deve ficar protegida no GitHub (*Settings › Branches*, configurado pelo dono): só aceita mudanças por Pull Request com as duas verificações aprovadas (`Tipos, testes e compilação` e `Testes de navegador`). Mesmo sem a proteção ligada, a regra vale: agente nenhum envia direto para a `main`.
 
 Se não for possível abrir Issue ou PR (sem acesso ao GitHub), **não envie para a `main`**: deixe o trabalho numa branch e avise quem pediu.
 
