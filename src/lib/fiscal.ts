@@ -21,7 +21,7 @@ export type DocLido = {
   placa: string | null
   chavesCte: string[]
 }
-export type EventoLido = { tipo: 'evento'; doc: 'cte' | 'mdfe'; chave: string; evento: 'encerramento' | 'cancelamento'; em: Date; aceito: boolean }
+type EventoLido = { tipo: 'evento'; doc: 'cte' | 'mdfe'; chave: string; evento: 'encerramento' | 'cancelamento'; em: Date; aceito: boolean }
 export type Leitura = ({ tipo: 'cte' | 'mdfe' } & DocLido) | EventoLido | { tipo: 'erro'; erro: string }
 
 const parser = new XMLParser({
@@ -41,23 +41,30 @@ const txt = (x: unknown): string | null => {
   const s = String(x).trim()
   return s || null
 }
-const lista = <T,>(x: unknown): T[] => (Array.isArray(x) ? (x as T[]) : x == null ? [] : [x as T])
-const centavos = (x: unknown) => { const v = Number(txt(x)); return Number.isFinite(v) ? Math.round(v * 100) : null }
+const lista = <T>(x: unknown): T[] => (Array.isArray(x) ? (x as T[]) : x == null ? [] : [x as T])
+const centavos = (x: unknown) => {
+  const v = Number(txt(x))
+  return Number.isFinite(v) ? Math.round(v * 100) : null
+}
 
 /** Confere o dígito verificador (módulo 11) de uma chave de acesso de 44 dígitos. */
 export function chaveValida(chave: string): boolean {
   if (!/^\d{44}$/.test(chave)) return false
-  let soma = 0, peso = 2
-  for (let i = 42; i >= 0; i--) { soma += Number(chave[i]) * peso; peso = peso === 9 ? 2 : peso + 1 }
+  let soma = 0,
+    peso = 2
+  for (let i = 42; i >= 0; i--) {
+    soma += Number(chave[i]) * peso
+    peso = peso === 9 ? 2 : peso + 1
+  }
   const resto = soma % 11
   const dv = resto < 2 ? 0 : 11 - resto
   return dv === Number(chave[43])
 }
 export const formatarChave = (c: string) => c.replace(/(\d{4})(?=\d)/g, '$1 ')
-export const modeloDaChave = (c: string) => c.slice(20, 22) // 57 = CT-e, 58 = MDF-e
 
 function cidade(mun: unknown, uf: unknown): string | null {
-  const m = txt(mun), u = txt(uf)
+  const m = txt(mun),
+    u = txt(uf)
   return m ? (u ? `${m}/${u}` : m) : null
 }
 
@@ -82,17 +89,27 @@ function lerCte(raiz: No, prot: No): Leitura {
   const chave = (txt(inf['@Id']) ?? '').replace(/^CTe/, '') || txt(no(prot.infProt).chCTe) || ''
   const ide = no(inf.ide)
   if (!chaveValida(chave)) return { tipo: 'erro', erro: 'Chave do CT-e inválida no XML.' }
-  const norm = no(inf.infCTeNorm), carga = no(norm.infCarga)
+  const norm = no(inf.infCTeNorm),
+    carga = no(norm.infCarga)
   const qs = lista<No>(carga.infQ)
   const q = qs.find((x) => /PESO/i.test(txt(x.tpMed) ?? '') && peso(x.cUnid, x.qCarga)) ?? qs.find((x) => peso(x.cUnid, x.qCarga))
   return {
-    tipo: 'cte', chave,
-    numero: Number(txt(ide.nCT)), serie: Number(txt(ide.serie) ?? 0), emitidoEm: new Date(txt(ide.dhEmi) ?? ''),
+    tipo: 'cte',
+    chave,
+    numero: Number(txt(ide.nCT)),
+    serie: Number(txt(ide.serie) ?? 0),
+    emitidoEm: new Date(txt(ide.dhEmi) ?? ''),
     ...situacaoProt(prot),
-    emitente: txt(no(inf.emit).xNome), remetente: txt(no(inf.rem).xNome), destinatario: txt(no(inf.dest).xNome),
-    origem: cidade(ide.xMunIni, ide.UFIni), destino: cidade(ide.xMunFim, ide.UFFim),
-    produto: txt(carga.proPred), pesoKg: q ? peso(q.cUnid, q.qCarga) : null,
-    valor: centavos(no(inf.vPrest).vTPrest), placa: null, chavesCte: [],
+    emitente: txt(no(inf.emit).xNome),
+    remetente: txt(no(inf.rem).xNome),
+    destinatario: txt(no(inf.dest).xNome),
+    origem: cidade(ide.xMunIni, ide.UFIni),
+    destino: cidade(ide.xMunFim, ide.UFFim),
+    produto: txt(carga.proPred),
+    pesoKg: q ? peso(q.cUnid, q.qCarga) : null,
+    valor: centavos(no(inf.vPrest).vTPrest),
+    placa: null,
+    chavesCte: [],
   }
 }
 
@@ -106,14 +123,26 @@ function lerMdfe(raiz: No, prot: No): Leitura {
   const carrega = lista<No>(ide.infMunCarrega)[0]
   const tot = no(inf.tot)
   return {
-    tipo: 'mdfe', chave,
-    numero: Number(txt(ide.nMDF)), serie: Number(txt(ide.serie) ?? 0), emitidoEm: new Date(txt(ide.dhEmi) ?? ''),
+    tipo: 'mdfe',
+    chave,
+    numero: Number(txt(ide.nMDF)),
+    serie: Number(txt(ide.serie) ?? 0),
+    emitidoEm: new Date(txt(ide.dhEmi) ?? ''),
     ...situacaoProt(prot),
-    emitente: txt(no(inf.emit).xNome), remetente: null, destinatario: null,
-    origem: cidade(carrega?.xMunCarrega, ide.UFIni), destino: cidade(descargas[descargas.length - 1]?.xMunDescarga, ide.UFFim),
-    produto: txt(no(inf.prodPred).xProd), pesoKg: peso(tot.cUnid, tot.qCarga), valor: centavos(tot.vCarga),
+    emitente: txt(no(inf.emit).xNome),
+    remetente: null,
+    destinatario: null,
+    origem: cidade(carrega?.xMunCarrega, ide.UFIni),
+    destino: cidade(descargas[descargas.length - 1]?.xMunDescarga, ide.UFFim),
+    produto: txt(no(inf.prodPred).xProd),
+    pesoKg: peso(tot.cUnid, tot.qCarga),
+    valor: centavos(tot.vCarga),
     placa: (txt(no(rodo.veicTracao).placa) ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '') || null,
-    chavesCte: descargas.flatMap((d) => lista<No>(d.infCTe).map((c) => txt(c.chCTe)).filter((x): x is string => !!x)),
+    chavesCte: descargas.flatMap((d) =>
+      lista<No>(d.infCTe)
+        .map((c) => txt(c.chCTe))
+        .filter((x): x is string => !!x),
+    ),
   }
 }
 
@@ -132,7 +161,11 @@ function lerEvento(raiz: No, doc: 'cte' | 'mdfe'): Leitura {
 /** Lê o XML de um CT-e, MDF-e ou evento. Aceita o arquivo "proc" (com protocolo) ou só o documento. */
 export function lerXmlFiscal(xml: string): Leitura {
   let r: No
-  try { r = parser.parse(xml) } catch { return { tipo: 'erro', erro: 'Arquivo não é um XML válido.' } }
+  try {
+    r = parser.parse(xml)
+  } catch {
+    return { tipo: 'erro', erro: 'Arquivo não é um XML válido.' }
+  }
   if (r.cteProc) return lerCte(no(r.cteProc), no(no(r.cteProc).protCTe))
   if (r.CTe) return lerCte(r, {})
   if (r.mdfeProc) return lerMdfe(no(r.mdfeProc), no(no(r.mdfeProc).protMDFe))
@@ -152,7 +185,10 @@ export function nomeCidade(xmlCidade: string | null, conhecidas: string[] = []):
   const achada = conhecidas.find((c) => sem(c) === sem(xmlCidade))
   if (achada) return achada
   const [m, uf] = xmlCidade.split('/')
-  const t = m.toLowerCase().replace(/(^|[\s-])(\p{L})/gu, (_, a, b) => a + b.toUpperCase()).replace(/\b(Da|De|Do|Das|Dos|E)\b/g, (x) => x.toLowerCase())
+  const t = m
+    .toLowerCase()
+    .replace(/(^|[\s-])(\p{L})/gu, (_, a, b) => a + b.toUpperCase())
+    .replace(/\b(Da|De|Do|Das|Dos|E)\b/g, (x) => x.toLowerCase())
   return uf ? `${t}/${uf.toUpperCase()}` : t
 }
 

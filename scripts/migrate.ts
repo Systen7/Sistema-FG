@@ -2,7 +2,9 @@ import { drizzle } from 'drizzle-orm/postgres-js'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import postgres from 'postgres'
 // Carrega o .env quando existe (no computador); na Vercel as variáveis já vêm do painel.
-try { process.loadEnvFile() } catch {}
+try {
+  process.loadEnvFile()
+} catch {}
 
 // Migração usa a conexão direta (sem pooler) quando existe, como a DATABASE_URL_UNPOOLED que o Neon cria na Vercel.
 const url = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL

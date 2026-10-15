@@ -7,7 +7,7 @@ import { eq } from 'drizzle-orm'
 import { db, schema } from '@/db'
 
 import { COOKIE_NOME } from './token-edge'
-export const COOKIE = COOKIE_NOME
+const COOKIE = COOKIE_NOME
 const DIA = 86400
 const DURACAO = { motorista: 180 * DIA, admin: 30 * DIA }
 
@@ -19,14 +19,19 @@ function segredo() {
   return new TextEncoder().encode(s)
 }
 
-export async function assinar(s: Sessao) {
-  return new SignJWT({ ...s }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime(Math.floor(Date.now() / 1000) + DURACAO[s.tipo]).sign(segredo())
+async function assinar(s: Sessao) {
+  return new SignJWT({ ...s })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime(Math.floor(Date.now() / 1000) + DURACAO[s.tipo])
+    .sign(segredo())
 }
-export async function verificar(token: string | undefined): Promise<Sessao | null> {
+async function verificar(token: string | undefined): Promise<Sessao | null> {
   if (!token) return null
   try {
     const { payload } = await jwtVerify(token, segredo())
-    if ((payload.tipo === 'admin' || payload.tipo === 'motorista') && typeof payload.id === 'number') return { tipo: payload.tipo, id: payload.id, v: Number(payload.v) || 1 }
+    if ((payload.tipo === 'admin' || payload.tipo === 'motorista') && typeof payload.id === 'number')
+      return { tipo: payload.tipo, id: payload.id, v: Number(payload.v) || 1 }
   } catch {}
   return null
 }
@@ -34,7 +39,11 @@ export async function verificar(token: string | undefined): Promise<Sessao | nul
 export async function iniciarSessao(s: Sessao) {
   const jar = await cookies()
   jar.set(COOKIE, await assinar(s), {
-    httpOnly: true, sameSite: 'lax', path: '/', secure: process.env.NODE_ENV === 'production' && !process.env.INSECURE_COOKIES, maxAge: DURACAO[s.tipo],
+    httpOnly: true,
+    sameSite: 'lax',
+    path: '/',
+    secure: process.env.NODE_ENV === 'production' && !process.env.INSECURE_COOKIES,
+    maxAge: DURACAO[s.tipo],
   })
 }
 export async function encerrarSessao() {
@@ -57,7 +66,7 @@ export async function exigirMotorista() {
   const s = await sessaoAtual()
   if (s?.tipo !== 'motorista') redirect('/entrar')
   const [m] = await db.select().from(schema.motoristas).where(eq(schema.motoristas.id, s.id))
-  if (!m || !m.ativo || m.versaoSessao !== s.v) redirect('/entrar?saiu=1')
+  if (!m?.ativo || m.versaoSessao !== s.v) redirect('/entrar?saiu=1')
   return m
 }
 
@@ -66,7 +75,7 @@ export async function motoristaDaApi() {
   const s = await sessaoAtual()
   if (s?.tipo !== 'motorista') return null
   const [m] = await db.select().from(schema.motoristas).where(eq(schema.motoristas.id, s.id))
-  return m && m.ativo && m.versaoSessao === s.v ? m : null
+  return m?.ativo && m.versaoSessao === s.v ? m : null
 }
 export async function adminDaApi() {
   const s = await sessaoAtual()
@@ -79,7 +88,8 @@ export const hash = (s: string) => bcrypt.hash(s, 10)
 export const confere = (s: string, h: string) => bcrypt.compare(s, h)
 
 // Bloqueio após tentativas erradas: 5 erros seguidos travam por 15 minutos.
-const LIMITE = 5, BLOQUEIO_MIN = 15
+const LIMITE = 5,
+  BLOQUEIO_MIN = 15
 export async function bloqueado(chave: string): Promise<number> {
   const [t] = await db.select().from(schema.tentativasLogin).where(eq(schema.tentativasLogin.chave, chave))
   if (t?.bloqueadoAte && t.bloqueadoAte > new Date()) return Math.ceil((t.bloqueadoAte.getTime() - Date.now()) / 60000)
@@ -87,9 +97,11 @@ export async function bloqueado(chave: string): Promise<number> {
 }
 export async function registrarFalha(chave: string) {
   const [t] = await db.select().from(schema.tentativasLogin).where(eq(schema.tentativasLogin.chave, chave))
-  const falhas = (t?.bloqueadoAte && t.bloqueadoAte <= new Date() ? 0 : t?.falhas ?? 0) + 1
+  const falhas = (t?.bloqueadoAte && t.bloqueadoAte <= new Date() ? 0 : (t?.falhas ?? 0)) + 1
   const bloqueadoAte = falhas >= LIMITE ? new Date(Date.now() + BLOQUEIO_MIN * 60000) : null
-  await db.insert(schema.tentativasLogin).values({ chave, falhas, bloqueadoAte })
+  await db
+    .insert(schema.tentativasLogin)
+    .values({ chave, falhas, bloqueadoAte })
     .onConflictDoUpdate({ target: schema.tentativasLogin.chave, set: { falhas: bloqueadoAte ? 0 : falhas, bloqueadoAte } })
   return LIMITE - falhas
 }

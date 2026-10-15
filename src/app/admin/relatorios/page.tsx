@@ -21,15 +21,24 @@ export default async function Relatorios() {
       <div className="cols">
         {TIPOS.map(([k, t, d]) => (
           <section key={k} className="panel">
-            <header><h2>{t}</h2></header>
+            <header>
+              <h2>{t}</h2>
+            </header>
             <p className="muted">{d}</p>
             <form action="/api/admin/exportar" className="row">
               <input type="hidden" name="tipo" value={k} />
               <select name="mes" className="inp" style={{ width: 'auto', minHeight: 40, padding: '6px 10px' }} aria-label="Mês">
                 {k !== 'acerto' && <option value="">Todos os meses</option>}
-                {meses.map((m) => <option key={m} value={m}>{nomeMes(m)}</option>)}
+                {meses.map((m) => (
+                  <option key={m} value={m}>
+                    {nomeMes(m)}
+                  </option>
+                ))}
               </select>
-              <button className="btn pri"><FileSpreadsheet className="ico" />Baixar planilha</button>
+              <button type="submit" className="btn pri">
+                <FileSpreadsheet className="ico" />
+                Baixar planilha
+              </button>
             </form>
           </section>
         ))}

@@ -1,0 +1,31 @@
+# O título do PR vira o commit na main ("Squash and merge"), então precisa seguir o padrão (commitlint).
+# Separado da verificação principal para que editar o título não rode tudo de novo.
+name: Título do PR
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, synchronize, reopened]
+
+concurrency:
+  group: titulo-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  titulo:
+    name: Padrão do título do PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      HUSKY: 0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Conferir título
+        env:
+          TITULO: ${{ github.event.pull_request.title }}
+        run: echo "$TITULO" | npx commitlint --verbose

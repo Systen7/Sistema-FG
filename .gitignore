@@ -7,3 +7,6 @@ next-env.d.ts
 test-results
 playwright-report
 /screenshots
+coverage
+reports
+.stryker-tmp

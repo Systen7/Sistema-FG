@@ -17,21 +17,56 @@ export default async function Conta() {
     <>
       <div>
         <h1>{m.nome}</h1>
-        <p className="muted" style={{ marginTop: 4 }}>{telefone(m.telefone)}</p>
+        <p className="muted" style={{ marginTop: 4 }}>
+          {telefone(m.telefone)}
+        </p>
       </div>
       <Instalar />
       <section className="panel">
         <h2>Meus dados</h2>
         <div className="list">
-          <div><span>Caminhão</span><span>{cam ? <><span className="plate">{cam.placa}</span>{cam.placaCarreta && <> <span className="plate">{cam.placaCarreta}</span></>}</> : '—'}</span></div>
-          <div><span>Comissão sobre o frete</span><b>{num(m.comissaoPct, m.comissaoPct % 1 ? 1 : 0)}%</b></div>
-          <div><span>Validade da CNH</span><span>{dataLonga(m.cnhAte)}</span></div>
-          <div><span>Exame toxicológico</span><span>{dataLonga(m.toxicologicoAte)}</span></div>
+          <div>
+            <span>Caminhão</span>
+            <span>
+              {cam ? (
+                <>
+                  <span className="plate">{cam.placa}</span>
+                  {cam.placaCarreta && (
+                    <>
+                      {' '}
+                      <span className="plate">{cam.placaCarreta}</span>
+                    </>
+                  )}
+                </>
+              ) : (
+                '—'
+              )}
+            </span>
+          </div>
+          <div>
+            <span>Comissão sobre o frete</span>
+            <b>{num(m.comissaoPct, m.comissaoPct % 1 ? 1 : 0)}%</b>
+          </div>
+          <div>
+            <span>Validade da CNH</span>
+            <span>{dataLonga(m.cnhAte)}</span>
+          </div>
+          <div>
+            <span>Exame toxicológico</span>
+            <span>{dataLonga(m.toxicologicoAte)}</span>
+          </div>
         </div>
         <p className="small muted">Algum dado errado? Avise o escritório.</p>
       </section>
       <TrocarPin />
-      {cfg.whatsappEscritorio && <a className="acao" href={`https://wa.me/55${cfg.whatsappEscritorio}`}><MessageCircle className="ico" /><span>Falar com o escritório<small>Abre o WhatsApp</small></span></a>}
+      {cfg.whatsappEscritorio && (
+        <a className="acao" href={`https://wa.me/55${cfg.whatsappEscritorio}`}>
+          <MessageCircle className="ico" />
+          <span>
+            Falar com o escritório<small>Abre o WhatsApp</small>
+          </span>
+        </a>
+      )}
       <Sair acao={sair} />
     </>
   )

@@ -5,11 +5,23 @@ import { TIPOS_DESPESA, lerNumero, lerReais, nomeTipo } from '@/lib/format'
 export const camposMotorista = (caminhoes: [string, string][], novo: boolean): Campo[] => [
   { nome: 'nome', rotulo: 'Nome completo', largo: true },
   { nome: 'telefone', rotulo: 'Celular (WhatsApp) com DDD', tipo: 'tel', placeholder: '(66) 99999-0000', dica: 'O motorista entra com este número.' },
-  { nome: 'pin', rotulo: novo ? 'PIN de 4 números' : 'Novo PIN', tipo: 'senha', obrig: novo, placeholder: novo ? '' : 'deixe vazio para manter', dica: novo ? 'Ou envie o link de acesso e ele não precisa decorar.' : undefined },
+  {
+    nome: 'pin',
+    rotulo: novo ? 'PIN de 4 números' : 'Novo PIN',
+    tipo: 'senha',
+    obrig: novo,
+    placeholder: novo ? '' : 'deixe vazio para manter',
+    dica: novo ? 'Ou envie o link de acesso e ele não precisa decorar.' : undefined,
+  },
   { nome: 'comissaoPct', rotulo: 'Comissão sobre o frete (%)', tipo: 'num', dica: 'Vale para as próximas viagens; as já iniciadas mantêm o percentual delas.' },
   {
-    nome: 'caminhaoId', rotulo: 'Caminhão', tipo: 'select', opcoes: [['', caminhoes.length ? 'Sem caminhão' : 'Nenhum caminhão cadastrado'], ...caminhoes],
-    dica: caminhoes.length ? 'Sem caminhão, ele não consegue iniciar viagem no app.' : 'Cadastre o caminhão em Frota e manutenção e depois volte aqui para escolher.',
+    nome: 'caminhaoId',
+    rotulo: 'Caminhão',
+    tipo: 'select',
+    opcoes: [['', caminhoes.length ? 'Sem caminhão' : 'Nenhum caminhão cadastrado'], ...caminhoes],
+    dica: caminhoes.length
+      ? 'Sem caminhão, ele não consegue iniciar viagem no app.'
+      : 'Cadastre o caminhão em Frota e manutenção e depois volte aqui para escolher.',
   },
   { nome: 'cnhAte', rotulo: 'Validade da CNH', tipo: 'data', obrig: false },
   { nome: 'toxicologicoAte', rotulo: 'Validade do exame toxicológico', tipo: 'data', obrig: false },
@@ -40,7 +52,15 @@ export const camposViagem = (motoristas: [string, string][], caminhoes: [string,
   { nome: 'adiantamento', rotulo: 'Adiantamento ao motorista (R$)', tipo: 'dinheiro', obrig: false },
   { nome: 'inicio', rotulo: 'Início', tipo: 'data' },
   { nome: 'kmInicial', rotulo: 'Km inicial', tipo: 'num' },
-  { nome: 'status', rotulo: 'Situação', tipo: 'select', opcoes: [['andamento', 'Em viagem'], ['encerrada', 'Encerrada']] },
+  {
+    nome: 'status',
+    rotulo: 'Situação',
+    tipo: 'select',
+    opcoes: [
+      ['andamento', 'Em viagem'],
+      ['encerrada', 'Encerrada'],
+    ],
+  },
   { nome: 'fim', rotulo: 'Chegada', tipo: 'data', obrig: false },
   { nome: 'kmFinal', rotulo: 'Km final', tipo: 'num', obrig: false },
   { nome: 'kmVazio', rotulo: 'Km rodado vazio', tipo: 'num', obrig: false },
@@ -51,8 +71,25 @@ export const camposDespesa: Campo[] = [
   { nome: 'valor', rotulo: 'Valor (R$)', tipo: 'dinheiro' },
   { nome: 'litros', rotulo: 'Litros (se combustível)', tipo: 'num', obrig: false },
   { nome: 'data', rotulo: 'Data', tipo: 'data' },
-  { nome: 'pagoPor', rotulo: 'Quem pagou', tipo: 'select', opcoes: [['empresa', 'Empresa'], ['motorista', 'Motorista (reembolsar)']] },
-  { nome: 'status', rotulo: 'Situação', tipo: 'select', opcoes: [['aprovada', 'Aprovada'], ['pendente', 'Pendente'], ['recusada', 'Recusada']] },
+  {
+    nome: 'pagoPor',
+    rotulo: 'Quem pagou',
+    tipo: 'select',
+    opcoes: [
+      ['empresa', 'Empresa'],
+      ['motorista', 'Motorista (reembolsar)'],
+    ],
+  },
+  {
+    nome: 'status',
+    rotulo: 'Situação',
+    tipo: 'select',
+    opcoes: [
+      ['aprovada', 'Aprovada'],
+      ['pendente', 'Pendente'],
+      ['recusada', 'Recusada'],
+    ],
+  },
   { nome: 'obs', rotulo: 'Observação', largo: true, obrig: false },
 ]
 
@@ -103,12 +140,18 @@ export function ler(f: FormData, campos: Campo[]) {
     if (!s && obrig && t !== 'select') throw new ErroCampo(`Preencha "${c.rotulo}".`)
     if (t === 'bool') o[c.nome] = s === '1'
     else if (t === 'num') {
-      if (!s) { o[c.nome] = null; continue }
+      if (!s) {
+        o[c.nome] = null
+        continue
+      }
       const v = lerNumero(s)
       if (v === null || v < 0) throw new ErroCampo(`"${c.rotulo}" precisa ser um número.`)
       o[c.nome] = v
     } else if (t === 'dinheiro') {
-      if (!s) { o[c.nome] = c.obrig === false ? 0 : null; continue }
+      if (!s) {
+        o[c.nome] = c.obrig === false ? 0 : null
+        continue
+      }
       const v = lerReais(s)
       if (v === null || v < 0) throw new ErroCampo(`"${c.rotulo}" precisa ser um valor em reais.`)
       o[c.nome] = v

@@ -6,7 +6,9 @@ import { hash, iniciarSessao } from '@/lib/auth'
 
 export async function criarPrimeiroAdmin(_: { erro?: string } | undefined, f: FormData) {
   const nome = String(f.get('nome') ?? '').trim()
-  const usuario = String(f.get('usuario') ?? '').trim().toLowerCase()
+  const usuario = String(f.get('usuario') ?? '')
+    .trim()
+    .toLowerCase()
   const senha = String(f.get('senha') ?? '')
   const empresa = String(f.get('empresa') ?? '').trim() || 'Empresa FG'
   if (!nome) return { erro: 'Digite seu nome.' }
@@ -21,7 +23,10 @@ export async function criarPrimeiroAdmin(_: { erro?: string } | undefined, f: Fo
     RETURNING id`)
   const linhas = Array.from(r as unknown as { id: number }[])
   if (!linhas.length) redirect('/entrar')
-  await db.insert(s.configuracao).values({ id: 1, nomeEmpresa: empresa }).onConflictDoUpdate({ target: s.configuracao.id, set: { nomeEmpresa: empresa } })
+  await db
+    .insert(s.configuracao)
+    .values({ id: 1, nomeEmpresa: empresa })
+    .onConflictDoUpdate({ target: s.configuracao.id, set: { nomeEmpresa: empresa } })
   await iniciarSessao({ tipo: 'admin', id: linhas[0].id, v: 1 })
-  redirect('/admin?ok=' + encodeURIComponent('Bem-vindo! Comece cadastrando caminhões e motoristas.'))
+  redirect(`/admin?ok=${encodeURIComponent('Bem-vindo! Comece cadastrando caminhões e motoristas.')}`)
 }

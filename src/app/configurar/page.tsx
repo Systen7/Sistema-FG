@@ -14,11 +14,15 @@ export default async function Configurar() {
   if (n > 0) redirect('/entrar')
   return (
     <main className="login">
-      <div className="brand"><i>FG</i>Sistema FG</div>
+      <div className="brand">
+        <i>FG</i>Sistema FG
+      </div>
       <section className="hero">
         <div>
           <h1 style={{ fontSize: 30 }}>Primeiro acesso</h1>
-          <p className="muted" style={{ marginTop: 6 }}>Crie o seu acesso de administrador. Esta tela some assim que ele for criado.</p>
+          <p className="muted" style={{ marginTop: 6 }}>
+            Crie o seu acesso de administrador. Esta tela some assim que ele for criado.
+          </p>
         </div>
         <PrimeiroAcesso />
       </section>

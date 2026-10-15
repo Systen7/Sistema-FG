@@ -1,0 +1,149 @@
+# Roda em todo Pull Request para a main (e em envios para a main).
+# Só faça merge com todas as verificações verdes. Ver AGENTS.md.
+name: Verificação
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: verificacao-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SESSION_SECRET: segredo-somente-para-testes-automaticos
+  TZ_EMPRESA: America/Sao_Paulo
+  HUSKY: 0
+
+jobs:
+  qualidade:
+    name: Qualidade de código
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint e formatação (Biome)
+        run: npx biome ci .
+      - name: Tipos (TypeScript)
+        run: npm run tipos
+      - name: Contratos de arquitetura (dependency-cruiser)
+        run: npm run arquitetura
+      - name: Código e dependências sem uso (Knip)
+        run: npm run knip
+
+  codigo:
+    name: Tipos, testes e compilação
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: fg
+          POSTGRES_PASSWORD: fg
+          POSTGRES_DB: fg_teste
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U fg" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgres://fg:fg@localhost:5432/fg_teste
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Testes de unidade e de integração (com cobertura)
+        run: npm run test:cobertura
+      - name: Enviar cobertura ao Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/lcov.info
+          flags: unidade-integracao
+          fail_ci_if_error: false
+      - name: Compilação de produção
+        run: npm run build
+
+  mutacao:
+    name: Testes de mutação
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Resultado anterior guardado: só os mutantes de código ou testes que mudaram rodam de novo.
+      - uses: actions/cache@v4
+        with:
+          path: reports/stryker-incremental.json
+          key: stryker-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            stryker-${{ github.ref }}-
+            stryker-refs/heads/main-
+      - name: Stryker
+        run: npm run mutacao
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: relatorio-mutacao
+          path: reports/mutation
+          retention-days: 14
+
+  navegador:
+    name: Testes de navegador
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: fg
+          POSTGRES_PASSWORD: fg
+          POSTGRES_DB: fg
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U fg" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://fg:fg@localhost:5432/fg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Navegador para os testes
+        run: npx playwright install --with-deps chromium
+      - name: Banco de dados
+        run: npm run db:migrate && npm run db:seed -- --limpar
+      - name: Compilar e subir o sistema
+        run: |
+          npm run build
+          nohup npx next start -p 3000 > servidor.log 2>&1 &
+          npx --yes wait-on@8 -t 60000 http-get://localhost:3000/api/saude
+      - name: Testes de navegador
+        run: PROD=1 npx playwright test
+      - name: Registro do servidor (se falhar)
+        if: failure()
+        run: tail -n 200 servidor.log
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: relatorio-playwright
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7

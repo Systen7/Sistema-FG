@@ -19,17 +19,37 @@ describe('leitura do XML', () => {
     expect(r.tipo).toBe('cte')
     if (r.tipo !== 'cte') return
     expect(r).toMatchObject({
-      chave: c, numero: 1234, serie: 1, situacao: 'autorizado', protocolo: '151260000012345', origem: 'RONDONOPOLIS/MT', destino: 'SANTOS/SP',
-      remetente: 'AGRO SOJA SA', destinatario: 'TERMINAL PORTUARIO SANTOS', produto: 'SOJA EM GRAOS', pesoKg: 37000, valor: 1_380_000,
+      chave: c,
+      numero: 1234,
+      serie: 1,
+      situacao: 'autorizado',
+      protocolo: '151260000012345',
+      origem: 'RONDONOPOLIS/MT',
+      destino: 'SANTOS/SP',
+      remetente: 'AGRO SOJA SA',
+      destinatario: 'TERMINAL PORTUARIO SANTOS',
+      produto: 'SOJA EM GRAOS',
+      pesoKg: 37000,
+      valor: 1_380_000,
     })
     expect(r.emitidoEm.toISOString()).toBe('2026-10-10T12:15:00.000Z')
   })
   it('lê MDF-e com placa sem traço, peso em toneladas e CT-e vinculados', () => {
-    const c = chave('58', 77), cte = chave('57', 1234)
+    const c = chave('58', 77),
+      cte = chave('57', 1234)
     const r = lerXmlFiscal(MDFE(c, cte))
     expect(r.tipo).toBe('mdfe')
     if (r.tipo !== 'mdfe') return
-    expect(r).toMatchObject({ numero: 77, placa: 'RKT4E21', pesoKg: 37000, valor: 9_800_000, chavesCte: [cte], origem: 'RONDONOPOLIS/MT', destino: 'SANTOS/SP', situacao: 'autorizado' })
+    expect(r).toMatchObject({
+      numero: 77,
+      placa: 'RKT4E21',
+      pesoKg: 37000,
+      valor: 9_800_000,
+      chavesCte: [cte],
+      origem: 'RONDONOPOLIS/MT',
+      destino: 'SANTOS/SP',
+      situacao: 'autorizado',
+    })
   })
   it('reconhece o evento de encerramento do MDF-e', () => {
     const c = chave('58', 77)

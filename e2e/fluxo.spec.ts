@@ -4,7 +4,9 @@ import { execSync } from 'node:child_process'
 // Fluxo completo: escritório envia o link, motorista entra, inicia viagem, lança gastos (um sem sinal), encerra; escritório aprova e vê o acerto.
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC', 'base64')
 
-test.beforeAll(() => { execSync('npx tsx scripts/seed.ts --limpar', { stdio: 'inherit' }) })
+test.beforeAll(() => {
+  execSync('npx tsx scripts/seed.ts --limpar', { stdio: 'inherit' })
+})
 
 async function digitar(p: Page, rotulo: string, digitos: string) {
   const i = p.getByLabel(rotulo)
@@ -93,7 +95,10 @@ test('fluxo completo motorista + escritório', async ({ browser }) => {
   await adm.getByRole('button', { name: /Aprovar todas/ }).click()
   await expect(adm.getByText(/despesas aprovadas/)).toBeVisible()
   await adm.goto('/admin/viagens?motorista=1&status=encerrada')
-  await adm.getByRole('link', { name: /Rondonópolis\/MT → Santos\/SP/ }).first().click()
+  await adm
+    .getByRole('link', { name: /Rondonópolis\/MT → Santos\/SP/ })
+    .first()
+    .click()
   await expect(adm.getByRole('img', { name: 'Comprovante' })).toBeVisible()
   const res = await adm.request.get('/api/admin/exportar?tipo=despesas')
   expect(res.headers()['content-type']).toContain('text/csv')

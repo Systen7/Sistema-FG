@@ -2,8 +2,12 @@
 // Monta uma chave válida: UF(2) AAMM(4) CNPJ(14) modelo(2) série(3) número(9) tpEmis(1) código(8) + DV
 export function chave(modelo: '57' | '58', numero: number) {
   const base = `51${'2610'}12345678000199${modelo}001${String(numero).padStart(9, '0')}1${'12345678'}`
-  let soma = 0, peso = 2
-  for (let i = 42; i >= 0; i--) { soma += Number(base[i]) * peso; peso = peso === 9 ? 2 : peso + 1 }
+  let soma = 0,
+    peso = 2
+  for (let i = 42; i >= 0; i--) {
+    soma += Number(base[i]) * peso
+    peso = peso === 9 ? 2 : peso + 1
+  }
   const r = soma % 11
   return base + (r < 2 ? 0 : 11 - r)
 }
@@ -44,4 +48,3 @@ export const ENCERRAMENTO = (ch: string) => `<procEventoMDFe xmlns="http://www.p
   <eventoMDFe versao="3.00"><infEvento Id="ID110112${ch}01"><chMDFe>${ch}</chMDFe><dhEvento>2026-10-13T17:30:00-03:00</dhEvento><tpEvento>110112</tpEvento></infEvento></eventoMDFe>
   <retEventoMDFe versao="3.00"><infEvento><cStat>135</cStat><xMotivo>Evento registrado</xMotivo></infEvento></retEventoMDFe>
 </procEventoMDFe>`
-

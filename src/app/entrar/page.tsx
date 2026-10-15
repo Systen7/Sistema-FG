@@ -15,6 +15,8 @@ export default async function Entrar(props: PageProps<'/entrar'>) {
   const [{ n }] = await db.select({ n: sql<number>`count(*)::int` }).from(schema.administradores)
   if (n === 0) redirect('/configurar')
   const cfg = await config()
-  const zap = cfg.whatsappEscritorio ? `https://wa.me/55${cfg.whatsappEscritorio}?text=${encodeURIComponent('Olá, preciso de ajuda para entrar no app da empresa.')}` : null
+  const zap = cfg.whatsappEscritorio
+    ? `https://wa.me/55${cfg.whatsappEscritorio}?text=${encodeURIComponent('Olá, preciso de ajuda para entrar no app da empresa.')}`
+    : null
   return <Login empresa={cfg.nomeEmpresa} ajuda={zap} demo={process.env.DEMO === '1'} motivo={sp.saiu ? 'saiu' : sp.link ? 'link' : null} />
 }
