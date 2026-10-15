@@ -4,24 +4,14 @@ import { revalidatePath } from 'next/cache'
 import { eq } from 'drizzle-orm'
 import { db, schema as s } from '@/db'
 import { exigirAdmin } from '@/lib/auth'
-import { importarArquivos, anexarPdf, ligarDocumento, type ResultadoArquivo } from '@/lib/documentos'
+import { anexarPdf, ligarDocumento } from '@/lib/documentos'
 import { apagarArquivos } from '@/lib/armazenamento'
 import { registrar } from '@/lib/audit'
 
 const comMsg = (url: string, msg: string) => url + (url.includes('?') ? '&' : '?') + 'ok=' + encodeURIComponent(msg)
 const atualizar = () => { revalidatePath('/admin', 'layout'); revalidatePath('/m', 'layout') }
 
-export type EstadoImport = { resultados?: ResultadoArquivo[]; erro?: string } | undefined
-
-export async function importarDocumentos(viagemId: number | null, _: EstadoImport, f: FormData): Promise<EstadoImport> {
-  const a = await exigirAdmin()
-  const arquivos = f.getAll('arquivos').filter((x): x is File => x instanceof File && x.size > 0)
-  if (!arquivos.length) return { erro: 'Escolha um ou mais arquivos XML ou PDF.' }
-  if (arquivos.length > 50) return { erro: 'Envie no máximo 50 arquivos por vez.' }
-  const resultados = await importarArquivos(arquivos, viagemId, 'admin:' + a.id)
-  atualizar()
-  return { resultados }
-}
+// A importação de XML/PDF fica em /api/admin/documentos (rota com progresso de envio).
 
 export async function ligarDoc(id: number, voltar: string, f: FormData) {
   const a = await exigirAdmin()

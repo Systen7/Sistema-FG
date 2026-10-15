@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { eq, and, desc } from 'drizzle-orm'
 import { Plus, Flag, Play, Fuel, ChevronRight, IdCard, MessageCircle } from 'lucide-react'
@@ -10,13 +11,12 @@ import { dataCurta, dataLonga, num, primeiroNome, reais, reaisC } from '@/lib/fo
 import { ListaGastos } from './lista-gastos'
 import { DocumentosViagem } from './documentos'
 import { documentosDasViagens } from '@/lib/documentos'
+import { MLista } from '@/components/esqueleto'
 
 export default async function Viagem() {
   const m = await exigirMotorista()
   const [cfg, v] = await Promise.all([config(), viagemAtiva(m.id)])
   const [cam] = m.caminhaoId ? await db.select().from(s.caminhoes).where(eq(s.caminhoes.id, m.caminhaoId)) : []
-  const mes = mesAtual()
-  const doMes = agregar(await viagensDoMes(mes, { motoristaId: m.id }), cfg.retornoPct)
   const H = hoje()
   const docs = ([['CNH', m.cnhAte], ['Exame toxicológico', m.toxicologicoAte]] as const)
     .filter(([, d]) => d && dias(H, d) <= 30).map(([n, d]) => ({ n, d: d!, x: dias(H, d!) }))
@@ -50,22 +50,14 @@ export default async function Viagem() {
         </section>
       )}
 
-      <section className="panel">
-        <header><h2>{nomeMes(mes)}</h2><Link href="/m/extrato" className="btn sm">Ver extrato<ChevronRight className="ico" /></Link></header>
-        <div className="kv">
-          <div><span className="lbl">Viagens encerradas</span><b>{doMes.n}</b></div>
-          <div><span className="lbl">Sua comissão</span><b className="y">{reais(doMes.comissao)}</b></div>
-        </div>
-        {doMes.km > 0 && <p className="small muted">{num(doMes.km)} km rodados{doMes.litros ? ` · média de ${num(doMes.km / doMes.litros, 2)} km/l` : ''}</p>}
-      </section>
+      <Suspense fallback={<MLista itens={1} />}><SecaoMes motoristaId={m.id} retorno={cfg.retornoPct} /></Suspense>
 
       {zap && <a className="acao" href={zap}><MessageCircle className="ico" /><span>Falar com o escritório<small>Abre o WhatsApp</small></span></a>}
     </>
   )
 }
 
-async function ViagemAtiva({ v, retorno }: { v: Awaited<ReturnType<typeof viagemAtiva>> & {}; retorno: number }) {
-  const docs = await documentosDasViagens([v.id])
+function ViagemAtiva({ v, retorno }: { v: Awaited<ReturnType<typeof viagemAtiva>> & {}; retorno: number }) {
   const c = calcViagem(v, retorno)
   const semFrete = v.frete === 0
   return (
@@ -87,7 +79,8 @@ async function ViagemAtiva({ v, retorno }: { v: Awaited<ReturnType<typeof viagem
         </div>
       </section>
 
-      <DocumentosViagem docs={docs.map((d) => ({ id: d.id, tipo: d.tipo, numero: d.numero, chave: d.chave, situacao: d.situacao, temPdf: !!d.pdfId }))} />
+      {/* sem esqueleto: a maioria das viagens não tem documento, e um bloco cinza que some depois seria pior */}
+      <Suspense fallback={null}><SecaoDocumentos viagemId={v.id} /></Suspense>
 
       <section className="panel">
         <header>
@@ -99,5 +92,27 @@ async function ViagemAtiva({ v, retorno }: { v: Awaited<ReturnType<typeof viagem
         <p className="small muted">Toque num gasto para corrigir. Gasto corrigido volta para o escritório aprovar.</p>
       </section>
     </>
+  )
+}
+
+/** Documentos da viagem: carrega à parte para a tela abrir sem esperar. */
+async function SecaoDocumentos({ viagemId }: { viagemId: number }) {
+  const docs = await documentosDasViagens([viagemId])
+  return <DocumentosViagem docs={docs.map((d) => ({ id: d.id, tipo: d.tipo, numero: d.numero, chave: d.chave, situacao: d.situacao, temPdf: !!d.pdfId }))} />
+}
+
+/** Resumo do mês do motorista (carrega sob demanda). */
+async function SecaoMes({ motoristaId, retorno }: { motoristaId: number; retorno: number }) {
+  const mes = mesAtual()
+  const doMes = agregar(await viagensDoMes(mes, { motoristaId }), retorno)
+  return (
+    <section className="panel">
+      <header><h2>{nomeMes(mes)}</h2><Link href="/m/extrato" className="btn sm">Ver extrato<ChevronRight className="ico" /></Link></header>
+      <div className="kv">
+        <div><span className="lbl">Viagens encerradas</span><b>{doMes.n}</b></div>
+        <div><span className="lbl">Sua comissão</span><b className="y">{reais(doMes.comissao)}</b></div>
+      </div>
+      {doMes.km > 0 && <p className="small muted">{num(doMes.km)} km rodados{doMes.litros ? ` · média de ${num(doMes.km / doMes.litros, 2)} km/l` : ''}</p>}
+    </section>
   )
 }

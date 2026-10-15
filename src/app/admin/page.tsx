@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
+import { Grafico as EsqGrafico } from '@/components/esqueleto'
 import { ArrowRight } from 'lucide-react'
 import { config, viagensDoMes, emAndamento, pendentes, motoristas, caminhoes, manutencoes, apolices, custosFixos, lembretes, pneus, dispensados, mesesDisponiveis, mdfeAbertos } from '@/lib/dados'
 import { agregar, calcViagem, resultadoGeral } from '@/lib/calc'
@@ -9,6 +11,7 @@ import { Cabecalho, Periodo, Placa, Valor } from './ui'
 import { Distribuicao, Tendencia } from './graficos'
 import { Pendentes } from './pendentes'
 import { dispensarAlerta } from './actions'
+import { Enviar } from '@/components/enviar'
 
 export const metadata = { title: 'Painel' }
 
@@ -24,10 +27,6 @@ export default async function Painel(props: PageProps<'/admin'>) {
   const urg = calcAlertas(H, { motoristas: ms, caminhoes: cs, apolices: ap, lembretes: lb, pneus: pn, cfg, mdfes }).filter((a) => a.urgente && !ds.has(a.chave))
   const primeiro = meses[meses.length - 1] ?? mes
   const ult = [5, 4, 3, 2, 1, 0].map((i) => somaMeses(mes, -i)).filter((m) => m >= primeiro)
-  const tend = await Promise.all(ult.map(async (m) => {
-    const r = resultadoGeral(m, H, await viagensDoMes(m), mn, ap, fx, cfg.retornoPct)
-    return { mes: m, rotulo: nomeMes(m, true), frete: r.frete, lucro: r.lucro, parcial: m === atual }
-  }))
   const porMot = ms.filter((m) => m.ativo).map((m) => ({ m, a: agregar(vs.filter((v) => v.motoristaId === m.id), cfg.retornoPct) })).sort((x, y) => y.a.lucroViagens - x.a.lucroViagens)
   const mx = Math.max(1, ...porMot.map((x) => Math.abs(x.a.lucroViagens)))
   const cam = (id: number) => cs.find((c) => c.id === id)
@@ -71,7 +70,7 @@ export default async function Painel(props: PageProps<'/admin'>) {
                   <span>{a.texto}<br /><span className="chip bad">{a.detalhe}</span></span>
                   <span className="row">
                     <Link href={a.link} className="btn sm">Resolver</Link>
-                    <form action={dispensarAlerta.bind(null, a.chave, '/admin')}><button className="btn sm ghost">Dispensar</button></form>
+                    <form action={dispensarAlerta.bind(null, a.chave, '/admin')}><Enviar className="btn sm ghost">Dispensar</Enviar></form>
                   </span>
                 </div>
               ))}
@@ -101,10 +100,10 @@ export default async function Painel(props: PageProps<'/admin'>) {
         </section>
       </div>
 
-      <section className="panel">
-        <header><h2>Faturamento e lucro por mês</h2><span className="small muted">* mês em andamento, ainda parcial</span></header>
-        <Tendencia meses={tend} />
-      </section>
+      {/* Os 6 meses pedem várias consultas: chegam depois, sem segurar o resto do painel. */}
+      <Suspense fallback={<EsqGrafico />}>
+        <SecaoTendencia ult={ult} H={H} atual={atual} retornoPct={cfg.retornoPct} />
+      </Suspense>
 
       <section className="panel">
         <header><h2>Resultado por motorista</h2><span className="small muted">lucro das viagens, antes de manutenção e custos fixos</span></header>
@@ -127,5 +126,19 @@ export default async function Painel(props: PageProps<'/admin'>) {
         </table></div>
       </section>
     </>
+  )
+}
+
+async function SecaoTendencia({ ult, H, atual, retornoPct }: { ult: string[]; H: string; atual: string; retornoPct: number }) {
+  const [mn, ap, fx] = await Promise.all([manutencoes(), apolices(), custosFixos()])
+  const tend = await Promise.all(ult.map(async (m) => {
+    const r = resultadoGeral(m, H, await viagensDoMes(m), mn, ap, fx, retornoPct)
+    return { mes: m, rotulo: nomeMes(m, true), frete: r.frete, lucro: r.lucro, parcial: m === atual }
+  }))
+  return (
+    <section className="panel">
+      <header><h2>Faturamento e lucro por mês</h2><span className="small muted">* mês em andamento, ainda parcial</span></header>
+      <Tendencia meses={tend} />
+    </section>
   )
 }

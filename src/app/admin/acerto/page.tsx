@@ -5,6 +5,7 @@ import { mesAtual, mesValido, nomeMes, dataDe } from '@/lib/datas'
 import { dataLonga, reaisC } from '@/lib/format'
 import { Cabecalho, Periodo } from '../ui'
 import { marcarPago, desfazerPago } from '../actions'
+import { Enviar } from '@/components/enviar'
 
 export const metadata = { title: 'Acerto' }
 
@@ -35,8 +36,8 @@ export default async function Acerto(props: PageProps<'/admin/acerto'>) {
                 <td className="r"><b style={{ color: a.saldo < 0 ? 'var(--bad)' : undefined }}>{reaisC(a.saldo)}</b>{a.saldo < 0 && <><br /><span className="small muted">motorista devolve</span></>}</td>
                 <td>{pago
                   ? <span className="row" style={{ flexWrap: 'nowrap' }}><span className="chip ok">Pago em {dataLonga(dataDe(pago.pagoEm))}</span>
-                    {pago.valor !== a.saldo && <span className="chip warn" title="Algum valor mudou depois do pagamento (ex.: gasto aprovado depois). Desfaça e marque de novo, acertando a diferença.">pago {reaisC(pago.valor)} · agora {reaisC(a.saldo)}</span>}<form action={desfazerPago.bind(null, m.id, mes, aqui)}><button className="btn sm ghost">Desfazer</button></form></span>
-                  : a.viagens ? <form action={marcarPago.bind(null, m.id, mes, a.saldo, aqui)}><button className="btn sm pri">Marcar como pago</button></form> : <span className="muted small">sem viagens</span>}</td>
+                    {pago.valor !== a.saldo && <span className="chip warn" title="Algum valor mudou depois do pagamento (ex.: gasto aprovado depois). Desfaça e marque de novo, acertando a diferença.">pago {reaisC(pago.valor)} · agora {reaisC(a.saldo)}</span>}<form action={desfazerPago.bind(null, m.id, mes, aqui)}><Enviar className="btn sm ghost">Desfazer</Enviar></form></span>
+                  : a.viagens ? <form action={marcarPago.bind(null, m.id, mes, a.saldo, aqui)}><Enviar className="btn sm pri">Marcar como pago</Enviar></form> : <span className="muted small">sem viagens</span>}</td>
               </tr>
             ))}
           </tbody>

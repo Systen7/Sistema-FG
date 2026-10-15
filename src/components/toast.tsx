@@ -18,11 +18,14 @@ export function Toast() {
     q.delete('ok'); q.delete('erro')
     router.replace(path + (q.size ? '?' + q : ''), { scroll: false })
   }, [sp, router, path])
+  const [saindo, setSaindo] = useState(false)
   useEffect(() => {
     if (!msg) return
-    // Avisos de problema ficam mais tempo na tela, para dar tempo de ler.
-    const t = setTimeout(() => setMsg(null), msg.tipo === 'bad' ? 9000 : 3200)
-    return () => clearTimeout(t)
+    setSaindo(false)
+    // Avisos de problema ficam mais tempo na tela, para dar tempo de ler. Saída animada antes de sumir.
+    const t = setTimeout(() => setSaindo(true), msg.tipo === 'bad' ? 9000 : 3200)
+    const u = setTimeout(() => setMsg(null), (msg.tipo === 'bad' ? 9000 : 3200) + 200)
+    return () => { clearTimeout(t); clearTimeout(u) }
   }, [msg])
   useEffect(() => {
     const h = (e: Event) => setMsg((e as CustomEvent).detail)
@@ -31,7 +34,7 @@ export function Toast() {
   }, [])
   if (!msg) return null
   return (
-    <div className={'toast ' + msg.tipo} role="status" aria-live="polite">
+    <div key={msg.t} className={'toast ' + msg.tipo + (saindo ? ' saindo' : '')} role="status" aria-live="polite" onClick={() => setSaindo(true)}>
       {msg.tipo === 'ok' ? <CheckCircle2 className="ico" style={{ color: 'var(--good)' }} /> : <AlertTriangle className="ico" style={{ color: 'var(--bad)' }} />}
       {msg.t}
     </div>

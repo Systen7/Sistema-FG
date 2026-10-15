@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from 'next'
 import { Jost, Bodoni_Moda } from 'next/font/google'
 import './globals.css'
+import './movimento.css'
+import { Suspense } from 'react'
+import { ProgressoNav } from '@/components/progresso-nav'
 
 const body = Jost({ subsets: ['latin'], variable: '--font-body', weight: ['300', '400', '500', '600', '700'], display: 'swap' })
 const display = Bodoni_Moda({ subsets: ['latin'], variable: '--font-display', weight: ['400', '500', '600'], display: 'swap' })
@@ -24,7 +27,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={`${body.variable} ${display.variable}`}>
-      <body>{children}</body>
+      <body>
+        <Suspense><ProgressoNav /></Suspense>
+        {children}
+      </body>
     </html>
   )
 }

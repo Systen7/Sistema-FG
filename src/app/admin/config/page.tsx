@@ -6,6 +6,7 @@ import { telefone } from '@/lib/format'
 import { Cabecalho } from '../ui'
 import { removerAdmin } from '../actions'
 import { FormEmpresa, FormSenha, FormNovoAdmin } from './forms'
+import { Enviar } from '@/components/enviar'
 
 export const metadata = { title: 'Configurações' }
 
@@ -38,7 +39,7 @@ export default async function Config() {
           {adms.map((a) => (
             <div key={a.id}>
               <span><b>{a.nome}</b> <span className="muted small">usuário {a.usuario}</span>{a.id === eu.id && <span className="chip run" style={{ marginLeft: 6 }}>você</span>}</span>
-              {a.id !== eu.id && <form action={removerAdmin.bind(null, a.id)}><button className="btn sm del ghost">Remover acesso</button></form>}
+              {a.id !== eu.id && <form action={removerAdmin.bind(null, a.id)}><Enviar className="btn sm del ghost">Remover acesso</Enviar></form>}
             </div>
           ))}
         </div>
@@ -50,7 +51,7 @@ export default async function Config() {
       <section className="panel">
         <header><h2>Histórico de alterações</h2><span className="small muted">últimas 60 ações</span></header>
         {hist.length ? (
-          <div className="scroll"><table>
+          <div className="scroll"><table className="tabela-longa">
             <thead><tr><th>Quando</th><th>Quem</th><th>O quê</th></tr></thead>
             <tbody>{hist.map((h) => (
               <tr key={h.id}>

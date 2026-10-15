@@ -4,7 +4,6 @@ import { db, schema as s } from '@/db'
 import { Cabecalho } from '../ui'
 import { Importador } from './importador'
 import { TabelaDocumentos } from './tabela'
-import { importarDocumentos } from './actions'
 
 export const metadata = { title: 'Documentos fiscais' }
 
@@ -30,7 +29,7 @@ export default async function Documentos(props: PageProps<'/admin/documentos'>) 
       <Cabecalho titulo="Documentos fiscais" texto="CT-e e MDF-e emitidos no seu emissor. Importe os XML: o sistema lê os dados, liga cada documento à viagem e avisa se algum MDF-e ficar sem encerrar." />
       <section className="panel">
         <header><h2>Importar</h2><span className="small muted">pode mandar vários de uma vez</span></header>
-        <Importador acao={importarDocumentos.bind(null, null)} />
+        <Importador />
         <p className="small muted">O MDF-e é ligado sozinho à viagem do caminhão com a mesma placa naquela data, e leva junto os CT-e que ele cita. Para dar baixa num MDF-e, importe o XML do evento de encerramento ou use o botão “Encerrado”.</p>
       </section>
       <nav className="seg" aria-label="Filtro">
