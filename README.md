@@ -109,7 +109,7 @@ As fotos dos comprovantes ficam no próprio banco (reduzidas para cerca de 150 K
 
 ## Como trabalhar neste projeto
 
-Toda mudança segue o fluxo **Issue → branch → Pull Request (mencionando a Issue) → merge**, e o merge na `main` publica em produção. O passo a passo e as regras estão no **[AGENTS.md](./AGENTS.md)**, que vale para pessoas e para qualquer agente de IA.
+Toda mudança segue o fluxo **Issue → branch → Pull Request (mencionando a Issue) → merge**. O merge na `main` publica em produção e é feito pelo dono do projeto, depois de conferir a prévia da Vercel. O passo a passo e as regras estão no **[AGENTS.md](./AGENTS.md)**, que vale para pessoas e para qualquer agente de IA.
 
 ## Comandos
 

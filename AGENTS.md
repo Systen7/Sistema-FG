@@ -33,11 +33,18 @@ Repositório: `Systen7/Sistema-FG`. Produção: https://sistema-fg.vercel.app (V
 
 5. **Verificação automática** (GitHub Actions, `.github/workflows/verificacao.yml`) roda em todo PR: tipos, testes de unidade, compilação de produção e testes de navegador com banco. **Só faça merge com tudo verde.**
 
-6. **Prévia na Vercel:** todo PR ganha uma publicação de prévia com endereço próprio (aparece no PR). Use para conferir antes do merge. A prévia usa o **mesmo banco de produção**: não apague nem invente dados lá.
+6. **Prévia na Vercel:** todo PR ganha uma publicação de prévia com endereço próprio (aparece no PR). A prévia usa o **mesmo banco de produção**: não apague nem invente dados lá.
 
-7. **Merge = publicação.** Ao fazer o merge na `main`, a Vercel publica em produção e aplica as migrações do banco. Prefira **Squash and merge**, com o título do PR como mensagem. Depois apague a branch.
+7. **Quem faz o merge é o dono do projeto, nunca o agente.** O merge na `main` publica em produção. O agente:
+   - abre o PR, espera as verificações ficarem verdes e corrige o que falhar;
+   - avisa o dono com o link do PR, o link da prévia e o que conferir nela;
+   - **para aí.** Não faz merge, não envia direto para a `main` e não pede para "liberar" a proteção.
 
-8. **Depois do merge**, confira se a publicação ficou **Ready** na Vercel e se a Issue foi fechada.
+   O dono confere a prévia e clica em **Squash and merge** no GitHub. A branch é apagada depois do merge.
+
+8. **Depois do merge** (se o dono pedir), o agente confere se a publicação ficou **Ready** na Vercel e se a Issue foi fechada.
+
+A `main` é protegida no GitHub: só aceita mudanças por Pull Request com as duas verificações aprovadas (`Tipos, testes e compilação` e `Testes de navegador`).
 
 Se não for possível abrir Issue ou PR (sem acesso ao GitHub), **não envie para a `main`**: deixe o trabalho numa branch e avise quem pediu.
 

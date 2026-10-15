@@ -16,3 +16,5 @@ Closes #
 - [ ] Testes de navegador (`npm run e2e`) passam, ou o motivo de não rodar está explicado
 - [ ] Mudou o banco? Migração incluída em `drizzle/` e compatível com os dados de produção
 - [ ] Conferido na prévia da Vercel
+
+<!-- Merge: só o dono do projeto, depois de olhar a prévia (AGENTS.md). -->
