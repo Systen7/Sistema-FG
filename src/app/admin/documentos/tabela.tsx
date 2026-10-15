@@ -7,7 +7,7 @@ import { formatarChave, nomeCidade, textoCarga } from '@/lib/fiscal'
 import { ligarDoc, marcarEncerrado, reabrirDoc, excluirDoc, anexarPdfDoc } from './actions'
 import { Enviar } from '@/components/enviar'
 
-export function Situacao({ d }: { d: Documento }) {
+function Situacao({ d }: { d: Documento }) {
   if (d.situacao === 'cancelado') return <span className="chip bad">Cancelado</span>
   if (d.situacao === 'sem_protocolo') return <span className="chip warn">Sem protocolo</span>
   if (d.tipo === 'mdfe')

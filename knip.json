@@ -1,0 +1,6 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["scripts/*.{ts,mjs}", "tests/apoio/vazio.ts"],
+  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{ts,mjs}", "tests/**/*.ts", "e2e/**/*.ts"],
+  "ignoreDependencies": ["@stryker-mutator/command-runner", "@stryker-mutator/api"]
+}

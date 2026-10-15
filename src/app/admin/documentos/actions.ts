@@ -8,7 +8,7 @@ import { anexarPdf, ligarDocumento } from '@/lib/documentos'
 import { apagarArquivos } from '@/lib/armazenamento'
 import { registrar } from '@/lib/audit'
 
-const comMsg = (url: string, msg: string) => `${url + (url.includes('?') ? '&' : '?')}ok=${encodeURIComponent(msg)}`
+const comMsg = (url: string, msg: string) => `${url}${url.includes('?') ? '&' : '?'}ok=${encodeURIComponent(msg)}`
 const atualizar = () => {
   revalidatePath('/admin', 'layout')
   revalidatePath('/m', 'layout')

@@ -6,8 +6,10 @@ export const dsnServidor = () => process.env.SENTRY_DSN || process.env.NEXT_PUBL
 
 /** Fração das requisições com rastreamento de desempenho no Sentry (padrão 10%). */
 export const amostraTraces = () => {
-  const n = Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE)
-  return Number.isFinite(n) && n >= 0 && n <= 1 ? n : 0.1
+  // Variável vazia (comum no painel da Vercel e no .env) conta como não definida.
+  const v = (process.env.SENTRY_TRACES_SAMPLE_RATE || process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE || '').trim()
+  const n = Number(v)
+  return v && Number.isFinite(n) && n >= 0 && n <= 1 ? n : 0.1
 }
 
 const semToken = (u: string) => u.replace(/\/acesso\/[^/?#]+/g, '/acesso/[token]')
@@ -19,7 +21,8 @@ export function limparEvento<E extends ErrorEvent>(e: E): E {
     if (e.request.url) e.request.url = semToken(e.request.url)
     delete e.request.cookies
     if (e.request.headers) for (const h of Object.keys(e.request.headers)) if (/cookie|authorization/i.test(h)) delete e.request.headers[h]
-    if (typeof e.request.data === 'string' && /pin|senha/i.test(e.request.data)) e.request.data = '[removido]'
+    // Corpo da requisição (texto ou objeto) pode ter PIN, senha, telefone: nunca sai daqui.
+    if (e.request.data !== undefined) e.request.data = '[removido]'
   }
   return e
 }

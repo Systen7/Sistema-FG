@@ -7,8 +7,8 @@ import { dataDe, somaDias } from './datas'
 import { registrar } from './audit'
 import { medir, registrarErro } from './obs/log'
 
-export const MAX_XML = 1024 * 1024
-export const MAX_PDF = 3 * 1024 * 1024
+const MAX_XML = 1024 * 1024
+const MAX_PDF = 3 * 1024 * 1024
 export type ResultadoArquivo = { arquivo: string; ok: boolean; mensagem: string }
 const nomeDoc = (d: { tipo: string; numero: number }) => `${d.tipo === 'cte' ? 'CT-e' : 'MDF-e'} nº ${d.numero}`
 

@@ -7,15 +7,23 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next typegen && tsc --noEmit",
+    "prepare": "husky",
+    "tipos": "next typegen && tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "arquitetura": "depcruise src tests e2e scripts --config .dependency-cruiser.cjs",
+    "knip": "knip",
+    "test": "vitest run --project unidade",
+    "test:integracao": "vitest run --project integracao",
+    "test:cobertura": "vitest run --coverage",
+    "mutacao": "stryker run",
+    "e2e": "playwright test",
+    "check": "npm run tipos && npm run lint && npm run arquitetura && npm run knip && npm test",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
-    "test": "vitest run",
-    "e2e": "playwright test",
     "db:admin": "tsx scripts/criar-admin.ts",
-    "icones": "node scripts/icones.mjs",
-    "check": "next typegen && tsc --noEmit && vitest run"
+    "icones": "node scripts/icones.mjs"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.1",
@@ -32,8 +40,7 @@
     "qrcode": "^1.5.4",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "server-only": "^0.0.1",
-    "zod": "^4.3.6"
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
@@ -41,7 +48,6 @@
     "@commitlint/config-conventional": "^21.2.3",
     "@playwright/test": "^1.64.1",
     "@stryker-mutator/core": "^10.0.0",
-    "@stryker-mutator/vitest-runner": "^10.0.0",
     "@types/node": "^22.20.5",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19.3.0",

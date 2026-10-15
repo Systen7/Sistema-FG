@@ -96,6 +96,3 @@ export function ProgressoNav() {
     />
   )
 }
-
-/** Avisa a barra de progresso que uma navegação vai começar (ex.: antes de router.push). */
-export const avisarNavegacao = () => window.dispatchEvent(new Event('fg:navegando'))

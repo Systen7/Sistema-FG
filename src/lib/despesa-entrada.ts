@@ -4,7 +4,7 @@ import { TIPOS_DESPESA, lerNumero, lerReais } from './format'
 import { guardarNoBlob, usaBlob } from './armazenamento'
 
 // A Vercel aceita até 4,5 MB por envio; a foto já chega reduzida pelo celular (cerca de 150 KB).
-export const MAX_FOTO = 4 * 1024 * 1024
+const MAX_FOTO = 4 * 1024 * 1024
 
 export type EntradaDespesa = {
   tipo: string

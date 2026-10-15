@@ -21,7 +21,7 @@ export type DocLido = {
   placa: string | null
   chavesCte: string[]
 }
-export type EventoLido = { tipo: 'evento'; doc: 'cte' | 'mdfe'; chave: string; evento: 'encerramento' | 'cancelamento'; em: Date; aceito: boolean }
+type EventoLido = { tipo: 'evento'; doc: 'cte' | 'mdfe'; chave: string; evento: 'encerramento' | 'cancelamento'; em: Date; aceito: boolean }
 export type Leitura = ({ tipo: 'cte' | 'mdfe' } & DocLido) | EventoLido | { tipo: 'erro'; erro: string }
 
 const parser = new XMLParser({
@@ -61,7 +61,6 @@ export function chaveValida(chave: string): boolean {
   return dv === Number(chave[43])
 }
 export const formatarChave = (c: string) => c.replace(/(\d{4})(?=\d)/g, '$1 ')
-export const modeloDaChave = (c: string) => c.slice(20, 22) // 57 = CT-e, 58 = MDF-e
 
 function cidade(mun: unknown, uf: unknown): string | null {
   const m = txt(mun),

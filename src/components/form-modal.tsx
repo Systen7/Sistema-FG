@@ -172,8 +172,8 @@ function Entrada({ c, v }: { c: Campo; v: unknown }) {
   else if (t === 'num')
     el = <input name={c.nome} inputMode="decimal" defaultValue={val === '' ? '' : String(v).replace('.', ',')} placeholder={c.placeholder} />
   else el = <input name={c.nome} type={t === 'tel' ? 'tel' : 'text'} defaultValue={val} placeholder={c.placeholder} autoComplete="off" />
-  // biome-ignore lint/a11y/noLabelWithoutControl: o campo está em `el`, dentro do próprio label
   return (
+    // biome-ignore lint/a11y/noLabelWithoutControl: o campo está em `el`, dentro do próprio label
     <label className={cls}>
       {rot}
       {el}

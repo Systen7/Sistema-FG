@@ -25,7 +25,7 @@ import {
   camposLembrete,
 } from './campos'
 
-const comMsg = (url: string, msg: string, chave = 'ok') => `${url + (url.includes('?') ? '&' : '?') + chave}=${encodeURIComponent(msg)}`
+const comMsg = (url: string, msg: string, chave = 'ok') => `${url}${url.includes('?') ? '&' : '?'}${chave}=${encodeURIComponent(msg)}`
 
 /** Executa uma gravação: erros de preenchimento voltam para o formulário; sucesso volta para a página com aviso. */
 async function gravar(fn: (autor: string) => Promise<string>): Promise<Estado> {

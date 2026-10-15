@@ -1,6 +1,6 @@
 import { Fuel, Ticket, UtensilsCrossed, Wrench, PackageOpen, BedDouble, Droplet, Receipt, type LucideIcon } from 'lucide-react'
 
-export const ICONE_TIPO: Record<string, LucideIcon> = {
+const ICONE_TIPO: Record<string, LucideIcon> = {
   Diesel: Fuel,
   Pedágio: Ticket,
   Alimentação: UtensilsCrossed,

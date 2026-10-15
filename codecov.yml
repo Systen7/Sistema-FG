@@ -1,0 +1,14 @@
+# Cobertura dos testes de unidade e integração (regras, rotas de API e ações).
+# As telas são cobertas pelos testes de navegador (Playwright), que não entram nesta conta.
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%   # não deixa a cobertura cair mais de 1 ponto num PR
+    patch:
+      default:
+        target: 70%     # código novo do PR precisa vir com teste
+comment:
+  layout: "condensed_header, diff, files"
+  require_changes: true

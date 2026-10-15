@@ -1,5 +1,7 @@
 # Sistema FG
 
+[![Verificação](https://github.com/Systen7/Sistema-FG/actions/workflows/verificacao.yml/badge.svg)](https://github.com/Systen7/Sistema-FG/actions/workflows/verificacao.yml) [![Cobertura](https://codecov.io/gh/Systen7/Sistema-FG/graph/badge.svg)](https://codecov.io/gh/Systen7/Sistema-FG)
+
 Gestão de viagens, despesas e frota da transportadora. É **um sistema só**, com um único banco de dados e duas entradas:
 
 | Quem | Endereço | O que faz |
@@ -121,9 +123,47 @@ Toda mudança segue o fluxo **Issue → branch → Pull Request (mencionando a I
 | `npm run db:migrate` | Aplica as migrações |
 | `npm run db:seed -- --limpar` | Apaga tudo e recria os exemplos |
 | `npm run db:admin -- usuario "Nome" senha` | Cria acesso do escritório ou redefine a senha |
-| `npm run check` | Tipos e testes de unidade (rode antes de abrir um PR) |
-| `npm test` | Testes das regras de cálculo |
+| `npm run check` | Tipos, lint, arquitetura, código sem uso e testes de unidade (rode antes de abrir um PR) |
+| `npm run format` | Corrige formatação e o que o lint souber corrigir sozinho (Biome) |
+| `npm test` | Testes de unidade (regras puras e contratos de arquitetura) |
+| `npm run test:integracao` | Testes com PostgreSQL de verdade (precisa de `TEST_DATABASE_URL`, ver abaixo) |
+| `npm run test:cobertura` | Unidade + integração com relatório de cobertura em `coverage/` |
+| `npm run mutacao` | Teste de mutação (Stryker) nas regras de negócio; relatório em `reports/mutation/` |
 | `npm run e2e` | Teste completo no navegador: motorista + escritório, inclusive sem sinal |
+
+### Qualidade e testes
+
+| Ferramenta | O que garante | Onde |
+| --- | --- | --- |
+| **Biome** | Lint (inclusive acessibilidade e regras do React/Next) e formatação única | `biome.jsonc` |
+| **dependency-cruiser** | Contratos de arquitetura: quem pode importar quem (banco isolado, regras sem telas, código do celular sem servidor, sem ciclos) | `.dependency-cruiser.cjs` |
+| **Teste de arquitetura** | Componente de cliente nunca puxa banco ou segredo; **toda rota e ação confere a sessão** (exceções listadas com motivo) | `tests/arquitetura.test.ts` |
+| **Knip** | Arquivos, exports e dependências sem uso | `knip.json` |
+| **commitlint + Husky** | Padrão dos commits e do título do PR; lint dos arquivos antes de cada commit | `commitlint.config.js`, `.husky/` |
+| **Vitest** | Unidade (`tests/`) e integração com PostgreSQL (`tests/integracao/`) | `vitest.config.ts` |
+| **Stryker** | Teste de mutação: mede se os testes realmente pegam erro nas regras de dinheiro, datas e XML | `stryker.config.mjs` |
+| **Playwright** | Fluxos completos no navegador, com trace/vídeo quando falha | `e2e/`, `playwright.config.ts` |
+| **Codecov** | Cobertura em cada PR (não pode cair; código novo precisa de teste) | `codecov.yml` |
+
+Testes de integração no computador (o banco **precisa** ter "test" no nome, porque os testes apagam tudo):
+
+```bash
+createdb fg_teste
+TEST_DATABASE_URL=postgres://fg:fg@localhost:5432/fg_teste npm run test:integracao
+```
+
+## Observabilidade
+
+Tudo é opcional: sem as variáveis abaixo o sistema funciona igual e não envia nada para fora.
+
+| O quê | Como ligar |
+| --- | --- |
+| **Erros (Sentry)**: servidor, navegador e celular do motorista, com tela amigável de "Tentar de novo" | Crie um projeto Next.js no [sentry.io](https://sentry.io) (plano grátis) e defina na Vercel `SENTRY_DSN` e `NEXT_PUBLIC_SENTRY_DSN` (o mesmo DSN). Para ver o código original nos erros, defina também `SENTRY_AUTH_TOKEN`, `SENTRY_ORG` e `SENTRY_PROJECT`. |
+| **Desempenho (OpenTelemetry)**: cada requisição vira um trace, com etapas como a importação de XML | Na Vercel, instale a integração do **Datadog**, **New Relic**, Grafana, Honeycomb etc. em *Integrations* (os traces vão sozinhos). Fora da Vercel, use `OTEL_EXPORTER_OTLP_ENDPOINT` e `OTEL_EXPORTER_OTLP_HEADERS` (ex.: New Relic: `https://otlp.nr-data.net` com `api-key=...`). |
+| **Logs estruturados** | Já ligados: uma linha JSON por evento com `traceId`, para cruzar com o trace. Aparecem em *Logs* na Vercel ou no fornecedor. |
+| **Disponibilidade** | `GET /api/saude` responde `{ ok, banco, ms, versao }` (503 se o banco cair). Use num monitor como UptimeRobot ou Better Stack. |
+
+Privacidade (LGPD): nenhum cookie, corpo de requisição, PIN, senha ou dado do usuário é enviado ao Sentry, e o token do link de acesso é apagado das URLs. Amostragem de desempenho no Sentry: 10% (`SENTRY_TRACES_SAMPLE_RATE`).
 
 ## Estrutura
 
@@ -139,6 +179,10 @@ src/
   lib/calc.ts      regras de cálculo (funções puras, com testes)
   lib/alertas.ts   vencimentos e avisos
   lib/cliente/     fila offline e redução de foto (roda no celular)
+  lib/obs/         observabilidade: Sentry, logs estruturados e spans
+  instrumentation*.ts  liga OpenTelemetry e Sentry (servidor e navegador)
+tests/             unidade e contratos de arquitetura · tests/integracao/ com PostgreSQL
+e2e/               testes de navegador (Playwright)
 public/sw.js       service worker (abrir sem sinal)
 ```
 

@@ -218,19 +218,17 @@ for (const [dr, ro, ini, carga, frete, adi, ds] of andamento) {
       status: 'andamento',
     })
     .returning()
-  await db
-    .insert(s.despesas)
-    .values(
-      ds.map(([tipo, valor, data, pagoPor, status, litros]) => ({
-        viagemId: v.id,
-        tipo,
-        valor: C(valor),
-        data: D(data),
-        pagoPor,
-        status,
-        litros: litros ?? null,
-      })),
-    )
+  await db.insert(s.despesas).values(
+    ds.map(([tipo, valor, data, pagoPor, status, litros]) => ({
+      viagemId: v.id,
+      tipo,
+      valor: C(valor),
+      data: D(data),
+      pagoPor,
+      status,
+      litros: litros ?? null,
+    })),
+  )
 }
 for (const c of cams)
   await db

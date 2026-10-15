@@ -1,5 +1,3 @@
-// Peças de tela do escritório usadas em várias páginas (componentes de servidor).
-import Link from 'next/link'
 import { nomeMes } from '@/lib/datas'
 import { dataLonga, reais } from '@/lib/format'
 import { dias } from '@/lib/datas'
@@ -57,14 +55,6 @@ export function Vence({ d, hoje, aviso, urgente }: { d: string | null; hoje: str
   if (!d) return <span className="muted">—</span>
   const n = dias(hoje, d)
   return <span className={`chip ${n <= urgente ? 'bad' : n <= aviso ? 'warn' : 'ok'}`}>{dataLonga(d)}</span>
-}
-
-export function BotaoLink({ href, children, pri }: { href: string; children: React.ReactNode; pri?: boolean }) {
-  return (
-    <Link href={href} scroll={false} className={`btn ${pri ? 'pri' : ''}`}>
-      {children}
-    </Link>
-  )
 }
 
 export function Vazio({ children }: { children: React.ReactNode }) {

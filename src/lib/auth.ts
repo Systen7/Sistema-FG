@@ -7,7 +7,7 @@ import { eq } from 'drizzle-orm'
 import { db, schema } from '@/db'
 
 import { COOKIE_NOME } from './token-edge'
-export const COOKIE = COOKIE_NOME
+const COOKIE = COOKIE_NOME
 const DIA = 86400
 const DURACAO = { motorista: 180 * DIA, admin: 30 * DIA }
 
@@ -19,14 +19,14 @@ function segredo() {
   return new TextEncoder().encode(s)
 }
 
-export async function assinar(s: Sessao) {
+async function assinar(s: Sessao) {
   return new SignJWT({ ...s })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(Math.floor(Date.now() / 1000) + DURACAO[s.tipo])
     .sign(segredo())
 }
-export async function verificar(token: string | undefined): Promise<Sessao | null> {
+async function verificar(token: string | undefined): Promise<Sessao | null> {
   if (!token) return null
   try {
     const { payload } = await jwtVerify(token, segredo())
