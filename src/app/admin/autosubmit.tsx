@@ -17,11 +17,17 @@ export function AutoSubmit() {
       const t = e.target as HTMLElement
       if (t.closest('a,button,input,select,summary,form')) return
       const tr = t.closest<HTMLElement>('[data-href]')
-      if (tr) { window.dispatchEvent(new Event('fg:navegando')); router.push(tr.dataset.href!) }
+      if (tr) {
+        window.dispatchEvent(new Event('fg:navegando'))
+        router.push(tr.dataset.href!)
+      }
     }
     document.addEventListener('change', mudou)
     document.addEventListener('click', clicou)
-    return () => { document.removeEventListener('change', mudou); document.removeEventListener('click', clicou) }
+    return () => {
+      document.removeEventListener('change', mudou)
+      document.removeEventListener('click', clicou)
+    }
   }, [router])
   return null
 }

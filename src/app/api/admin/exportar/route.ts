@@ -28,40 +28,148 @@ export async function GET(req: Request) {
   let linhas: unknown[][] = []
 
   if (tipo === 'viagens') {
-    linhas = [['Nº', 'Motorista', 'Caminhão', 'Origem', 'Destino', 'Carga', 'Início', 'Chegada', 'Situação', 'Km inicial', 'Km final', 'Km rodado', 'Km vazio', 'Litros', 'Km/l', 'Frete (R$)', 'Combustível (R$)', 'Pedágio (R$)', 'Outras despesas (R$)', 'Comissão %', 'Comissão (R$)', 'Adiantamento (R$)', 'Lucro da viagem (R$)']]
+    linhas = [
+      [
+        'Nº',
+        'Motorista',
+        'Caminhão',
+        'Origem',
+        'Destino',
+        'Carga',
+        'Início',
+        'Chegada',
+        'Situação',
+        'Km inicial',
+        'Km final',
+        'Km rodado',
+        'Km vazio',
+        'Litros',
+        'Km/l',
+        'Frete (R$)',
+        'Combustível (R$)',
+        'Pedágio (R$)',
+        'Outras despesas (R$)',
+        'Comissão %',
+        'Comissão (R$)',
+        'Adiantamento (R$)',
+        'Lucro da viagem (R$)',
+      ],
+    ]
     for (const v of vs) {
       const c = calcViagem(v, cfg.retornoPct)
-      linhas.push([v.id, nm(v.motoristaId), pl(v.caminhaoId), v.origem, v.destino, v.carga, v.inicio, v.fim, v.status === 'andamento' ? 'Em viagem' : 'Encerrada', v.kmInicial, v.kmFinal, c.km, v.kmVazio, c.litros, c.consumo, rs(v.frete), rs(c.diesel), rs(c.pedagio), rs(c.outros), v.comissaoPct, rs(c.comissao), rs(v.adiantamento), rs(c.lucro)])
+      linhas.push([
+        v.id,
+        nm(v.motoristaId),
+        pl(v.caminhaoId),
+        v.origem,
+        v.destino,
+        v.carga,
+        v.inicio,
+        v.fim,
+        v.status === 'andamento' ? 'Em viagem' : 'Encerrada',
+        v.kmInicial,
+        v.kmFinal,
+        c.km,
+        v.kmVazio,
+        c.litros,
+        c.consumo,
+        rs(v.frete),
+        rs(c.diesel),
+        rs(c.pedagio),
+        rs(c.outros),
+        v.comissaoPct,
+        rs(c.comissao),
+        rs(v.adiantamento),
+        rs(c.lucro),
+      ])
     }
   } else if (tipo === 'despesas') {
     linhas = [['Viagem', 'Motorista', 'Caminhão', 'Data', 'Tipo', 'Valor (R$)', 'Litros', 'Quem pagou', 'Situação', 'Observação', 'Tem foto']]
-    for (const v of vs) for (const d of v.despesas) linhas.push([v.id, nm(v.motoristaId), pl(v.caminhaoId), d.data, nomeTipo(d.tipo), rs(d.valor), d.litros, d.pagoPor === 'motorista' ? 'Motorista' : 'Empresa', d.status, d.obs, d.fotoId ? 'sim' : 'não'])
+    for (const v of vs)
+      for (const d of v.despesas)
+        linhas.push([
+          v.id,
+          nm(v.motoristaId),
+          pl(v.caminhaoId),
+          d.data,
+          nomeTipo(d.tipo),
+          rs(d.valor),
+          d.litros,
+          d.pagoPor === 'motorista' ? 'Motorista' : 'Empresa',
+          d.status,
+          d.obs,
+          d.fotoId ? 'sim' : 'não',
+        ])
   } else if (tipo === 'acerto') {
     const m = mes ?? mesAtual()
     const doMes = mes ? vs : await viagensDoMes(m)
     linhas = [['Mês', 'Motorista', 'Viagens', 'Comissões (R$)', 'Reembolsos (R$)', 'Adiantamentos (R$)', 'Saldo (R$)']]
     for (const mo of ms) {
-      const a = acerto(doMes.filter((v) => v.motoristaId === mo.id && v.status === 'encerrada'), cfg.retornoPct)
+      const a = acerto(
+        doMes.filter((v) => v.motoristaId === mo.id && v.status === 'encerrada'),
+        cfg.retornoPct,
+      )
       if (a.viagens) linhas.push([m, mo.nome, a.viagens, rs(a.comissao), rs(a.reembolso), rs(a.adiantamento), rs(a.saldo)])
     }
   } else if (tipo === 'manutencoes') {
     linhas = [['Data', 'Caminhão', 'Tipo', 'Descrição', 'Valor (R$)', 'Imprevisto']]
-    for (const x of await manutencoes()) if (!mes || x.data.startsWith(mes)) linhas.push([x.data, pl(x.caminhaoId), x.tipo, x.descricao, rs(x.valor), x.imprevisto ? 'sim' : 'não'])
+    for (const x of await manutencoes())
+      if (!mes || x.data.startsWith(mes)) linhas.push([x.data, pl(x.caminhaoId), x.tipo, x.descricao, rs(x.valor), x.imprevisto ? 'sim' : 'não'])
   } else if (tipo === 'documentos') {
     const { db, schema } = await import('@/db')
     const { asc } = await import('drizzle-orm')
     const { dataDe } = await import('@/lib/datas')
     const docs = await db.select().from(schema.documentos).orderBy(asc(schema.documentos.emitidoEm))
-    linhas = [['Tipo', 'Número', 'Série', 'Chave', 'Emissão', 'Situação', 'Encerrado em', 'Viagem', 'Origem', 'Destino', 'Produto', 'Peso (kg)', 'Valor (R$)', 'Placa', 'Remetente', 'Destinatário']]
+    linhas = [
+      [
+        'Tipo',
+        'Número',
+        'Série',
+        'Chave',
+        'Emissão',
+        'Situação',
+        'Encerrado em',
+        'Viagem',
+        'Origem',
+        'Destino',
+        'Produto',
+        'Peso (kg)',
+        'Valor (R$)',
+        'Placa',
+        'Remetente',
+        'Destinatário',
+      ],
+    ]
     for (const d of docs) {
       const em = dataDe(d.emitidoEm)
       if (mes && !em.startsWith(mes)) continue
-      linhas.push([d.tipo === 'cte' ? 'CT-e' : 'MDF-e', d.numero, d.serie, `\u200b${d.chave}`, em, d.situacao, d.encerradoEm ? dataDe(d.encerradoEm) : '', d.viagemId, d.origem, d.destino, d.produto, d.pesoKg, d.valor != null ? rs(d.valor) : null, d.placa, d.remetente, d.destinatario])
+      linhas.push([
+        d.tipo === 'cte' ? 'CT-e' : 'MDF-e',
+        d.numero,
+        d.serie,
+        `\u200b${d.chave}`,
+        em,
+        d.situacao,
+        d.encerradoEm ? dataDe(d.encerradoEm) : '',
+        d.viagemId,
+        d.origem,
+        d.destino,
+        d.produto,
+        d.pesoKg,
+        d.valor != null ? rs(d.valor) : null,
+        d.placa,
+        d.remetente,
+        d.destinatario,
+      ])
     }
   } else return new Response('Tipo inválido', { status: 400 })
 
   const csv = `﻿${linhas.map((l) => l.map(cel).join(';')).join('\r\n')}`
   return new Response(csv, {
-    headers: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': `attachment; filename="fg-${tipo}-${mes ?? 'tudo'}.csv"`, 'Cache-Control': 'no-store' },
+    headers: {
+      'Content-Type': 'text/csv; charset=utf-8',
+      'Content-Disposition': `attachment; filename="fg-${tipo}-${mes ?? 'tudo'}.csv"`,
+      'Cache-Control': 'no-store',
+    },
   })
 }

@@ -12,7 +12,17 @@ import { gerarPneus, SULCO_NOVO, CUSTO_PNEU_NOVO } from '@/lib/pneus'
 import { soDigitos } from '@/lib/format'
 import type { Estado } from '@/components/form-modal'
 import {
-  ErroCampo, ler, camposMotorista, camposCaminhao, camposViagem, camposDespesa, camposManutencao, camposPneu, camposApolice, camposFixo, camposLembrete,
+  ErroCampo,
+  ler,
+  camposMotorista,
+  camposCaminhao,
+  camposViagem,
+  camposDespesa,
+  camposManutencao,
+  camposPneu,
+  camposApolice,
+  camposFixo,
+  camposLembrete,
 } from './campos'
 
 const comMsg = (url: string, msg: string, chave = 'ok') => `${url + (url.includes('?') ? '&' : '?') + chave}=${encodeURIComponent(msg)}`
@@ -42,7 +52,10 @@ async function gravar(fn: (autor: string) => Promise<string>): Promise<Estado> {
 
 const opcoesCaminhoes = async (): Promise<[string, string][]> => (await db.select().from(s.caminhoes)).map((c) => [String(c.id), c.placa])
 const opcoesMotoristas = async (): Promise<[string, string][]> => (await db.select().from(s.motoristas)).map((m) => [String(m.id), m.nome])
-const placa = (p: unknown) => String(p ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+const placa = (p: unknown) =>
+  String(p ?? '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
 
 // ---------- motoristas ----------
 export async function salvarMotorista(id: number | null, voltar: string, _: Estado, f: FormData) {
@@ -55,16 +68,27 @@ export async function salvarMotorista(id: number | null, voltar: string, _: Esta
     const pin = String(f.get('pin') ?? '').trim()
     if ((id == null || pin) && !/^\d{4}$/.test(pin)) throw new ErroCampo('O PIN precisa ter 4 números.')
     const dados = {
-      nome: String(o.nome), telefone: tel, comissaoPct: com, caminhaoId: o.caminhaoId ? Number(o.caminhaoId) : null,
-      cnhAte: o.cnhAte as string | null, toxicologicoAte: o.toxicologicoAte as string | null, ativo: Boolean(o.ativo),
+      nome: String(o.nome),
+      telefone: tel,
+      comissaoPct: com,
+      caminhaoId: o.caminhaoId ? Number(o.caminhaoId) : null,
+      cnhAte: o.cnhAte as string | null,
+      toxicologicoAte: o.toxicologicoAte as string | null,
+      ativo: Boolean(o.ativo),
       ...(pin ? { pinHash: await hash(pin) } : {}),
     }
     if (id == null) {
-      const [m] = await db.insert(s.motoristas).values({ ...dados, pinHash: dados.pinHash! }).returning()
+      const [m] = await db
+        .insert(s.motoristas)
+        .values({ ...dados, pinHash: dados.pinHash! })
+        .returning()
       await registrar(autor, 'cadastrou', 'motorista', m.id, { nome: m.nome })
       return `${comMsg(voltar, 'Motorista cadastrado. Envie o link de acesso pelo WhatsApp.')}&acesso=${m.id}`
     }
-    await db.update(s.motoristas).set({ ...dados, ...(dados.ativo ? {} : { versaoSessao: sql`${s.motoristas.versaoSessao} + 1` }) }).where(eq(s.motoristas.id, id))
+    await db
+      .update(s.motoristas)
+      .set({ ...dados, ...(dados.ativo ? {} : { versaoSessao: sql`${s.motoristas.versaoSessao} + 1` }) })
+      .where(eq(s.motoristas.id, id))
     await registrar(autor, 'alterou', 'motorista', id, { ...dados, pinHash: pin ? 'alterado' : undefined })
     return comMsg(voltar, 'Alterações salvas')
   })
@@ -88,7 +112,10 @@ export async function gerarLinkAcesso(id: number): Promise<{ link?: string; erro
 }
 export async function desconectarMotorista(id: number, voltar: string) {
   const a = await exigirAdmin()
-  await db.update(s.motoristas).set({ versaoSessao: sql`${s.motoristas.versaoSessao} + 1` }).where(eq(s.motoristas.id, id))
+  await db
+    .update(s.motoristas)
+    .set({ versaoSessao: sql`${s.motoristas.versaoSessao} + 1` })
+    .where(eq(s.motoristas.id, id))
   await db.delete(s.linksAcesso).where(eq(s.linksAcesso.motoristaId, id))
   await registrar(`admin:${a.id}`, 'desconectou aparelhos', 'motorista', id)
   redirect(comMsg(voltar, 'Motorista desconectado de todos os aparelhos'))
@@ -102,9 +129,16 @@ export async function salvarCaminhao(id: number | null, voltar: string, _: Estad
     if (!/^[A-Z]{3}\d[A-Z0-9]\d{2}$/.test(p)) throw new ErroCampo('Placa inválida. Use o formato ABC1D23 ou ABC1234.')
     const pc = o.placaCarreta ? placa(o.placaCarreta) : null
     const dados = {
-      placa: p, placaCarreta: pc, descricao: String(o.descricao), ano: o.ano ? Math.round(Number(o.ano)) : null, km: Math.round(Number(o.km)),
-      metaConsumo: Number(o.metaConsumo), proximaRevisaoKm: o.proximaRevisaoKm ? Math.round(Number(o.proximaRevisaoKm)) : null,
-      tacografoAte: o.tacografoAte as string | null, licenciamentoAte: o.licenciamentoAte as string | null, ativo: Boolean(o.ativo),
+      placa: p,
+      placaCarreta: pc,
+      descricao: String(o.descricao),
+      ano: o.ano ? Math.round(Number(o.ano)) : null,
+      km: Math.round(Number(o.km)),
+      metaConsumo: Number(o.metaConsumo),
+      proximaRevisaoKm: o.proximaRevisaoKm ? Math.round(Number(o.proximaRevisaoKm)) : null,
+      tacografoAte: o.tacografoAte as string | null,
+      licenciamentoAte: o.licenciamentoAte as string | null,
+      ativo: Boolean(o.ativo),
     }
     if (id == null) {
       const [c] = await db.insert(s.caminhoes).values(dados).returning()
@@ -133,7 +167,8 @@ export async function excluirCaminhao(id: number, voltar: string) {
 export async function salvarViagem(id: number | null, voltar: string, _: Estado, f: FormData) {
   return gravar(async (autor) => {
     const o = ler(f, camposViagem(await opcoesMotoristas(), await opcoesCaminhoes()))
-    const motoristaId = Number(o.motoristaId), caminhaoId = Number(o.caminhaoId)
+    const motoristaId = Number(o.motoristaId),
+      caminhaoId = Number(o.caminhaoId)
     const [m] = await db.select().from(s.motoristas).where(eq(s.motoristas.id, motoristaId))
     if (!m) throw new ErroCampo('Escolha o motorista.')
     const status = o.status as 'andamento' | 'encerrada'
@@ -146,23 +181,47 @@ export async function salvarViagem(id: number | null, voltar: string, _: Estado,
       if (fim < String(o.inicio)) throw new ErroCampo('A chegada não pode ser antes do início.')
       if (!kmFinal || kmFinal <= kmInicial) throw new ErroCampo('O km final precisa ser maior que o km inicial.')
       if (kmVazio >= kmFinal - kmInicial) throw new ErroCampo('O km vazio precisa ser menor que o total rodado.')
-    } else { kmFinal = null; fim = null }
+    } else {
+      kmFinal = null
+      fim = null
+    }
     const com = o.comissaoPct != null ? Number(o.comissaoPct) : null
     if (com != null && !(com >= 0 && com <= 50)) throw new ErroCampo('A comissão precisa ficar entre 0 e 50%.')
     const dados = {
-      motoristaId, caminhaoId, origem: String(o.origem), destino: String(o.destino), carga: String(o.carga), frete: Number(o.frete),
-      adiantamento: Number(o.adiantamento ?? 0), inicio: String(o.inicio), kmInicial, kmFinal, fim, kmVazio, status,
+      motoristaId,
+      caminhaoId,
+      origem: String(o.origem),
+      destino: String(o.destino),
+      carga: String(o.carga),
+      frete: Number(o.frete),
+      adiantamento: Number(o.adiantamento ?? 0),
+      inicio: String(o.inicio),
+      kmInicial,
+      kmFinal,
+      fim,
+      kmVazio,
+      status,
     }
     let vid = id
     if (id == null) {
-      const [v] = await db.insert(s.viagens).values({ ...dados, comissaoPct: com ?? m.comissaoPct }).returning()
+      const [v] = await db
+        .insert(s.viagens)
+        .values({ ...dados, comissaoPct: com ?? m.comissaoPct })
+        .returning()
       vid = v.id
       await registrar(autor, 'criou', 'viagem', v.id, dados)
     } else {
-      await db.update(s.viagens).set({ ...dados, ...(com != null ? { comissaoPct: com } : {}) }).where(eq(s.viagens.id, id))
+      await db
+        .update(s.viagens)
+        .set({ ...dados, ...(com != null ? { comissaoPct: com } : {}) })
+        .where(eq(s.viagens.id, id))
       await registrar(autor, 'alterou', 'viagem', id, dados)
     }
-    if (kmFinal) await db.update(s.caminhoes).set({ km: sql`greatest(${s.caminhoes.km}, ${kmFinal})` }).where(eq(s.caminhoes.id, caminhaoId))
+    if (kmFinal)
+      await db
+        .update(s.caminhoes)
+        .set({ km: sql`greatest(${s.caminhoes.km}, ${kmFinal})` })
+        .where(eq(s.caminhoes.id, caminhaoId))
     const docId = Number(f.get('docId'))
     if (id == null && docId && vid) await ligarDocumento(docId, vid) // viagem criada a partir de um CT-e/MDF-e
     return comMsg(voltar === '#nova' ? `/admin/viagens/${vid}` : voltar, id == null ? 'Viagem criada' : 'Viagem salva')
@@ -186,11 +245,19 @@ export async function salvarDespesa(id: number | null, viagemId: number, voltar:
     if (!Number(o.valor)) throw new ErroCampo('Informe o valor.')
     if (o.tipo === 'Diesel' && !o.litros) throw new ErroCampo('Informe os litros do abastecimento.')
     const dados = {
-      tipo: String(o.tipo), valor: Number(o.valor), litros: o.tipo === 'Diesel' ? Number(o.litros) : null, data: String(o.data),
-      pagoPor: o.pagoPor as 'empresa' | 'motorista', status: o.status as 'aprovada' | 'pendente' | 'recusada', obs: o.obs as string | null,
+      tipo: String(o.tipo),
+      valor: Number(o.valor),
+      litros: o.tipo === 'Diesel' ? Number(o.litros) : null,
+      data: String(o.data),
+      pagoPor: o.pagoPor as 'empresa' | 'motorista',
+      status: o.status as 'aprovada' | 'pendente' | 'recusada',
+      obs: o.obs as string | null,
     }
     if (id == null) {
-      const [d] = await db.insert(s.despesas).values({ ...dados, viagemId }).returning()
+      const [d] = await db
+        .insert(s.despesas)
+        .values({ ...dados, viagemId })
+        .returning()
       await registrar(autor, 'lançou', 'despesa', d.id, dados)
     } else {
       await db.update(s.despesas).set(dados).where(eq(s.despesas.id, id))
@@ -217,7 +284,10 @@ export async function aprovarDespesa(id: number, voltar: string) {
 }
 export async function recusarDespesa(id: number, voltar: string, f: FormData) {
   const a = await exigirAdmin()
-  const motivo = String(f.get('motivo') ?? '').trim().slice(0, 200) || null
+  const motivo =
+    String(f.get('motivo') ?? '')
+      .trim()
+      .slice(0, 200) || null
   await db.update(s.despesas).set({ status: 'recusada', motivoRecusa: motivo }).where(eq(s.despesas.id, id))
   await registrar(`admin:${a.id}`, 'recusou', 'despesa', id, { motivo })
   revalidatePath('/admin', 'layout')
@@ -226,7 +296,10 @@ export async function recusarDespesa(id: number, voltar: string, f: FormData) {
 export async function aprovarVarias(ids: number[], voltar: string) {
   const a = await exigirAdmin()
   for (const id of ids) {
-    await db.update(s.despesas).set({ status: 'aprovada', motivoRecusa: null }).where(and(eq(s.despesas.id, id), eq(s.despesas.status, 'pendente')))
+    await db
+      .update(s.despesas)
+      .set({ status: 'aprovada', motivoRecusa: null })
+      .where(and(eq(s.despesas.id, id), eq(s.despesas.status, 'pendente')))
   }
   await registrar(`admin:${a.id}`, 'aprovou em lote', 'despesa', null, { ids })
   revalidatePath('/admin', 'layout')
@@ -237,7 +310,14 @@ export async function aprovarVarias(ids: number[], voltar: string) {
 export async function salvarManutencao(id: number | null, voltar: string, _: Estado, f: FormData) {
   return gravar(async (autor) => {
     const o = ler(f, camposManutencao(await opcoesCaminhoes()))
-    const dados = { caminhaoId: Number(o.caminhaoId), data: String(o.data), tipo: String(o.tipo), descricao: String(o.descricao), valor: Number(o.valor), imprevisto: Boolean(o.imprevisto) }
+    const dados = {
+      caminhaoId: Number(o.caminhaoId),
+      data: String(o.data),
+      tipo: String(o.tipo),
+      descricao: String(o.descricao),
+      valor: Number(o.valor),
+      imprevisto: Boolean(o.imprevisto),
+    }
     if (id == null) await db.insert(s.manutencoes).values(dados)
     else await db.update(s.manutencoes).set(dados).where(eq(s.manutencoes.id, id))
     await registrar(autor, id == null ? 'lançou' : 'alterou', 'manutenção', id, dados)
@@ -265,9 +345,10 @@ export async function trocarPneu(id: number, voltar: string, f: FormData) {
   const a = await exigirAdmin()
   const [p] = await db.select().from(s.pneus).where(eq(s.pneus.id, id))
   const recapar = f.get('modo') === 'recapar'
-  await db.update(s.pneus).set(recapar
-    ? { sulco: 12, recapagens: p.recapagens + 1, custo: p.custo + 78000 }
-    : { sulco: SULCO_NOVO, recapagens: 0, km: 0, custo: CUSTO_PNEU_NOVO }).where(eq(s.pneus.id, id))
+  await db
+    .update(s.pneus)
+    .set(recapar ? { sulco: 12, recapagens: p.recapagens + 1, custo: p.custo + 78000 } : { sulco: SULCO_NOVO, recapagens: 0, km: 0, custo: CUSTO_PNEU_NOVO })
+    .where(eq(s.pneus.id, id))
   await registrar(`admin:${a.id}`, recapar ? 'recapou' : 'trocou', 'pneu', id, { antes: p })
   revalidatePath('/admin', 'layout')
   redirect(comMsg(voltar, recapar ? 'Recapagem registrada' : 'Pneu novo registrado'))
@@ -277,7 +358,13 @@ export async function trocarPneu(id: number, voltar: string, f: FormData) {
 export async function salvarApolice(id: number | null, voltar: string, _: Estado, f: FormData) {
   return gravar(async (autor) => {
     const o = ler(f, camposApolice)
-    const dados = { nome: String(o.nome), cobertura: String(o.cobertura), vigenciaAte: o.vigenciaAte as string | null, custoMensal: Number(o.custoMensal), obrigatorio: Boolean(o.obrigatorio) }
+    const dados = {
+      nome: String(o.nome),
+      cobertura: String(o.cobertura),
+      vigenciaAte: o.vigenciaAte as string | null,
+      custoMensal: Number(o.custoMensal),
+      obrigatorio: Boolean(o.obrigatorio),
+    }
     if (id == null) await db.insert(s.apolices).values(dados)
     else await db.update(s.apolices).set(dados).where(eq(s.apolices.id, id))
     await registrar(autor, id == null ? 'cadastrou' : 'alterou', 'apólice', id, dados)
@@ -349,8 +436,10 @@ export async function salvarConfig(_: Estado, f: FormData): Promise<Estado> {
       return v
     }
     const dados = {
-      diasAviso: Math.round(n('diasAviso', 'Avisar com quantos dias', 1, 365)), diasUrgente: Math.round(n('diasUrgente', 'Urgente com quantos dias', 0, 365)),
-      kmAvisoRevisao: Math.round(n('kmAvisoRevisao', 'Aviso de revisão', 0, 100000)), sulcoMinimo: n('sulcoMinimo', 'Sulco mínimo', 1.6, 15),
+      diasAviso: Math.round(n('diasAviso', 'Avisar com quantos dias', 1, 365)),
+      diasUrgente: Math.round(n('diasUrgente', 'Urgente com quantos dias', 0, 365)),
+      kmAvisoRevisao: Math.round(n('kmAvisoRevisao', 'Aviso de revisão', 0, 100000)),
+      sulcoMinimo: n('sulcoMinimo', 'Sulco mínimo', 1.6, 15),
       retornoPct: Math.round(n('retornoPct', 'Frete de retorno', 0, 100)),
       nomeEmpresa: String(f.get('nomeEmpresa') ?? '').trim() || 'Empresa FG',
       whatsappEscritorio: soDigitos(String(f.get('whatsappEscritorio') ?? '')) || null,
@@ -365,17 +454,25 @@ export async function salvarConfig(_: Estado, f: FormData): Promise<Estado> {
 }
 export async function trocarSenha(_: Estado, f: FormData): Promise<Estado> {
   const a = await exigirAdmin()
-  const atual = String(f.get('atual') ?? ''), nova = String(f.get('nova') ?? '')
+  const atual = String(f.get('atual') ?? ''),
+    nova = String(f.get('nova') ?? '')
   if (!(await confere(atual, a.senhaHash))) return { erro: 'A senha atual não confere.' }
   if (nova.length < 8) return { erro: 'A nova senha precisa ter pelo menos 8 caracteres.' }
   if (nova !== String(f.get('confirma') ?? '')) return { erro: 'A confirmação não bate com a nova senha.' }
-  await db.update(s.administradores).set({ senhaHash: await hash(nova) }).where(eq(s.administradores.id, a.id))
+  await db
+    .update(s.administradores)
+    .set({ senhaHash: await hash(nova) })
+    .where(eq(s.administradores.id, a.id))
   await registrar(`admin:${a.id}`, 'trocou a senha', 'administrador', a.id)
   redirect(`/admin/config?ok=${encodeURIComponent('Senha alterada')}`)
 }
 export async function novoAdmin(_: Estado, f: FormData): Promise<Estado> {
   return gravar(async (autor) => {
-    const nome = String(f.get('nome') ?? '').trim(), usuario = String(f.get('usuario') ?? '').trim().toLowerCase(), senha = String(f.get('senha') ?? '')
+    const nome = String(f.get('nome') ?? '').trim(),
+      usuario = String(f.get('usuario') ?? '')
+        .trim()
+        .toLowerCase(),
+      senha = String(f.get('senha') ?? '')
     if (!nome || !/^[a-z0-9._-]{3,30}$/.test(usuario)) throw new ErroCampo('Preencha o nome e um usuário sem espaços (3 a 30 letras ou números).')
     if (senha.length < 8) throw new ErroCampo('A senha precisa ter pelo menos 8 caracteres.')
     const [x] = await db.select().from(s.administradores).where(eq(s.administradores.usuario, usuario))
@@ -396,7 +493,10 @@ export async function removerAdmin(id: number) {
 // ---------- acerto ----------
 export async function marcarPago(motoristaId: number, mes: string, valor: number, voltar: string) {
   const a = await exigirAdmin()
-  await db.insert(s.acertos).values({ motoristaId, mes, valor }).onConflictDoUpdate({ target: [s.acertos.motoristaId, s.acertos.mes], set: { valor, pagoEm: new Date() } })
+  await db
+    .insert(s.acertos)
+    .values({ motoristaId, mes, valor })
+    .onConflictDoUpdate({ target: [s.acertos.motoristaId, s.acertos.mes], set: { valor, pagoEm: new Date() } })
   await registrar(`admin:${a.id}`, 'marcou acerto como pago', 'acerto', `${motoristaId}/${mes}`, { valor })
   revalidatePath('/admin', 'layout')
   redirect(comMsg(voltar, 'Acerto marcado como pago'))

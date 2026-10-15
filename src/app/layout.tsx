@@ -14,7 +14,13 @@ export const metadata: Metadata = {
   applicationName: 'Sistema FG',
   appleWebApp: { capable: true, title: 'FG Motorista', statusBarStyle: 'black-translucent' },
   formatDetection: { telephone: false },
-  icons: { icon: [{ url: '/favicon-32.png', sizes: '32x32' }, { url: '/icon-192.png', sizes: '192x192' }], apple: '/apple-touch-icon.png' },
+  icons: {
+    icon: [
+      { url: '/favicon-32.png', sizes: '32x32' },
+      { url: '/icon-192.png', sizes: '192x192' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
 }
 
 export const viewport: Viewport = {
@@ -28,7 +34,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className={`${body.variable} ${display.variable}`}>
       <body>
-        <Suspense><ProgressoNav /></Suspense>
+        <Suspense>
+          <ProgressoNav />
+        </Suspense>
         {children}
       </body>
     </html>

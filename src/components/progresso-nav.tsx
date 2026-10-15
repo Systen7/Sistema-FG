@@ -27,7 +27,12 @@ export function ProgressoNav() {
     parar()
     setValor(1)
     setEstado('fim')
-    setTimeout(() => { if (!ativo.current) { setEstado('parado'); setValor(0) } }, 420)
+    setTimeout(() => {
+      if (!ativo.current) {
+        setEstado('parado')
+        setValor(0)
+      }
+    }, 420)
   }
   const comecar = () => {
     if (ativo.current) return
@@ -42,7 +47,9 @@ export function ProgressoNav() {
 
   // Fim: o endereço mudou.
   // biome-ignore lint/correctness/useExhaustiveDependencies: roda de propósito a cada troca de endereço (path, sp)
-  useEffect(() => { terminar() }, [path, sp])
+  useEffect(() => {
+    terminar()
+  }, [path, sp])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: ouvintes registrados uma vez; as funções só usam refs e setters estáveis
   useEffect(() => {
@@ -57,7 +64,12 @@ export function ProgressoNav() {
     }
     const envio = (e: SubmitEvent) => {
       const f = e.target as HTMLFormElement
-      if ((f.getAttribute('method') ?? 'get').toLowerCase() === 'get' && f.getAttribute('action')?.startsWith('/') && !f.getAttribute('action')?.startsWith('/api/')) comecar()
+      if (
+        (f.getAttribute('method') ?? 'get').toLowerCase() === 'get' &&
+        f.getAttribute('action')?.startsWith('/') &&
+        !f.getAttribute('action')?.startsWith('/api/')
+      )
+        comecar()
     }
     const aviso = () => comecar()
     document.addEventListener('click', clique, true)
@@ -73,7 +85,16 @@ export function ProgressoNav() {
     }
   }, [])
 
-  return <div className="barra-nav" data-estado={estado} style={{ transform: `scaleX(${valor})` }} role="progressbar" aria-hidden={estado === 'parado'} aria-label="Carregando a página" />
+  return (
+    <div
+      className="barra-nav"
+      data-estado={estado}
+      style={{ transform: `scaleX(${valor})` }}
+      role="progressbar"
+      aria-hidden={estado === 'parado'}
+      aria-label="Carregando a página"
+    />
+  )
 }
 
 /** Avisa a barra de progresso que uma navegação vai começar (ex.: antes de router.push). */

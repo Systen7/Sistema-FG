@@ -18,7 +18,10 @@ export async function POST(req: Request) {
     if (ja) return NextResponse.json({ ok: true, id: ja.id, repetido: true })
   }
   const viagemId = Number(f.get('viagemId'))
-  const [v] = await db.select().from(s.viagens).where(and(eq(s.viagens.id, viagemId), eq(s.viagens.motoristaId, m.id)))
+  const [v] = await db
+    .select()
+    .from(s.viagens)
+    .where(and(eq(s.viagens.id, viagemId), eq(s.viagens.motoristaId, m.id)))
   if (!v) return NextResponse.json({ erro: 'Viagem não encontrada.' }, { status: 404 })
   const e = lerDespesa(f)
   if ('erro' in e) return NextResponse.json(e, { status: 400 })
@@ -26,10 +29,22 @@ export async function POST(req: Request) {
   const foto = await salvarFoto(f)
   if (foto && typeof foto === 'object') return NextResponse.json(foto, { status: 400 })
   try {
-    const [d] = await db.insert(s.despesas).values({
-      viagemId: v.id, tipo: e.tipo, valor: e.valor, litros: e.litros, kmAbastecimento: e.kmAbastecimento, obs: e.obs, pagoPor: e.pagoPor,
-      data: e.data ?? hoje(), status: 'pendente', fotoId: foto, clientId,
-    }).returning()
+    const [d] = await db
+      .insert(s.despesas)
+      .values({
+        viagemId: v.id,
+        tipo: e.tipo,
+        valor: e.valor,
+        litros: e.litros,
+        kmAbastecimento: e.kmAbastecimento,
+        obs: e.obs,
+        pagoPor: e.pagoPor,
+        data: e.data ?? hoje(),
+        status: 'pendente',
+        fotoId: foto,
+        clientId,
+      })
+      .returning()
     await registrar(`motorista:${m.id}`, 'lançou', 'despesa', d.id, { viagem: v.id, tipo: d.tipo, valor: d.valor })
     log('info', 'gasto lançado', { motorista: m.id, viagem: v.id, despesa: d.id, comFoto: !!foto })
     return NextResponse.json({ ok: true, id: d.id })

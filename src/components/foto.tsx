@@ -6,10 +6,17 @@ export function Foto({ src, alt = '', className = '', ...resto }: React.ImgHTMLA
   const [ok, setOk] = useState(false)
   return (
     <img
-      {...resto} src={src} alt={alt} loading="lazy" decoding="async"
+      {...resto}
+      src={src}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
       className={`${className} img-carrega${ok ? ' ok' : ''}`}
-      onLoad={() => setOk(true)} onError={() => setOk(true)}
-      ref={(el) => { if (el?.complete && el.naturalWidth) setOk(true) }}
+      onLoad={() => setOk(true)}
+      onError={() => setOk(true)}
+      ref={(el) => {
+        if (el?.complete && el.naturalWidth) setOk(true)
+      }}
     />
   )
 }

@@ -14,8 +14,16 @@ export default async function Encerrar() {
   const c = calcViagem(v, (await config()).retornoPct)
   return (
     <EncerrarForm
-      id={v.id} origem={v.origem} destino={v.destino} kmInicial={v.kmInicial} inicio={v.inicio} hoje={hoje()}
-      frete={v.frete} comissao={c.comissao} gastos={c.total} pendentes={c.pendentes}
+      id={v.id}
+      origem={v.origem}
+      destino={v.destino}
+      kmInicial={v.kmInicial}
+      inicio={v.inicio}
+      hoje={hoje()}
+      frete={v.frete}
+      comissao={c.comissao}
+      gastos={c.total}
+      pendentes={c.pendentes}
     />
   )
 }

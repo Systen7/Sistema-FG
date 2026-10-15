@@ -12,7 +12,11 @@ export async function GET(_req: Request, ctx: RouteContext<'/api/fotos/[id]'>) {
   if (!adm) {
     const m = await motoristaDaApi()
     if (!m) return new NextResponse(null, { status: 401 })
-    const [r] = await db.select({ mot: s.viagens.motoristaId }).from(s.despesas).innerJoin(s.viagens, eq(s.despesas.viagemId, s.viagens.id)).where(eq(s.despesas.fotoId, id))
+    const [r] = await db
+      .select({ mot: s.viagens.motoristaId })
+      .from(s.despesas)
+      .innerJoin(s.viagens, eq(s.despesas.viagemId, s.viagens.id))
+      .where(eq(s.despesas.fotoId, id))
     if (r?.mot !== m.id) return new NextResponse(null, { status: 404 })
   }
   const [f] = await db.select().from(s.fotos).where(eq(s.fotos.id, id))

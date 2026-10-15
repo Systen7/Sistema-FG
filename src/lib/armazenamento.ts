@@ -16,7 +16,10 @@ export async function guardarNoBlob(dados: Buffer, mime: string, pasta = 'compro
 export async function guardarArquivo(dados: Buffer, mime: string, pasta = 'comprovantes'): Promise<string> {
   const { db, schema: s } = await import('@/db')
   const valores = usaBlob() ? { chave: await guardarNoBlob(dados, mime, pasta) } : { dados }
-  const [r] = await db.insert(s.fotos).values({ ...valores, mime, tamanho: dados.length }).returning({ id: s.fotos.id })
+  const [r] = await db
+    .insert(s.fotos)
+    .values({ ...valores, mime, tamanho: dados.length })
+    .returning({ id: s.fotos.id })
   return r.id
 }
 
@@ -34,7 +37,12 @@ export async function apagarArquivos(ids: (string | null | undefined)[]) {
   const linhas = await db.select({ id: s.fotos.id, chave: s.fotos.chave }).from(s.fotos).where(inArray(s.fotos.id, lista))
   const chaves = linhas.map((l) => l.chave).filter((x): x is string => !!x)
   if (chaves.length && usaBlob()) {
-    try { const { del } = await import('@vercel/blob'); await del(chaves) } catch (e) { registrarErro(e, 'Falha ao apagar do Blob', { arquivos: chaves.length }) }
+    try {
+      const { del } = await import('@vercel/blob')
+      await del(chaves)
+    } catch (e) {
+      registrarErro(e, 'Falha ao apagar do Blob', { arquivos: chaves.length })
+    }
   }
   await db.delete(s.fotos).where(inArray(s.fotos.id, lista))
 }

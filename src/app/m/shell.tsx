@@ -16,7 +16,10 @@ export function Abas() {
   return (
     <nav className="m-tabs" aria-label="Menu">
       {abas.map(({ href, nome, Ico, ativo }) => (
-        <Link key={href} href={href} aria-current={ativo ? 'page' : undefined}><Ico className="ico" />{nome}</Link>
+        <Link key={href} href={href} aria-current={ativo ? 'page' : undefined}>
+          <Ico className="ico" />
+          {nome}
+        </Link>
       ))}
     </nav>
   )
@@ -35,21 +38,50 @@ export function Rede({ motoristaId }: { motoristaId: number }) {
       if (recusados.length) toast(`Não foi possível enviar: ${recusados.join(' · ')}. Fale com o escritório.`, 'bad')
       if ((n || recusados.length) && navigator.onLine) router.refresh()
     }
-    const on = () => { setOnline(true); sync() }
+    const on = () => {
+      setOnline(true)
+      sync()
+    }
     const off = () => setOnline(false)
     setOnline(navigator.onLine)
-    conta(); sync()
+    conta()
+    sync()
     window.addEventListener('online', on)
     window.addEventListener('offline', off)
-    const visivel = () => { if (document.visibilityState === 'visible') sync() }
+    const visivel = () => {
+      if (document.visibilityState === 'visible') sync()
+    }
     document.addEventListener('visibilitychange', visivel)
     const t = setInterval(sync, 30000)
     const des = aoMudar(conta)
-    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); document.removeEventListener('visibilitychange', visivel); clearInterval(t); des() }
+    return () => {
+      window.removeEventListener('online', on)
+      window.removeEventListener('offline', off)
+      document.removeEventListener('visibilitychange', visivel)
+      clearInterval(t)
+      des()
+    }
   }, [router, motoristaId])
-  if (!online) return <span className="net off" role="status"><CloudOff className="ico" />Sem sinal{fila ? ` · ${fila} guardado${fila > 1 ? 's' : ''}` : ''}</span>
-  if (fila) return <span className="net fila" role="status"><CloudUpload className="ico" />Enviando {fila}</span>
-  return <span className="net"><span className="dot" />Conectado</span>
+  if (!online)
+    return (
+      <span className="net off" role="status">
+        <CloudOff className="ico" />
+        Sem sinal{fila ? ` · ${fila} guardado${fila > 1 ? 's' : ''}` : ''}
+      </span>
+    )
+  if (fila)
+    return (
+      <span className="net fila" role="status">
+        <CloudUpload className="ico" />
+        Enviando {fila}
+      </span>
+    )
+  return (
+    <span className="net">
+      <span className="dot" />
+      Conectado
+    </span>
+  )
 }
 
 export function RegistrarSW() {

@@ -3,17 +3,21 @@ import { execSync } from 'node:child_process'
 import { chave, CTE, MDFE, ENCERRAMENTO } from '../tests/xml-exemplos'
 
 // CT-e e MDF-e: importar XML, criar a viagem pelo MDF-e, motorista ver a chave no celular, PDF, encerramento.
-test.beforeAll(() => { execSync('npx tsx scripts/seed.ts --limpar', { stdio: 'inherit' }) })
+test.beforeAll(() => {
+  execSync('npx tsx scripts/seed.ts --limpar', { stdio: 'inherit' })
+})
 
 const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date())
 const PDF = Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF')
 
 test('documentos fiscais do XML até o celular do motorista', async ({ browser }) => {
-  const ch = chave('57', 1234), mdfe = chave('58', 77)
+  const ch = chave('57', 1234),
+    mdfe = chave('58', 77)
   const adm = await (await browser.newContext({ viewport: { width: 1366, height: 900 } })).newPage()
   await adm.goto('/entrar')
   await adm.getByRole('button', { name: 'Escritório' }).click()
-  await adm.fill('input[name=usuario]', 'admin'); await adm.fill('input[name=senha]', 'fg2026')
+  await adm.fill('input[name=usuario]', 'admin')
+  await adm.fill('input[name=senha]', 'fg2026')
   await adm.getByRole('button', { name: 'Entrar' }).click()
   await adm.waitForURL('**/admin')
 
@@ -63,7 +67,8 @@ test('documentos fiscais do XML até o celular do motorista', async ({ browser }
   expect(r.headers()['content-type']).toBe('application/pdf')
   // outro motorista não abre o PDF dessa viagem
   const outro = await (await browser.newContext()).newPage()
-  await outro.goto('/entrar'); await outro.fill('input[type=tel]', '64900000002')
+  await outro.goto('/entrar')
+  await outro.fill('input[type=tel]', '64900000002')
   await outro.getByRole('button', { name: 'Continuar' }).click()
   for (const d of '2222') await outro.getByRole('button', { name: d, exact: true }).click()
   await outro.waitForURL('**/m')
@@ -71,7 +76,9 @@ test('documentos fiscais do XML até o celular do motorista', async ({ browser }
 
   // evento de encerramento dá baixa no MDF-e
   await adm.goto(viagemUrl)
-  await adm.locator('input[type=file][multiple]').setInputFiles({ name: 'encerramento.xml', mimeType: 'application/xml', buffer: Buffer.from(ENCERRAMENTO(mdfe)) })
+  await adm
+    .locator('input[type=file][multiple]')
+    .setInputFiles({ name: 'encerramento.xml', mimeType: 'application/xml', buffer: Buffer.from(ENCERRAMENTO(mdfe)) })
   await expect(adm.getByText('MDF-e nº 77 marcado como encerrado.')).toBeVisible()
   await adm.goto('/admin/documentos?ver=abertos')
   await expect(adm.getByText('Nenhum documento.')).toBeVisible()

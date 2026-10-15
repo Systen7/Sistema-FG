@@ -8,7 +8,10 @@ import { lerDoBlob } from '@/lib/armazenamento'
 // /api/documentos/12/xml: XML original (só escritório)
 export async function GET(_req: Request, ctx: RouteContext<'/api/documentos/[id]/[arquivo]'>) {
   const { id, arquivo } = await ctx.params
-  const [d] = await db.select().from(s.documentos).where(eq(s.documentos.id, Number(id) || 0))
+  const [d] = await db
+    .select()
+    .from(s.documentos)
+    .where(eq(s.documentos.id, Number(id) || 0))
   if (!d || (arquivo !== 'pdf' && arquivo !== 'xml')) return new NextResponse(null, { status: 404 })
   const adm = await adminDaApi()
   if (!adm) {
@@ -19,12 +22,23 @@ export async function GET(_req: Request, ctx: RouteContext<'/api/documentos/[id]
   }
   const nome = `${d.tipo === 'cte' ? 'CTe' : 'MDFe'}-${d.numero}-${d.chave}`
   if (arquivo === 'xml') {
-    return new NextResponse(d.xml, { headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Content-Disposition': `attachment; filename="${nome}.xml"`, 'Cache-Control': 'private, no-store' } })
+    return new NextResponse(d.xml, {
+      headers: {
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Content-Disposition': `attachment; filename="${nome}.xml"`,
+        'Cache-Control': 'private, no-store',
+      },
+    })
   }
   if (!d.pdfId) return new NextResponse(null, { status: 404 })
   const [f] = await db.select().from(s.fotos).where(eq(s.fotos.id, d.pdfId))
   if (!f) return new NextResponse(null, { status: 404 })
-  const cab = { 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="${nome}.pdf"`, 'Cache-Control': 'private, max-age=3600', 'X-Content-Type-Options': 'nosniff' }
+  const cab = {
+    'Content-Type': 'application/pdf',
+    'Content-Disposition': `inline; filename="${nome}.pdf"`,
+    'Cache-Control': 'private, max-age=3600',
+    'X-Content-Type-Options': 'nosniff',
+  }
   if (f.chave) {
     const b = await lerDoBlob(f.chave)
     return b ? new NextResponse(b.stream, { headers: cab }) : new NextResponse(null, { status: 404 })

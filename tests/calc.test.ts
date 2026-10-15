@@ -4,17 +4,51 @@ import { lerNumero, lerReais, reais, reaisC } from '@/lib/format'
 import { calcAlertas } from '@/lib/alertas'
 
 const v = (o: Partial<ViagemCompleta> = {}): ViagemCompleta => ({
-  id: 1, motoristaId: 1, caminhaoId: 1, origem: 'A', destino: 'B', carga: 'Soja', frete: 1_000_000, comissaoPct: 10, adiantamento: 100_000,
-  inicio: '2026-09-01', fim: '2026-09-03', kmInicial: 1000, kmFinal: 2000, kmVazio: 0, status: 'encerrada', criadoEm: new Date(), despesas: [], ...o,
+  id: 1,
+  motoristaId: 1,
+  caminhaoId: 1,
+  origem: 'A',
+  destino: 'B',
+  carga: 'Soja',
+  frete: 1_000_000,
+  comissaoPct: 10,
+  adiantamento: 100_000,
+  inicio: '2026-09-01',
+  fim: '2026-09-03',
+  kmInicial: 1000,
+  kmFinal: 2000,
+  kmVazio: 0,
+  status: 'encerrada',
+  criadoEm: new Date(),
+  despesas: [],
+  ...o,
 })
 const d = (o: Record<string, unknown>) => ({
-  id: 1, viagemId: 1, tipo: 'Diesel', valor: 0, litros: null, kmAbastecimento: null, obs: null, data: '2026-09-01', pagoPor: 'empresa' as const,
-  status: 'aprovada' as const, motivoRecusa: null, fotoId: null, clientId: null, criadoEm: new Date(), ...o,
+  id: 1,
+  viagemId: 1,
+  tipo: 'Diesel',
+  valor: 0,
+  litros: null,
+  kmAbastecimento: null,
+  obs: null,
+  data: '2026-09-01',
+  pagoPor: 'empresa' as const,
+  status: 'aprovada' as const,
+  motivoRecusa: null,
+  fotoId: null,
+  clientId: null,
+  criadoEm: new Date(),
+  ...o,
 })
 
 describe('cálculo da viagem', () => {
   it('lucro = frete − despesas − comissão, ignorando recusadas', () => {
-    const c = calcViagem(v({ despesas: [d({ valor: 300_000, litros: 400 }), d({ tipo: 'Pedágio', valor: 50_000 }), d({ tipo: 'Alimentação', valor: 20_000, status: 'recusada' })] }), 60)
+    const c = calcViagem(
+      v({
+        despesas: [d({ valor: 300_000, litros: 400 }), d({ tipo: 'Pedágio', valor: 50_000 }), d({ tipo: 'Alimentação', valor: 20_000, status: 'recusada' })],
+      }),
+      60,
+    )
     expect(c.total).toBe(350_000)
     expect(c.comissao).toBe(100_000)
     expect(c.lucro).toBe(1_000_000 - 350_000 - 100_000)
@@ -45,10 +79,15 @@ describe('acerto e resultado do mês', () => {
     expect(fracaoMes('2026-11', '2026-10-15')).toBe(0)
   })
   it('lucro líquido desconta manutenção, seguros e fixos', () => {
-    const g = resultadoGeral('2026-09', '2026-10-15', [v()],
+    const g = resultadoGeral(
+      '2026-09',
+      '2026-10-15',
+      [v()],
       [{ id: 1, caminhaoId: 1, data: '2026-09-10', tipo: 'Corretiva', descricao: '', valor: 50_000, imprevisto: false }],
       [{ id: 1, nome: 'Casco', cobertura: '', vigenciaAte: null, custoMensal: 30_000, obrigatorio: false }],
-      [{ id: 1, nome: 'Contador', valorMensal: 20_000 }], 60)
+      [{ id: 1, nome: 'Contador', valorMensal: 20_000 }],
+      60,
+    )
     expect(g.lucro).toBe(1_000_000 - 100_000 - 50_000 - 30_000 - 20_000)
     expect(agregar([v()], 60).n).toBe(1)
   })
@@ -74,9 +113,39 @@ describe('alertas', () => {
     const cfg = { id: 1, diasAviso: 60, diasUrgente: 20, kmAvisoRevisao: 5000, sulcoMinimo: 3, retornoPct: 60, nomeEmpresa: 'FG', whatsappEscritorio: null }
     const a = calcAlertas('2026-10-01', {
       cfg,
-      motoristas: [{ id: 1, nome: 'Ana', telefone: '', pinHash: '', comissaoPct: 10, caminhaoId: 1, cnhAte: '2026-10-11', toxicologicoAte: '2028-01-01', ativo: true, versaoSessao: 1, criadoEm: new Date() }],
-      caminhoes: [{ id: 1, placa: 'AAA1A11', placaCarreta: null, descricao: '', ano: null, km: 99_000, metaConsumo: 2.4, proximaRevisaoKm: 100_000, tacografoAte: null, licenciamentoAte: null, ativo: true }],
-      apolices: [], lembretes: [], pneus: [],
+      motoristas: [
+        {
+          id: 1,
+          nome: 'Ana',
+          telefone: '',
+          pinHash: '',
+          comissaoPct: 10,
+          caminhaoId: 1,
+          cnhAte: '2026-10-11',
+          toxicologicoAte: '2028-01-01',
+          ativo: true,
+          versaoSessao: 1,
+          criadoEm: new Date(),
+        },
+      ],
+      caminhoes: [
+        {
+          id: 1,
+          placa: 'AAA1A11',
+          placaCarreta: null,
+          descricao: '',
+          ano: null,
+          km: 99_000,
+          metaConsumo: 2.4,
+          proximaRevisaoKm: 100_000,
+          tacografoAte: null,
+          licenciamentoAte: null,
+          ativo: true,
+        },
+      ],
+      apolices: [],
+      lembretes: [],
+      pneus: [],
     })
     expect(a.map((x) => x.texto)).toEqual(['Revisão do AAA1A11', 'CNH de Ana'])
     expect(a.every((x) => x.urgente)).toBe(true)
@@ -87,11 +156,14 @@ describe('alerta de MDF-e aberto', () => {
   const cfg = { id: 1, diasAviso: 60, diasUrgente: 20, kmAvisoRevisao: 5000, sulcoMinimo: 3, retornoPct: 60, nomeEmpresa: 'FG', whatsappEscritorio: null }
   const base = { cfg, motoristas: [], caminhoes: [], apolices: [], lembretes: [], pneus: [] }
   it('avisa quando a viagem terminou ou passou de 30 dias; não avisa em viagem em andamento', () => {
-    const a = calcAlertas('2026-10-14', { ...base, mdfes: [
-      { id: 1, numero: 10, emitidoEm: '2026-10-10', viagemId: 5, viagemEncerrada: true },
-      { id: 2, numero: 11, emitidoEm: '2026-10-12', viagemId: 6, viagemEncerrada: false },
-      { id: 3, numero: 12, emitidoEm: '2026-09-01', viagemId: null, viagemEncerrada: false },
-    ] })
+    const a = calcAlertas('2026-10-14', {
+      ...base,
+      mdfes: [
+        { id: 1, numero: 10, emitidoEm: '2026-10-10', viagemId: 5, viagemEncerrada: true },
+        { id: 2, numero: 11, emitidoEm: '2026-10-12', viagemId: 6, viagemEncerrada: false },
+        { id: 3, numero: 12, emitidoEm: '2026-09-01', viagemId: null, viagemEncerrada: false },
+      ],
+    })
     expect(a.map((x) => x.texto)).toEqual(['MDF-e nº 10 ainda aberto', 'MDF-e nº 12 ainda aberto'])
     expect(a.every((x) => x.urgente)).toBe(true)
   })

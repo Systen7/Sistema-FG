@@ -17,7 +17,10 @@ export default async function Iniciar() {
   const uniq = (a: string[]) => [...new Set(a)]
   return (
     <IniciarForm
-      hoje={hoje()} km={cam.km} placa={cam.placa} comissao={m.comissaoPct}
+      hoje={hoje()}
+      km={cam.km}
+      placa={cam.placa}
+      comissao={m.comissaoPct}
       rotas={meu.rotas.length ? meu.rotas : geral.rotas}
       cidades={uniq([...meu.cidades, ...geral.cidades]).slice(0, 40)}
       cargas={uniq([...meu.cargas, ...geral.cargas]).slice(0, 8)}

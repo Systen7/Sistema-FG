@@ -4,142 +4,468 @@
    nada piscando para chamar atenção; sem entrada escalonada em listas; tudo some com prefers-reduced-motion. */
 
 :root {
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);      /* chegada: rápida no começo, pousa suave */
-  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);       /* saída: começa suave, sai rápido */
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);  /* mudança de estado com o elemento visível */
-  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);    /* painel de baixo (curva nativa do iOS) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* chegada: rápida no começo, pousa suave */
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45); /* saída: começa suave, sai rápido */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* mudança de estado com o elemento visível */
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1); /* painel de baixo (curva nativa do iOS) */
   --t-toque: 120ms;
   --t-rapido: 150ms;
   --t-base: 200ms;
   --t-entrada: 220ms;
   --t-revela: 420ms;
 }
-.m { --t-entrada: 300ms; --t-base: 240ms }
+.m {
+  --t-entrada: 300ms;
+  --t-base: 240ms;
+}
 
 /* ---------- entrada de página ----------
    O template de cada área envolve a página em .pagina. Quando o esqueleto é trocado pelo conteúdo,
    os blocos novos entram com opacidade + subida curta + desfoque ("materializa"). Um só movimento, sem escalonar. */
-.pagina { display: contents }
-.pagina > :not(.ov):not(.sheet-ov):not(.toast) { animation: entra var(--t-entrada) var(--ease-out) both }
-@keyframes entra { from { opacity: 0; transform: translateY(6px); filter: blur(4px) } }
-.m .pagina > :not(.ov):not(.sheet-ov):not(.toast) { animation-name: entra-m }
-@keyframes entra-m { from { opacity: 0; transform: translateY(10px); filter: blur(4px) } }
+.pagina {
+  display: contents;
+}
+.pagina > :not(.ov):not(.sheet-ov):not(.toast) {
+  animation: entra var(--t-entrada) var(--ease-out) both;
+}
+@keyframes entra {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+    filter: blur(4px);
+  }
+}
+.m .pagina > :not(.ov):not(.sheet-ov):not(.toast) {
+  animation-name: entra-m;
+}
+@keyframes entra-m {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(4px);
+  }
+}
 /* O esqueleto só aparece (sem subir), para não somar dois movimentos seguidos. */
-.pagina > .esq-pagina { animation: aparece var(--t-base) var(--ease-out) both }
-@keyframes aparece { from { opacity: 0 } }
-.entra { animation: entra var(--t-entrada) var(--ease-out) both }
+.pagina > .esq-pagina {
+  animation: aparece var(--t-base) var(--ease-out) both;
+}
+@keyframes aparece {
+  from {
+    opacity: 0;
+  }
+}
+.entra {
+  animation: entra var(--t-entrada) var(--ease-out) both;
+}
 
 /* ---------- esqueleto (skeleton) ---------- */
-.esq-pagina { display: flex; flex-direction: column; gap: 20px }
-.m .esq-pagina { gap: 18px }
-.esq { display: block; background: var(--surface2); border-radius: 6px; position: relative; overflow: hidden; color: transparent }
+.esq-pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.m .esq-pagina {
+  gap: 18px;
+}
+.esq {
+  display: block;
+  background: var(--surface2);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  color: transparent;
+}
 .esq::after {
-  content: ""; position: absolute; inset: 0; transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(126, 166, 255, .07), transparent);
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(126, 166, 255, 0.07), transparent);
   animation: brilho 1.6s var(--ease-in-out) infinite;
 }
-@keyframes brilho { to { transform: translateX(100%) } }
-.esq.linha { height: 12px; border-radius: 4px }
-.esq.titulo { height: 34px; width: 220px; border-radius: 6px }
-.m .esq.titulo { height: 30px; width: 180px }
-.esq.texto { height: 14px; border-radius: 4px }
-.esq.num { height: 26px; width: 60%; border-radius: 5px; margin-top: 6px }
-.esq.botao { height: 40px; width: 140px; border-radius: 6px }
-.esq.acao { height: 76px; border-radius: 14px }
-.esq.circ { border-radius: 50% }
-.esq-tabela { display: flex; flex-direction: column }
-.esq-tabela > div { display: grid; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--line) }
-.esq-tabela > div:last-child { border-bottom: 0 }
-.esq-hero { background: var(--road); border: 1px solid var(--road3); border-radius: 10px; padding: 24px 22px; display: flex; flex-direction: column; gap: 16px }
-.m .esq-hero { border-radius: 16px; padding: 18px }
+@keyframes brilho {
+  to {
+    transform: translateX(100%);
+  }
+}
+.esq.linha {
+  height: 12px;
+  border-radius: 4px;
+}
+.esq.titulo {
+  height: 34px;
+  width: 220px;
+  border-radius: 6px;
+}
+.m .esq.titulo {
+  height: 30px;
+  width: 180px;
+}
+.esq.texto {
+  height: 14px;
+  border-radius: 4px;
+}
+.esq.num {
+  height: 26px;
+  width: 60%;
+  border-radius: 5px;
+  margin-top: 6px;
+}
+.esq.botao {
+  height: 40px;
+  width: 140px;
+  border-radius: 6px;
+}
+.esq.acao {
+  height: 76px;
+  border-radius: 14px;
+}
+.esq.circ {
+  border-radius: 50%;
+}
+.esq-tabela {
+  display: flex;
+  flex-direction: column;
+}
+.esq-tabela > div {
+  display: grid;
+  gap: 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+}
+.esq-tabela > div:last-child {
+  border-bottom: 0;
+}
+.esq-hero {
+  background: var(--road);
+  border: 1px solid var(--road3);
+  border-radius: 10px;
+  padding: 24px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.m .esq-hero {
+  border-radius: 16px;
+  padding: 18px;
+}
 
 /* ---------- barra de progresso da navegação (topo) ---------- */
 .barra-nav {
-  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 100; pointer-events: none;
-  background: linear-gradient(90deg, var(--y), var(--yt)); transform-origin: left; transform: scaleX(0); opacity: 0;
-  transition: transform 300ms var(--ease-out), opacity var(--t-base) var(--ease-out);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 100;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--y), var(--yt));
+  transform-origin: left;
+  transform: scaleX(0);
+  opacity: 0;
+  transition:
+    transform 300ms var(--ease-out),
+    opacity var(--t-base) var(--ease-out);
 }
-.barra-nav[data-estado="indo"] { opacity: 1 }
-.barra-nav[data-estado="fim"] { opacity: 0; transition: transform var(--t-rapido) var(--ease-out), opacity 260ms var(--ease-in) 120ms }
+.barra-nav[data-estado="indo"] {
+  opacity: 1;
+}
+.barra-nav[data-estado="fim"] {
+  opacity: 0;
+  transition:
+    transform var(--t-rapido) var(--ease-out),
+    opacity 260ms var(--ease-in) 120ms;
+}
 
 /* ---------- botões e toques ---------- */
-.btn, .acao, .tile, .opcao, .foto, .keypad button, .sug button, .legend button, .tcard {
-  transition: transform var(--t-toque) var(--ease-out), border-color var(--t-rapido) var(--ease-out),
-    background-color var(--t-rapido) var(--ease-out), color var(--t-rapido) var(--ease-out), opacity var(--t-rapido) var(--ease-out);
+.btn,
+.acao,
+.tile,
+.opcao,
+.foto,
+.keypad button,
+.sug button,
+.legend button,
+.tcard {
+  transition:
+    transform var(--t-toque) var(--ease-out),
+    border-color var(--t-rapido) var(--ease-out),
+    background-color var(--t-rapido) var(--ease-out),
+    color var(--t-rapido) var(--ease-out),
+    opacity var(--t-rapido) var(--ease-out);
 }
-.btn:active, .acao:active, .tile:active, .opcao:active, .foto:active, .sug button:active { transform: scale(.97) }
-.keypad button:active { transform: scale(.95) }
-.nav a, .m-tabs a, .seg a, .seg button, tr.click > td, .list > a { transition: background-color var(--t-rapido) var(--ease-out), color var(--t-rapido) var(--ease-out) }
+.btn:active,
+.acao:active,
+.tile:active,
+.opcao:active,
+.foto:active,
+.sug button:active {
+  transform: scale(0.97);
+}
+.keypad button:active {
+  transform: scale(0.95);
+}
+.nav a,
+.m-tabs a,
+.seg a,
+.seg button,
+tr.click > td,
+.list > a {
+  transition:
+    background-color var(--t-rapido) var(--ease-out),
+    color var(--t-rapido) var(--ease-out);
+}
 /* Botão enviando: some o texto, aparece o indicador, sem mudar de tamanho. */
-.btn[aria-busy="true"] { pointer-events: none; opacity: .85 }
-.btn .spin { animation: spin .7s linear infinite }
+.btn[aria-busy="true"] {
+  pointer-events: none;
+  opacity: 0.85;
+}
+.btn .spin {
+  animation: spin 0.7s linear infinite;
+}
 
 /* PIN: o ponto preenche com um toque de escala (feedback de cada número digitado). */
-.pins i { transition: background-color var(--t-rapido) var(--ease-out), border-color var(--t-rapido) var(--ease-out), transform var(--t-toque) var(--ease-out) }
-.pins i.on { transform: scale(1.12) }
-.pins.erro { animation: shake 350ms var(--ease-in-out) }
+.pins i {
+  transition:
+    background-color var(--t-rapido) var(--ease-out),
+    border-color var(--t-rapido) var(--ease-out),
+    transform var(--t-toque) var(--ease-out);
+}
+.pins i.on {
+  transform: scale(1.12);
+}
+.pins.erro {
+  animation: shake 350ms var(--ease-in-out);
+}
 
 /* ---------- janelas (modal) ---------- */
-.ov { animation: aparece var(--t-base) var(--ease-out) both }
-.dlg { animation: dlg-entra var(--t-entrada) var(--ease-out) both; transform-origin: 50% 40% }
-@keyframes dlg-entra { from { opacity: 0; transform: translateY(8px) scale(.97); filter: blur(4px) } }
-.ov.saindo { animation: some var(--t-rapido) var(--ease-in) both }
-.ov.saindo .dlg { animation: dlg-sai var(--t-rapido) var(--ease-in) both }
-@keyframes some { to { opacity: 0 } }
-@keyframes dlg-sai { to { opacity: 0; transform: translateY(4px) scale(.98); filter: blur(2px) } }
+.ov {
+  animation: aparece var(--t-base) var(--ease-out) both;
+}
+.dlg {
+  animation: dlg-entra var(--t-entrada) var(--ease-out) both;
+  transform-origin: 50% 40%;
+}
+@keyframes dlg-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+    filter: blur(4px);
+  }
+}
+.ov.saindo {
+  animation: some var(--t-rapido) var(--ease-in) both;
+}
+.ov.saindo .dlg {
+  animation: dlg-sai var(--t-rapido) var(--ease-in) both;
+}
+@keyframes some {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes dlg-sai {
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+    filter: blur(2px);
+  }
+}
 
 /* ---------- painel de baixo (celular) ---------- */
-.sheet-ov { animation: aparece var(--t-base) var(--ease-out) both }
-.sheet { animation: sobe 380ms var(--ease-sheet) both }
-@keyframes sobe { from { transform: translateY(100%) } }
-.sheet-ov.saindo { animation: some 220ms var(--ease-in) both }
-.sheet-ov.saindo .sheet { animation: desce 220ms var(--ease-in) both }
-@keyframes desce { to { transform: translateY(100%) } }
+.sheet-ov {
+  animation: aparece var(--t-base) var(--ease-out) both;
+}
+.sheet {
+  animation: sobe 380ms var(--ease-sheet) both;
+}
+@keyframes sobe {
+  from {
+    transform: translateY(100%);
+  }
+}
+.sheet-ov.saindo {
+  animation: some 220ms var(--ease-in) both;
+}
+.sheet-ov.saindo .sheet {
+  animation: desce 220ms var(--ease-in) both;
+}
+@keyframes desce {
+  to {
+    transform: translateY(100%);
+  }
+}
 
 /* ---------- avisos (toast) ---------- */
-.toast { animation: toast-entra 280ms var(--ease-out) both }
-@keyframes toast-entra { from { opacity: 0; transform: translate(-50%, 12px); filter: blur(4px) } }
-.toast.saindo { animation: toast-sai 180ms var(--ease-in) both }
-@keyframes toast-sai { to { opacity: 0; transform: translate(-50%, 6px); filter: blur(2px) } }
+.toast {
+  animation: toast-entra 280ms var(--ease-out) both;
+}
+@keyframes toast-entra {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+    filter: blur(4px);
+  }
+}
+.toast.saindo {
+  animation: toast-sai 180ms var(--ease-in) both;
+}
+@keyframes toast-sai {
+  to {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+    filter: blur(2px);
+  }
+}
 
 /* ---------- menus que abrem a partir do botão (recusar, excluir) ---------- */
-details[open] > summary + * { animation: menu-abre var(--t-rapido) var(--ease-out) both; transform-origin: top right }
-@keyframes menu-abre { from { opacity: 0; transform: translateY(-4px) scale(.96); filter: blur(2px) } }
+details[open] > summary + * {
+  animation: menu-abre var(--t-rapido) var(--ease-out) both;
+  transform-origin: top right;
+}
+@keyframes menu-abre {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.96);
+    filter: blur(2px);
+  }
+}
 
 /* ---------- conteúdo que aparece dentro da tela (formulário após escolher o tipo, avisos de erro) ---------- */
-.surge { animation: entra var(--t-entrada) var(--ease-out) both }
-.aviso, .err[role="alert"] { animation: entra var(--t-base) var(--ease-out) both }
+.surge {
+  animation: entra var(--t-entrada) var(--ease-out) both;
+}
+.aviso,
+.err[role="alert"] {
+  animation: entra var(--t-base) var(--ease-out) both;
+}
 
 /* ---------- troca de ícone (copiar → copiado, sem sinal → conectado) ---------- */
-.troca { animation: troca var(--t-base) var(--ease-out) both }
-@keyframes troca { from { opacity: 0; transform: scale(.85); filter: blur(2px) } }
+.troca {
+  animation: troca var(--t-base) var(--ease-out) both;
+}
+@keyframes troca {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+    filter: blur(2px);
+  }
+}
 
 /* ---------- dados que se revelam ao entrar na página ---------- */
-.bar i { transform-origin: left; animation: cresce var(--t-revela) var(--ease-out) both }
-@keyframes cresce { from { transform: scaleX(0) } }
-.stackbar { animation: revela-x 520ms var(--ease-out) both }
-@keyframes revela-x { from { clip-path: inset(0 100% 0 0) } to { clip-path: inset(0 0 0 0) } }
-.grafico-barras { animation: revela-y var(--t-revela) var(--ease-out) both }
-@keyframes revela-y { from { clip-path: inset(100% 0 0 0) } to { clip-path: inset(0 0 0 0) } }
+.bar i {
+  transform-origin: left;
+  animation: cresce var(--t-revela) var(--ease-out) both;
+}
+@keyframes cresce {
+  from {
+    transform: scaleX(0);
+  }
+}
+.stackbar {
+  animation: revela-x 520ms var(--ease-out) both;
+}
+@keyframes revela-x {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.grafico-barras {
+  animation: revela-y var(--t-revela) var(--ease-out) both;
+}
+@keyframes revela-y {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
 
 /* ---------- imagens sob demanda ---------- */
-.img-carrega { background: var(--surface2); opacity: 0; transition: opacity 260ms var(--ease-out), filter 260ms var(--ease-out); filter: blur(6px) }
-.img-carrega.ok { opacity: 1; filter: none }
+.img-carrega {
+  background: var(--surface2);
+  opacity: 0;
+  transition:
+    opacity 260ms var(--ease-out),
+    filter 260ms var(--ease-out);
+  filter: blur(6px);
+}
+.img-carrega.ok {
+  opacity: 1;
+  filter: none;
+}
 
 /* ---------- barra de progresso (envio de foto, importação) ---------- */
-.progresso { height: 6px; border-radius: 4px; background: var(--surface2); overflow: hidden }
-.progresso > i { display: block; height: 100%; border-radius: 4px; background: var(--yt); transform-origin: left; transition: transform 240ms var(--ease-out) }
-.btn .progresso { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; border-radius: 0; background: transparent }
-.btn .progresso > i { background: rgba(255, 255, 255, .7) }
-.btn.pri .progresso > i { background: rgba(0, 0, 0, .35) }
-.btn { position: relative; overflow: hidden }
+.progresso {
+  height: 6px;
+  border-radius: 4px;
+  background: var(--surface2);
+  overflow: hidden;
+}
+.progresso > i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--yt);
+  transform-origin: left;
+  transition: transform 240ms var(--ease-out);
+}
+.btn .progresso {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  border-radius: 0;
+  background: transparent;
+}
+.btn .progresso > i {
+  background: rgba(255, 255, 255, 0.7);
+}
+.btn.pri .progresso > i {
+  background: rgba(0, 0, 0, 0.35);
+}
+.btn {
+  position: relative;
+  overflow: hidden;
+}
 
 /* Linhas de tabelas longas só são desenhadas quando chegam perto da tela. */
-.tabela-longa tbody tr { content-visibility: auto; contain-intrinsic-size: auto 52px }
+.tabela-longa tbody tr {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 52px;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .esq::after { animation: none; display: none }
-  .barra-nav { transition: opacity var(--t-rapido) linear }
-  .pagina > *, .dlg, .sheet, .toast, .bar i, .stackbar, .grafico-barras, .surge, .troca, .aviso { animation: aparece .01ms both !important }
-  .btn:active, .acao:active, .tile:active, .opcao:active, .foto:active, .keypad button:active { transform: none }
+  .esq::after {
+    animation: none;
+    display: none;
+  }
+  .barra-nav {
+    transition: opacity var(--t-rapido) linear;
+  }
+  .pagina > *,
+  .dlg,
+  .sheet,
+  .toast,
+  .bar i,
+  .stackbar,
+  .grafico-barras,
+  .surge,
+  .troca,
+  .aviso {
+    animation: aparece 0.01ms both !important;
+  }
+  .btn:active,
+  .acao:active,
+  .tile:active,
+  .opcao:active,
+  .foto:active,
+  .keypad button:active {
+    transform: none;
+  }
 }

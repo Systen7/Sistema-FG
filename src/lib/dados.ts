@@ -13,7 +13,16 @@ export async function config() {
 
 async function comDespesas(vs: (typeof s.viagens.$inferSelect)[]): Promise<ViagemCompleta[]> {
   if (!vs.length) return []
-  const ds = await db.select().from(s.despesas).where(inArray(s.despesas.viagemId, vs.map((v) => v.id))).orderBy(asc(s.despesas.data), asc(s.despesas.id))
+  const ds = await db
+    .select()
+    .from(s.despesas)
+    .where(
+      inArray(
+        s.despesas.viagemId,
+        vs.map((v) => v.id),
+      ),
+    )
+    .orderBy(asc(s.despesas.data), asc(s.despesas.id))
   return vs.map((v) => ({ ...v, despesas: ds.filter((d) => d.viagemId === v.id) }))
 }
 
@@ -22,7 +31,13 @@ export async function viagensDoMes(mes: string, filtro?: { motoristaId?: number;
   const conds = [gte(s.viagens.inicio, `${mes}-01`), lt(s.viagens.inicio, `${somaMeses(mes, 1)}-01`)]
   if (filtro?.motoristaId) conds.push(eq(s.viagens.motoristaId, filtro.motoristaId))
   if (filtro?.caminhaoId) conds.push(eq(s.viagens.caminhaoId, filtro.caminhaoId))
-  return comDespesas(await db.select().from(s.viagens).where(and(...conds)).orderBy(desc(s.viagens.inicio), desc(s.viagens.id)))
+  return comDespesas(
+    await db
+      .select()
+      .from(s.viagens)
+      .where(and(...conds))
+      .orderBy(desc(s.viagens.inicio), desc(s.viagens.id)),
+  )
 }
 
 export async function viagensFiltradas(f: { status?: 'andamento' | 'encerrada'; motoristaId?: number; mes?: string }) {
@@ -30,7 +45,14 @@ export async function viagensFiltradas(f: { status?: 'andamento' | 'encerrada'; 
   if (f.status) conds.push(eq(s.viagens.status, f.status))
   if (f.motoristaId) conds.push(eq(s.viagens.motoristaId, f.motoristaId))
   if (f.mes) conds.push(gte(s.viagens.inicio, `${f.mes}-01`), lt(s.viagens.inicio, `${somaMeses(f.mes, 1)}-01`))
-  return comDespesas(await db.select().from(s.viagens).where(conds.length ? and(...conds) : undefined).orderBy(desc(s.viagens.inicio), desc(s.viagens.id)).limit(300))
+  return comDespesas(
+    await db
+      .select()
+      .from(s.viagens)
+      .where(conds.length ? and(...conds) : undefined)
+      .orderBy(desc(s.viagens.inicio), desc(s.viagens.id))
+      .limit(300),
+  )
 }
 
 export async function todasEncerradas() {
@@ -43,7 +65,10 @@ export async function viagem(id: number) {
 }
 
 export async function viagemAtiva(motoristaId: number) {
-  const [v] = await db.select().from(s.viagens).where(and(eq(s.viagens.motoristaId, motoristaId), eq(s.viagens.status, 'andamento')))
+  const [v] = await db
+    .select()
+    .from(s.viagens)
+    .where(and(eq(s.viagens.motoristaId, motoristaId), eq(s.viagens.status, 'andamento')))
   return v ? (await comDespesas([v]))[0] : null
 }
 
@@ -52,8 +77,12 @@ export async function emAndamento() {
 }
 
 export async function pendentes() {
-  return db.select({ d: s.despesas, v: s.viagens }).from(s.despesas).innerJoin(s.viagens, eq(s.despesas.viagemId, s.viagens.id))
-    .where(eq(s.despesas.status, 'pendente')).orderBy(asc(s.despesas.criadoEm))
+  return db
+    .select({ d: s.despesas, v: s.viagens })
+    .from(s.despesas)
+    .innerJoin(s.viagens, eq(s.despesas.viagemId, s.viagens.id))
+    .where(eq(s.despesas.status, 'pendente'))
+    .orderBy(asc(s.despesas.criadoEm))
 }
 
 export const motoristas = () => db.select().from(s.motoristas).orderBy(desc(s.motoristas.ativo), asc(s.motoristas.nome))
@@ -70,23 +99,28 @@ export const acertosDoMes = (mes: string) => db.select().from(s.acertos).where(e
 export async function mesesDisponiveis(atual: string) {
   const r = await db.execute<{ m: string }>(sql`SELECT DISTINCT to_char(inicio, 'YYYY-MM') AS m FROM viagens ORDER BY m DESC LIMIT 24`)
   const ms = new Set<string>([atual, ...Array.from(r as unknown as { m: string }[]).map((x) => x.m)])
-  return [...ms].filter((m) => m <= atual).sort().reverse()
+  return [...ms]
+    .filter((m) => m <= atual)
+    .sort()
+    .reverse()
 }
 
 /** Cidades e cargas já usadas, para sugerir ao motorista e evitar digitação. */
 export async function sugestoes(motoristaId?: number) {
   const base = db.select({ origem: s.viagens.origem, destino: s.viagens.destino, carga: s.viagens.carga, inicio: s.viagens.inicio }).from(s.viagens)
   const vs = await (motoristaId ? base.where(eq(s.viagens.motoristaId, motoristaId)) : base).orderBy(desc(s.viagens.inicio)).limit(200)
-  const conta = (xs: string[]) => [...xs.reduce((m, x) => m.set(x, (m.get(x) ?? 0) + 1), new Map<string, number>())].sort((a, b) => b[1] - a[1]).map((x) => x[0])
+  const conta = (xs: string[]) =>
+    [...xs.reduce((m, x) => m.set(x, (m.get(x) ?? 0) + 1), new Map<string, number>())].sort((a, b) => b[1] - a[1]).map((x) => x[0])
   const rotas: { origem: string; destino: string; carga: string }[] = []
   for (const v of vs) if (!rotas.some((r) => r.origem === v.origem && r.destino === v.destino) && rotas.length < 4) rotas.push(v)
   return { cidades: conta(vs.flatMap((v) => [v.origem, v.destino])).slice(0, 30), cargas: conta(vs.map((v) => v.carga)).slice(0, 12), rotas }
 }
 
-
 /** MDF-e autorizados e ainda não encerrados, com a situação da viagem. */
 export async function mdfeAbertos() {
-  const r = await db.select({ d: s.documentos, st: s.viagens.status }).from(s.documentos)
+  const r = await db
+    .select({ d: s.documentos, st: s.viagens.status })
+    .from(s.documentos)
     .leftJoin(s.viagens, eq(s.documentos.viagemId, s.viagens.id))
     .where(and(eq(s.documentos.tipo, 'mdfe'), eq(s.documentos.situacao, 'autorizado')))
   return r.map(({ d, st }) => ({ id: d.id, numero: d.numero, emitidoEm: dataDe(d.emitidoEm), viagemId: d.viagemId, viagemEncerrada: st === 'encerrada' }))

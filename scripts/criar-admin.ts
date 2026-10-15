@@ -2,7 +2,9 @@
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 // Carrega o .env quando existe (no computador); na Vercel as variáveis já vêm do painel.
-try { process.loadEnvFile() } catch {}
+try {
+  process.loadEnvFile()
+} catch {}
 import bcrypt from 'bcryptjs'
 import * as s from '../src/db/schema'
 
@@ -15,7 +17,9 @@ const client = postgres(process.env.DATABASE_URL ?? 'postgres://fg:fg@localhost:
 const db = drizzle(client, { schema: s })
 await db.insert(s.configuracao).values({ id: 1 }).onConflictDoNothing()
 const senhaHash = await bcrypt.hash(senha, 10)
-await db.insert(s.administradores).values({ usuario: usuario.toLowerCase(), nome, senhaHash })
+await db
+  .insert(s.administradores)
+  .values({ usuario: usuario.toLowerCase(), nome, senhaHash })
   .onConflictDoUpdate({ target: s.administradores.usuario, set: { nome, senhaHash } })
 console.log(`Acesso do escritório pronto: usuário "${usuario.toLowerCase()}".`)
 await client.end()

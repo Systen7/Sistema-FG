@@ -8,7 +8,9 @@ import { iniciarSessao } from '@/lib/auth'
 // Vale por 7 dias e pode ser aberto mais de uma vez (ex.: primeiro no WhatsApp, depois no navegador).
 export async function GET(req: Request, ctx: RouteContext<'/acesso/[token]'>) {
   const { token } = await ctx.params
-  const [l] = await db.select().from(s.linksAcesso)
+  const [l] = await db
+    .select()
+    .from(s.linksAcesso)
     .where(and(eq(s.linksAcesso.tokenHash, hashToken(token)), gt(s.linksAcesso.expiraEm, new Date())))
   const [m] = l ? await db.select().from(s.motoristas).where(eq(s.motoristas.id, l.motoristaId)) : []
   if (!l || !m?.ativo) return NextResponse.redirect(new URL('/entrar?link=expirado', req.url))

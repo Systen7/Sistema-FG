@@ -1,6 +1,4 @@
-import {
-  pgTable, serial, integer, text, date, timestamp, boolean, numeric, uuid, jsonb, customType, uniqueIndex, index, pgEnum,
-} from 'drizzle-orm/pg-core'
+import { pgTable, serial, integer, text, date, timestamp, boolean, numeric, uuid, jsonb, customType, uniqueIndex, index, pgEnum } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
 // Valores em dinheiro ficam em centavos (inteiro) para não ter erro de arredondamento.
@@ -50,30 +48,38 @@ export const motoristas = pgTable('motoristas', {
   criadoEm: timestamp('criado_em', { withTimezone: true }).defaultNow().notNull(),
 })
 
-export const viagens = pgTable('viagens', {
-  id: serial('id').primaryKey(),
-  motoristaId: integer('motorista_id').notNull().references(() => motoristas.id),
-  caminhaoId: integer('caminhao_id').notNull().references(() => caminhoes.id),
-  origem: text('origem').notNull(),
-  destino: text('destino').notNull(),
-  carga: text('carga').notNull(),
-  frete: integer('frete').notNull(),
-  // Percentual gravado no início: mudar a comissão do motorista depois não altera viagens antigas.
-  comissaoPct: decimal('comissao_pct').notNull(),
-  adiantamento: integer('adiantamento').notNull().default(0),
-  inicio: date('inicio').notNull(),
-  fim: date('fim'),
-  kmInicial: integer('km_inicial').notNull(),
-  kmFinal: integer('km_final'),
-  kmVazio: integer('km_vazio').notNull().default(0),
-  status: statusViagem('status').notNull().default('andamento'),
-  criadoEm: timestamp('criado_em', { withTimezone: true }).defaultNow().notNull(),
-}, (t) => [
-  index('viagens_motorista_idx').on(t.motoristaId),
-  index('viagens_inicio_idx').on(t.inicio),
-  // Garante no banco: no máximo uma viagem em andamento por motorista.
-  uniqueIndex('viagem_ativa_por_motorista').on(t.motoristaId).where(sql`status = 'andamento'`),
-])
+export const viagens = pgTable(
+  'viagens',
+  {
+    id: serial('id').primaryKey(),
+    motoristaId: integer('motorista_id')
+      .notNull()
+      .references(() => motoristas.id),
+    caminhaoId: integer('caminhao_id')
+      .notNull()
+      .references(() => caminhoes.id),
+    origem: text('origem').notNull(),
+    destino: text('destino').notNull(),
+    carga: text('carga').notNull(),
+    frete: integer('frete').notNull(),
+    // Percentual gravado no início: mudar a comissão do motorista depois não altera viagens antigas.
+    comissaoPct: decimal('comissao_pct').notNull(),
+    adiantamento: integer('adiantamento').notNull().default(0),
+    inicio: date('inicio').notNull(),
+    fim: date('fim'),
+    kmInicial: integer('km_inicial').notNull(),
+    kmFinal: integer('km_final'),
+    kmVazio: integer('km_vazio').notNull().default(0),
+    status: statusViagem('status').notNull().default('andamento'),
+    criadoEm: timestamp('criado_em', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    index('viagens_motorista_idx').on(t.motoristaId),
+    index('viagens_inicio_idx').on(t.inicio),
+    // Garante no banco: no máximo uma viagem em andamento por motorista.
+    uniqueIndex('viagem_ativa_por_motorista').on(t.motoristaId).where(sql`status = 'andamento'`),
+  ],
+)
 
 export const fotos = pgTable('fotos', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -85,57 +91,69 @@ export const fotos = pgTable('fotos', {
   criadoEm: timestamp('criado_em', { withTimezone: true }).defaultNow().notNull(),
 })
 
-export const despesas = pgTable('despesas', {
-  id: serial('id').primaryKey(),
-  viagemId: integer('viagem_id').notNull().references(() => viagens.id, { onDelete: 'cascade' }),
-  tipo: text('tipo').notNull(),
-  valor: integer('valor').notNull(),
-  litros: decimal('litros'),
-  kmAbastecimento: integer('km_abastecimento'),
-  obs: text('obs'),
-  data: date('data').notNull(),
-  pagoPor: pagoPor('pago_por').notNull().default('empresa'),
-  status: statusDespesa('status').notNull().default('pendente'),
-  motivoRecusa: text('motivo_recusa'),
-  fotoId: uuid('foto_id').references(() => fotos.id, { onDelete: 'set null' }),
-  // Identificador gerado no celular: um lançamento reenviado depois de falta de sinal não duplica.
-  clientId: text('client_id').unique(),
-  criadoEm: timestamp('criado_em', { withTimezone: true }).defaultNow().notNull(),
-}, (t) => [index('despesas_viagem_idx').on(t.viagemId), index('despesas_status_idx').on(t.status)])
+export const despesas = pgTable(
+  'despesas',
+  {
+    id: serial('id').primaryKey(),
+    viagemId: integer('viagem_id')
+      .notNull()
+      .references(() => viagens.id, { onDelete: 'cascade' }),
+    tipo: text('tipo').notNull(),
+    valor: integer('valor').notNull(),
+    litros: decimal('litros'),
+    kmAbastecimento: integer('km_abastecimento'),
+    obs: text('obs'),
+    data: date('data').notNull(),
+    pagoPor: pagoPor('pago_por').notNull().default('empresa'),
+    status: statusDespesa('status').notNull().default('pendente'),
+    motivoRecusa: text('motivo_recusa'),
+    fotoId: uuid('foto_id').references(() => fotos.id, { onDelete: 'set null' }),
+    // Identificador gerado no celular: um lançamento reenviado depois de falta de sinal não duplica.
+    clientId: text('client_id').unique(),
+    criadoEm: timestamp('criado_em', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index('despesas_viagem_idx').on(t.viagemId), index('despesas_status_idx').on(t.status)],
+)
 
 export const tipoDocumento = pgEnum('tipo_documento', ['cte', 'mdfe'])
 export const situacaoDocumento = pgEnum('situacao_documento', ['autorizado', 'encerrado', 'cancelado', 'sem_protocolo'])
 
 // CT-e e MDF-e emitidos no emissor do usuário: o sistema guarda o XML, liga à viagem e controla o encerramento do MDF-e.
-export const documentos = pgTable('documentos', {
-  id: serial('id').primaryKey(),
-  viagemId: integer('viagem_id').references(() => viagens.id, { onDelete: 'set null' }),
-  tipo: tipoDocumento('tipo').notNull(),
-  chave: text('chave').notNull().unique(),
-  numero: integer('numero').notNull(),
-  serie: integer('serie').notNull(),
-  emitidoEm: timestamp('emitido_em', { withTimezone: true }).notNull(),
-  situacao: situacaoDocumento('situacao').notNull(),
-  protocolo: text('protocolo'),
-  emitente: text('emitente'),
-  remetente: text('remetente'),
-  destinatario: text('destinatario'),
-  origem: text('origem'),
-  destino: text('destino'),
-  produto: text('produto'),
-  pesoKg: decimal('peso_kg'),
-  valor: integer('valor'), // CT-e: valor da prestação; MDF-e: valor da carga (centavos)
-  placa: text('placa'),
-  chavesCte: jsonb('chaves_cte').$type<string[]>(),
-  encerradoEm: timestamp('encerrado_em', { withTimezone: true }),
-  xml: text('xml').notNull(),
-  pdfId: uuid('pdf_id').references(() => fotos.id, { onDelete: 'set null' }),
-  criadoEm: timestamp('criado_em', { withTimezone: true }).defaultNow().notNull(),
-}, (t) => [index('documentos_viagem_idx').on(t.viagemId)])
+export const documentos = pgTable(
+  'documentos',
+  {
+    id: serial('id').primaryKey(),
+    viagemId: integer('viagem_id').references(() => viagens.id, { onDelete: 'set null' }),
+    tipo: tipoDocumento('tipo').notNull(),
+    chave: text('chave').notNull().unique(),
+    numero: integer('numero').notNull(),
+    serie: integer('serie').notNull(),
+    emitidoEm: timestamp('emitido_em', { withTimezone: true }).notNull(),
+    situacao: situacaoDocumento('situacao').notNull(),
+    protocolo: text('protocolo'),
+    emitente: text('emitente'),
+    remetente: text('remetente'),
+    destinatario: text('destinatario'),
+    origem: text('origem'),
+    destino: text('destino'),
+    produto: text('produto'),
+    pesoKg: decimal('peso_kg'),
+    valor: integer('valor'), // CT-e: valor da prestação; MDF-e: valor da carga (centavos)
+    placa: text('placa'),
+    chavesCte: jsonb('chaves_cte').$type<string[]>(),
+    encerradoEm: timestamp('encerrado_em', { withTimezone: true }),
+    xml: text('xml').notNull(),
+    pdfId: uuid('pdf_id').references(() => fotos.id, { onDelete: 'set null' }),
+    criadoEm: timestamp('criado_em', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index('documentos_viagem_idx').on(t.viagemId)],
+)
 
 export const manutencoes = pgTable('manutencoes', {
   id: serial('id').primaryKey(),
-  caminhaoId: integer('caminhao_id').notNull().references(() => caminhoes.id),
+  caminhaoId: integer('caminhao_id')
+    .notNull()
+    .references(() => caminhoes.id),
   data: date('data').notNull(),
   tipo: text('tipo').notNull(),
   descricao: text('descricao').notNull(),
@@ -143,18 +161,24 @@ export const manutencoes = pgTable('manutencoes', {
   imprevisto: boolean('imprevisto').notNull().default(false),
 })
 
-export const pneus = pgTable('pneus', {
-  id: serial('id').primaryKey(),
-  caminhaoId: integer('caminhao_id').notNull().references(() => caminhoes.id, { onDelete: 'cascade' }),
-  posicao: integer('posicao').notNull(),
-  eixo: text('eixo').notNull(),
-  lado: text('lado').notNull(),
-  local: text('local').notNull().default(''),
-  sulco: decimal('sulco').notNull(),
-  recapagens: integer('recapagens').notNull().default(0),
-  km: integer('km').notNull().default(0),
-  custo: integer('custo').notNull().default(0),
-}, (t) => [uniqueIndex('pneu_posicao').on(t.caminhaoId, t.posicao)])
+export const pneus = pgTable(
+  'pneus',
+  {
+    id: serial('id').primaryKey(),
+    caminhaoId: integer('caminhao_id')
+      .notNull()
+      .references(() => caminhoes.id, { onDelete: 'cascade' }),
+    posicao: integer('posicao').notNull(),
+    eixo: text('eixo').notNull(),
+    lado: text('lado').notNull(),
+    local: text('local').notNull().default(''),
+    sulco: decimal('sulco').notNull(),
+    recapagens: integer('recapagens').notNull().default(0),
+    km: integer('km').notNull().default(0),
+    custo: integer('custo').notNull().default(0),
+  },
+  (t) => [uniqueIndex('pneu_posicao').on(t.caminhaoId, t.posicao)],
+)
 
 export const apolices = pgTable('apolices', {
   id: serial('id').primaryKey(),
@@ -193,18 +217,26 @@ export const alertasDispensados = pgTable('alertas_dispensados', {
   em: timestamp('em', { withTimezone: true }).defaultNow().notNull(),
 })
 
-export const acertos = pgTable('acertos', {
-  id: serial('id').primaryKey(),
-  motoristaId: integer('motorista_id').notNull().references(() => motoristas.id),
-  mes: text('mes').notNull(), // AAAA-MM
-  valor: integer('valor').notNull(),
-  pagoEm: timestamp('pago_em', { withTimezone: true }).defaultNow().notNull(),
-}, (t) => [uniqueIndex('acerto_mes_motorista').on(t.motoristaId, t.mes)])
+export const acertos = pgTable(
+  'acertos',
+  {
+    id: serial('id').primaryKey(),
+    motoristaId: integer('motorista_id')
+      .notNull()
+      .references(() => motoristas.id),
+    mes: text('mes').notNull(), // AAAA-MM
+    valor: integer('valor').notNull(),
+    pagoEm: timestamp('pago_em', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex('acerto_mes_motorista').on(t.motoristaId, t.mes)],
+)
 
 export const linksAcesso = pgTable('links_acesso', {
   id: serial('id').primaryKey(),
   tokenHash: text('token_hash').notNull().unique(),
-  motoristaId: integer('motorista_id').notNull().references(() => motoristas.id, { onDelete: 'cascade' }),
+  motoristaId: integer('motorista_id')
+    .notNull()
+    .references(() => motoristas.id, { onDelete: 'cascade' }),
   expiraEm: timestamp('expira_em', { withTimezone: true }).notNull(),
   usadoEm: timestamp('usado_em', { withTimezone: true }),
 })
@@ -215,15 +247,19 @@ export const tentativasLogin = pgTable('tentativas_login', {
   bloqueadoAte: timestamp('bloqueado_ate', { withTimezone: true }),
 })
 
-export const auditoria = pgTable('auditoria', {
-  id: serial('id').primaryKey(),
-  em: timestamp('em', { withTimezone: true }).defaultNow().notNull(),
-  autor: text('autor').notNull(),
-  acao: text('acao').notNull(),
-  entidade: text('entidade').notNull(),
-  entidadeId: text('entidade_id'),
-  dados: jsonb('dados'),
-}, (t) => [index('auditoria_em_idx').on(t.em)])
+export const auditoria = pgTable(
+  'auditoria',
+  {
+    id: serial('id').primaryKey(),
+    em: timestamp('em', { withTimezone: true }).defaultNow().notNull(),
+    autor: text('autor').notNull(),
+    acao: text('acao').notNull(),
+    entidade: text('entidade').notNull(),
+    entidadeId: text('entidade_id'),
+    dados: jsonb('dados'),
+  },
+  (t) => [index('auditoria_em_idx').on(t.em)],
+)
 
 export type Motorista = typeof motoristas.$inferSelect
 export type Caminhao = typeof caminhoes.$inferSelect

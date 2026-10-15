@@ -9,8 +9,13 @@ export function enviarComProgresso(url: string, corpo: FormData, aoProgredir?: (
     const x = new XMLHttpRequest()
     x.open(metodo, url)
     x.responseType = 'json'
-    x.upload.onprogress = (e) => { if (e.lengthComputable) aoProgredir?.(Math.min(0.98, e.loaded / e.total)) }
-    x.onload = () => { aoProgredir?.(1); ok({ status: x.status, json: (x.response as Record<string, unknown>) ?? {} }) }
+    x.upload.onprogress = (e) => {
+      if (e.lengthComputable) aoProgredir?.(Math.min(0.98, e.loaded / e.total))
+    }
+    x.onload = () => {
+      aoProgredir?.(1)
+      ok({ status: x.status, json: (x.response as Record<string, unknown>) ?? {} })
+    }
     x.onerror = () => ok({ rede: true })
     x.ontimeout = () => ok({ rede: true })
     x.timeout = 120000

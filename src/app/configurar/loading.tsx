@@ -5,7 +5,10 @@ export default function Carregando() {
   return (
     <main className="login">
       <Pagina rotulo="Abrindo">
-        <div className="brand"><i>FG</i><Esq className="linha" w={140} h={18} /></div>
+        <div className="brand">
+          <i>FG</i>
+          <Esq className="linha" w={140} h={18} />
+        </div>
         <Esq h={52} style={{ borderRadius: 12 }} />
         <section className="panel" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <Esq className="titulo" w="60%" />

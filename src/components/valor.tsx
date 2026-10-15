@@ -9,7 +9,14 @@ export const CampoValor = forwardRef<HTMLInputElement, { centavos: number; onCha
       <label className="valor" htmlFor={id}>
         <span aria-hidden>R$</span>
         <input
-          ref={ref} id={id} aria-label={rotulo} inputMode="numeric" autoComplete="off" placeholder="0,00" value={txt} autoFocus={autoFocus}
+          ref={ref}
+          id={id}
+          aria-label={rotulo}
+          inputMode="numeric"
+          autoComplete="off"
+          placeholder="0,00"
+          value={txt}
+          autoFocus={autoFocus}
           onChange={(e) => {
             const d = e.target.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 9)
             onChange(d ? parseInt(d, 10) : 0)

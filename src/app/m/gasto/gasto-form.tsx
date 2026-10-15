@@ -13,15 +13,42 @@ const TIPOS = ['Diesel', 'Pedágio', 'Alimentação', 'Borracharia', 'Chapa / de
 const PAGA_EMPRESA = ['Diesel', 'Pedágio', 'Arla 32']
 const OBS: Record<string, [string, string]> = {
   Diesel: ['Posto', 'Ex.: Posto Trevão, Rondonópolis'],
-  'Pedágio': ['Praça ou rodovia', 'Ex.: BR-163, km 94'],
+  Pedágio: ['Praça ou rodovia', 'Ex.: BR-163, km 94'],
 }
 
-type Editar = { id: number; tipo: string; valor: number; litros: number | null; km: number | null; obs: string | null; pagoPor: string; data: string; foto: string | null; status: string }
+type Editar = {
+  id: number
+  tipo: string
+  valor: number
+  litros: number | null
+  km: number | null
+  obs: string | null
+  pagoPor: string
+  data: string
+  foto: string | null
+  status: string
+}
 
-export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, inicio, editar }: { motoristaId: number; viagemId: number; rota: string; hoje: string; inicio: string; editar: Editar | null }) {
+export function GastoForm({
+  motoristaId,
+  viagemId,
+  rota,
+  hoje: hojeServidor,
+  inicio,
+  editar,
+}: {
+  motoristaId: number
+  viagemId: number
+  rota: string
+  hoje: string
+  inicio: string
+  editar: Editar | null
+}) {
   // A tela pode ter sido aberta sem sinal a partir de uma cópia guardada; a data vale a do celular agora.
   const [hoje, setHoje] = useState(hojeServidor)
-  useEffect(() => { setHoje(hojeLocal()) }, [])
+  useEffect(() => {
+    setHoje(hojeLocal())
+  }, [])
   const router = useRouter()
   const [tipo, setTipo] = useState<string | null>(editar?.tipo ?? null)
   const [valor, setValor] = useState(editar?.valor ?? 0)
@@ -42,10 +69,16 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
   const valorRef = useRef<HTMLInputElement>(null)
   const camRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => () => { if (fotoUrl?.startsWith('blob:')) URL.revokeObjectURL(fotoUrl) }, [fotoUrl])
+  useEffect(
+    () => () => {
+      if (fotoUrl?.startsWith('blob:')) URL.revokeObjectURL(fotoUrl)
+    },
+    [fotoUrl],
+  )
 
   const escolher = (t: string) => {
-    setTipo(t); setErro('')
+    setTipo(t)
+    setErro('')
     if (!editar) setPago(PAGA_EMPRESA.includes(t) ? 'empresa' : 'motorista')
     setTimeout(() => valorRef.current?.focus(), 60)
   }
@@ -55,14 +88,18 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
   const pegarFoto = async (f: File | undefined) => {
     if (!f) return
     const b = await reduzirFoto(f)
-    setFoto(b); setSemFoto(false)
+    setFoto(b)
+    setSemFoto(false)
     setFotoUrl(URL.createObjectURL(b))
   }
 
   const enviar = async () => {
     setErro('')
     if (!tipo) return setErro('Escolha o tipo do gasto.')
-    if (!valor) { valorRef.current?.focus(); return setErro('Digite o valor.') }
+    if (!valor) {
+      valorRef.current?.focus()
+      return setErro('Digite o valor.')
+    }
     if (tipo === 'Diesel' && !litrosN) return setErro('Digite quantos litros abasteceu.')
     if (tipo === 'Diesel' && precoLitro && (precoLitro < 2 || precoLitro > 15)) {
       if (!confirm(`Deu R$ ${num(precoLitro, 2)} por litro. Os números estão certos?`)) return
@@ -74,8 +111,15 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
     try {
       if (editar) {
         const f = new FormData()
-        f.set('tipo', tipo); f.set('valor', String(valor / 100)); f.set('pagoPor', pago); f.set('obs', obs); f.set('data', data)
-        if (tipo === 'Diesel') { f.set('litros', litros); f.set('kmAbastecimento', km) }
+        f.set('tipo', tipo)
+        f.set('valor', String(valor / 100))
+        f.set('pagoPor', pago)
+        f.set('obs', obs)
+        f.set('data', data)
+        if (tipo === 'Diesel') {
+          f.set('litros', litros)
+          f.set('kmAbastecimento', km)
+        }
         if (foto) f.set('foto', foto, 'comprovante.jpg')
         if (semFoto) f.set('semFoto', '1')
         const r = await enviarComProgresso(`/api/m/despesas/${editar.id}`, f, aoProgredir, 'PATCH')
@@ -86,17 +130,31 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
         router.refresh()
         return
       }
-      const r = await enviarGasto({
-        clientId: novoId(), motoristaId, viagemId, tipo, valor: String(valor / 100), litros: tipo === 'Diesel' ? litros : undefined,
-        kmAbastecimento: tipo === 'Diesel' ? km : undefined, obs, pagoPor: pago, data: outroDia ? data : hojeLocal(), foto, criadoEm: Date.now(),
-      }, aoProgredir)
+      const r = await enviarGasto(
+        {
+          clientId: novoId(),
+          motoristaId,
+          viagemId,
+          tipo,
+          valor: String(valor / 100),
+          litros: tipo === 'Diesel' ? litros : undefined,
+          kmAbastecimento: tipo === 'Diesel' ? km : undefined,
+          obs,
+          pagoPor: pago,
+          data: outroDia ? data : hojeLocal(),
+          foto,
+          criadoEm: Date.now(),
+        },
+        aoProgredir,
+      )
       if (r.estado === 'erro') return setErro(r.erro)
       navigator.vibrate?.(r.estado === 'enviado' ? 40 : [40, 60, 40])
       setFeito(r.estado)
       // Sem sinal, não recarrega a tela: a tentativa falharia e o navegador mostraria a página de erro.
       if (r.estado === 'enviado') router.refresh()
     } finally {
-      setEnviando(false); setProgresso(null)
+      setEnviando(false)
+      setProgresso(null)
     }
   }
 
@@ -113,36 +171,55 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
   }
 
   const recomecar = () => {
-    setTipo(null); setValor(0); setLitros(''); setKm(''); setObs(''); setPago(null); setData(hoje); setOutroDia(false)
-    setFoto(null); setFotoUrl(null); setFeito(null); setErro('')
+    setTipo(null)
+    setValor(0)
+    setLitros('')
+    setKm('')
+    setObs('')
+    setPago(null)
+    setData(hoje)
+    setOutroDia(false)
+    setFoto(null)
+    setFotoUrl(null)
+    setFeito(null)
+    setErro('')
     window.scrollTo({ top: 0 })
   }
 
-  if (feito) return (
-    <div className="ok-grande surge">
-      <div className="circ" style={feito === 'na-fila' ? { background: 'var(--y-soft)', color: 'var(--run-ink)' } : undefined}>
-        {feito === 'enviado' ? <Check className="ico" /> : <CloudOff className="ico" />}
+  if (feito)
+    return (
+      <div className="ok-grande surge">
+        <div className="circ" style={feito === 'na-fila' ? { background: 'var(--y-soft)', color: 'var(--run-ink)' } : undefined}>
+          {feito === 'enviado' ? <Check className="ico" /> : <CloudOff className="ico" />}
+        </div>
+        <h1>{feito === 'enviado' ? 'Gasto enviado' : 'Guardado no celular'}</h1>
+        <p className="muted" style={{ maxWidth: '32ch' }}>
+          {feito === 'enviado'
+            ? `${NOME_TIPO[tipo!]} de R$ ${num(valor / 100, 2)} foi para o escritório aprovar.`
+            : 'Você está sem sinal. O gasto fica guardado e é enviado sozinho quando a internet voltar. Não precisa lançar de novo.'}
+        </p>
+        <div className="stack" style={{ width: '100%', marginTop: 12 }}>
+          <button type="button" className="btn xl pri" onClick={recomecar}>
+            Lançar outro gasto
+          </button>
+          <Link className="btn xl" href="/m">
+            Voltar para a viagem
+          </Link>
+        </div>
       </div>
-      <h1>{feito === 'enviado' ? 'Gasto enviado' : 'Guardado no celular'}</h1>
-      <p className="muted" style={{ maxWidth: '32ch' }}>
-        {feito === 'enviado'
-          ? `${NOME_TIPO[tipo!]} de R$ ${num(valor / 100, 2)} foi para o escritório aprovar.`
-          : 'Você está sem sinal. O gasto fica guardado e é enviado sozinho quando a internet voltar. Não precisa lançar de novo.'}
-      </p>
-      <div className="stack" style={{ width: '100%', marginTop: 12 }}>
-        <button type="button" className="btn xl pri" onClick={recomecar}>Lançar outro gasto</button>
-        <Link className="btn xl" href="/m">Voltar para a viagem</Link>
-      </div>
-    </div>
-  )
+    )
 
   return (
     <>
       <div className="row" style={{ gap: 12, flexWrap: 'nowrap' }}>
-        <Link href="/m" className="btn sm ghost" aria-label="Voltar"><ArrowLeft className="ico" /></Link>
+        <Link href="/m" className="btn sm ghost" aria-label="Voltar">
+          <ArrowLeft className="ico" />
+        </Link>
         <div className="grow">
           <h1 style={{ fontSize: 24 }}>{editar ? 'Corrigir gasto' : 'Lançar gasto'}</h1>
-          <p className="small muted">Viagem {viagemId} · {rota}</p>
+          <p className="small muted">
+            Viagem {viagemId} · {rota}
+          </p>
         </div>
       </div>
 
@@ -152,34 +229,72 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
           <div className="tiles">
             {TIPOS.map((t) => (
               <button key={t} type="button" className="tile" onClick={() => escolher(t)}>
-                <IconeTipo tipo={t} />{NOME_TIPO[t]}
+                <IconeTipo tipo={t} />
+                {NOME_TIPO[t]}
               </button>
             ))}
           </div>
         </section>
       ) : (
-        <form className="stack surge" style={{ gap: 18 }} onSubmit={(e) => { e.preventDefault(); enviar() }} noValidate>
-          <button type="button" className="tile" aria-pressed="true" onClick={() => !editar && setTipo(null)} style={{ minHeight: 0, flexDirection: 'row', alignItems: 'center' }} disabled={!!editar}>
-            <IconeTipo tipo={tipo} /><span className="grow">{NOME_TIPO[tipo]}</span>{!editar && <span className="small muted" style={{ fontWeight: 500 }}>Trocar</span>}
+        <form
+          className="stack surge"
+          style={{ gap: 18 }}
+          onSubmit={(e) => {
+            e.preventDefault()
+            enviar()
+          }}
+          noValidate
+        >
+          <button
+            type="button"
+            className="tile"
+            aria-pressed="true"
+            onClick={() => !editar && setTipo(null)}
+            style={{ minHeight: 0, flexDirection: 'row', alignItems: 'center' }}
+            disabled={!!editar}
+          >
+            <IconeTipo tipo={tipo} />
+            <span className="grow">{NOME_TIPO[tipo]}</span>
+            {!editar && (
+              <span className="small muted" style={{ fontWeight: 500 }}>
+                Trocar
+              </span>
+            )}
           </button>
 
           {tipo === 'Diesel' && (
-            <label className="campo">Quantos litros?
-              <input inputMode="decimal" autoComplete="off" placeholder="Ex.: 550" value={litros} onChange={(e) => setLitros(e.target.value.replace(/[^\d,]/g, ''))} style={{ fontSize: 26, fontWeight: 600 }} />
+            <label className="campo">
+              Quantos litros?
+              <input
+                inputMode="decimal"
+                autoComplete="off"
+                placeholder="Ex.: 550"
+                value={litros}
+                onChange={(e) => setLitros(e.target.value.replace(/[^\d,]/g, ''))}
+                style={{ fontSize: 26, fontWeight: 600 }}
+              />
             </label>
           )}
 
           <div className="campo">
             <span>{tipo === 'Diesel' ? 'Valor total pago' : 'Quanto custou?'}</span>
             <CampoValor ref={valorRef} id="valor" rotulo="Valor em reais" centavos={valor} onChange={setValor} />
-            {precoLitro && <span className="dica">Deu <b>R$ {num(precoLitro, 2)}</b> por litro</span>}
+            {precoLitro && (
+              <span className="dica">
+                Deu <b>R$ {num(precoLitro, 2)}</b> por litro
+              </span>
+            )}
           </div>
 
           <div className="campo">
             <span>Quem pagou?</span>
             <div className="duas" role="group" aria-label="Quem pagou">
-              <button type="button" className="opcao" aria-pressed={pago === 'empresa'} onClick={() => setPago('empresa')}>Empresa<small>cartão, tag ou faturado</small></button>
-              <button type="button" className="opcao" aria-pressed={pago === 'motorista'} onClick={() => setPago('motorista')}>Do meu bolso<small>entra no seu acerto</small></button>
+              <button type="button" className="opcao" aria-pressed={pago === 'empresa'} onClick={() => setPago('empresa')}>
+                Empresa<small>cartão, tag ou faturado</small>
+              </button>
+              <button type="button" className="opcao" aria-pressed={pago === 'motorista'} onClick={() => setPago('motorista')}>
+                Do meu bolso<small>entra no seu acerto</small>
+              </button>
             </div>
           </div>
 
@@ -190,46 +305,98 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
               <div className="foto tem">
                 <img src={fotoUrl} alt="Comprovante" />
                 <span className="grow">Foto anexada</span>
-                <button type="button" className="btn sm" onClick={() => camRef.current?.click()}>Trocar</button>
-                <button type="button" className="btn sm ghost" aria-label="Remover foto" onClick={() => { setFoto(null); setFotoUrl(null); if (editar?.foto) setSemFoto(true) }}><X className="ico" /></button>
+                <button type="button" className="btn sm" onClick={() => camRef.current?.click()}>
+                  Trocar
+                </button>
+                <button
+                  type="button"
+                  className="btn sm ghost"
+                  aria-label="Remover foto"
+                  onClick={() => {
+                    setFoto(null)
+                    setFotoUrl(null)
+                    if (editar?.foto) setSemFoto(true)
+                  }}
+                >
+                  <X className="ico" />
+                </button>
               </div>
             ) : (
-              <button type="button" className="foto" onClick={() => camRef.current?.click()}><Camera className="ico" /><span>Tirar foto do comprovante</span></button>
+              <button type="button" className="foto" onClick={() => camRef.current?.click()}>
+                <Camera className="ico" />
+                <span>Tirar foto do comprovante</span>
+              </button>
             )}
           </div>
 
           {tipo === 'Diesel' && (
-            <label className="campo">Km do caminhão no abastecimento (opcional)
+            <label className="campo">
+              Km do caminhão no abastecimento (opcional)
               <input inputMode="numeric" autoComplete="off" value={km} onChange={(e) => setKm(e.target.value.replace(/\D/g, ''))} />
             </label>
           )}
 
-          <label className="campo">{OBS[tipo]?.[0] ?? 'Observação'} (opcional)
+          <label className="campo">
+            {OBS[tipo]?.[0] ?? 'Observação'} (opcional)
             <input value={obs} maxLength={200} placeholder={OBS[tipo]?.[1] ?? ''} onChange={(e) => setObs(e.target.value)} />
           </label>
 
           {outroDia ? (
-            <label className="campo">Data do gasto
+            <label className="campo">
+              Data do gasto
               <input type="date" value={data} min={inicio} max={hoje} onChange={(e) => setData(e.target.value || hoje)} />
             </label>
           ) : (
-            <p className="row small muted" style={{ gap: 6 }}><CalendarDays className="ico" />{data === hoje ? 'Gasto de hoje' : `Gasto de ${dataLonga(data)}`} ·
-              <button type="button" className="linkbtn" onClick={() => setOutroDia(true)}>foi em outro dia?</button></p>
+            <p className="row small muted" style={{ gap: 6 }}>
+              <CalendarDays className="ico" />
+              {data === hoje ? 'Gasto de hoje' : `Gasto de ${dataLonga(data)}`} ·
+              <button type="button" className="linkbtn" onClick={() => setOutroDia(true)}>
+                foi em outro dia?
+              </button>
+            </p>
           )}
 
-          {erro && <p key={erro} className="aviso bad" role="alert">{erro}</p>}
+          {erro && (
+            <p key={erro} className="aviso bad" role="alert">
+              {erro}
+            </p>
+          )}
 
           <button type="submit" className="btn xl pri" disabled={enviando} aria-busy={enviando}>
             {enviando ? <span className="spin" /> : <Check className="ico" />}
             {progresso != null ? `Enviando foto ${Math.round(progresso * 100)}%` : enviando ? 'Enviando…' : editar ? 'Salvar correção' : 'Enviar gasto'}
-            {progresso != null && <span className="progresso" role="progressbar" aria-label="Envio da foto" aria-valuenow={Math.round(progresso * 100)} aria-valuemin={0} aria-valuemax={100}><i style={{ transform: `scaleX(${progresso})` }} /></span>}
+            {progresso != null && (
+              <span
+                className="progresso"
+                role="progressbar"
+                aria-label="Envio da foto"
+                aria-valuenow={Math.round(progresso * 100)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <i style={{ transform: `scaleX(${progresso})` }} />
+              </span>
+            )}
           </button>
 
-          {editar && editar.status !== 'aprovada' && (
-            apagar
-              ? <div className="duas"><button type="button" className="btn lg" onClick={() => setApagar(false)}>Cancelar</button><button type="button" className="btn lg del solid" onClick={excluir} disabled={enviando} aria-busy={enviando}>{enviando && <span className="spin" />}{enviando ? 'Apagando…' : 'Apagar mesmo'}</button></div>
-              : <button type="button" className="btn lg del ghost" onClick={() => setApagar(true)}><Trash2 className="ico" />Apagar este gasto</button>
-          )}
+          {editar &&
+            editar.status !== 'aprovada' &&
+            (apagar ? (
+              <div className="duas">
+                <button type="button" className="btn lg" onClick={() => setApagar(false)}>
+                  Cancelar
+                </button>
+                <button type="button" className="btn lg del solid" onClick={excluir} disabled={enviando} aria-busy={enviando}>
+                  {enviando && <span className="spin" />}
+                  {enviando ? 'Apagando…' : 'Apagar mesmo'}
+                </button>
+              </div>
+            ) : (
+              <button type="button" className="btn lg del ghost" onClick={() => setApagar(true)}>
+                <Trash2 className="ico" />
+                Apagar este gasto
+              </button>
+            ))}
         </form>
       )}
     </>

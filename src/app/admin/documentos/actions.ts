@@ -9,7 +9,10 @@ import { apagarArquivos } from '@/lib/armazenamento'
 import { registrar } from '@/lib/audit'
 
 const comMsg = (url: string, msg: string) => `${url + (url.includes('?') ? '&' : '?')}ok=${encodeURIComponent(msg)}`
-const atualizar = () => { revalidatePath('/admin', 'layout'); revalidatePath('/m', 'layout') }
+const atualizar = () => {
+  revalidatePath('/admin', 'layout')
+  revalidatePath('/m', 'layout')
+}
 
 // A importação de XML/PDF fica em /api/admin/documentos (rota com progresso de envio).
 
@@ -41,7 +44,10 @@ export async function reabrirDoc(id: number, voltar: string) {
 export async function excluirDoc(id: number, voltar: string) {
   const a = await exigirAdmin()
   const [d] = await db.delete(s.documentos).where(eq(s.documentos.id, id)).returning()
-  if (d) { await apagarArquivos([d.pdfId]); await registrar(`admin:${a.id}`, 'excluiu', 'documento', id, { chave: d.chave }) }
+  if (d) {
+    await apagarArquivos([d.pdfId])
+    await registrar(`admin:${a.id}`, 'excluiu', 'documento', id, { chave: d.chave })
+  }
   atualizar()
   redirect(comMsg(voltar, 'Documento excluído do sistema'))
 }

@@ -13,13 +13,18 @@ export default async function LayoutMotorista({ children }: { children: React.Re
   return (
     <div className="m">
       <header className="m-top">
-        <span className="brand"><i>FG</i>{cfg.nomeEmpresa}</span>
+        <span className="brand">
+          <i>FG</i>
+          {cfg.nomeEmpresa}
+        </span>
         <span className="sp" />
         <Rede motoristaId={m.id} />
       </header>
       <main className="m-body">{children}</main>
       <Abas />
-      <Suspense><Toast /></Suspense>
+      <Suspense>
+        <Toast />
+      </Suspense>
       <RegistrarSW />
     </div>
   )
