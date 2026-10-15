@@ -35,7 +35,7 @@ export default async function Alertas(props: PageProps<'/admin/alertas'>) {
             <div className="list">
               {ativos.map((a) => (
                 <div key={a.chave}>
-                  <span>{a.texto}<br /><span className={'chip ' + (a.urgente ? 'bad' : 'warn')}>{a.detalhe}</span></span>
+                  <span>{a.texto}<br /><span className={`chip ${a.urgente ? 'bad' : 'warn'}`}>{a.detalhe}</span></span>
                   <span className="row">
                     <Link href={a.link} className="btn sm">Resolver</Link>
                     <form action={dispensarAlerta.bind(null, a.chave, '/admin/alertas')}><Enviar className="btn sm ghost">Dispensar</Enviar></form>

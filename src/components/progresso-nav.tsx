@@ -41,8 +41,10 @@ export function ProgressoNav() {
   }
 
   // Fim: o endereço mudou.
-  useEffect(() => { terminar() }, [path, sp]) // eslint-disable-line react-hooks/exhaustive-deps
+  // biome-ignore lint/correctness/useExhaustiveDependencies: roda de propósito a cada troca de endereço (path, sp)
+  useEffect(() => { terminar() }, [path, sp])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: ouvintes registrados uma vez; as funções só usam refs e setters estáveis
   useEffect(() => {
     const clique = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -69,7 +71,7 @@ export function ProgressoNav() {
       window.removeEventListener('popstate', aviso)
       parar()
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   return <div className="barra-nav" data-estado={estado} style={{ transform: `scaleX(${valor})` }} role="progressbar" aria-hidden={estado === 'parado'} aria-label="Carregando a página" />
 }

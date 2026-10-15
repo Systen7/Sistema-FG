@@ -32,7 +32,7 @@ export async function PATCH(req: Request, ctx: RouteContext<'/api/m/despesas/[id
     status: 'pendente', motivoRecusa: null, ...(foto ? { fotoId: foto } : {}), ...(f.get('semFoto') === '1' ? { fotoId: null } : {}),
   }).where(eq(s.despesas.id, r.d.id))
   if (trocouFoto) await apagarArquivos([r.d.fotoId])
-  await registrar('motorista:' + m.id, 'editou', 'despesa', r.d.id, { antes: { valor: r.d.valor, tipo: r.d.tipo }, depois: { valor: e.valor, tipo: e.tipo } })
+  await registrar(`motorista:${m.id}`, 'editou', 'despesa', r.d.id, { antes: { valor: r.d.valor, tipo: r.d.tipo }, depois: { valor: e.valor, tipo: e.tipo } })
   return NextResponse.json({ ok: true })
 }
 
@@ -44,6 +44,6 @@ export async function DELETE(_req: Request, ctx: RouteContext<'/api/m/despesas/[
   if (r.d.status === 'aprovada') return NextResponse.json({ erro: 'Este gasto já foi aprovado. Para apagar, fale com o escritório.' }, { status: 409 })
   await db.delete(s.despesas).where(eq(s.despesas.id, r.d.id))
   await apagarArquivos([r.d.fotoId])
-  await registrar('motorista:' + m.id, 'excluiu', 'despesa', r.d.id, { tipo: r.d.tipo, valor: r.d.valor })
+  await registrar(`motorista:${m.id}`, 'excluiu', 'despesa', r.d.id, { tipo: r.d.tipo, valor: r.d.valor })
   return NextResponse.json({ ok: true })
 }

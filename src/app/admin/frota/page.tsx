@@ -16,7 +16,7 @@ export default async function Frota(props: PageProps<'/admin/frota'>) {
   const H = hoje(), atual = mesAtual()
   const mes = mesValido(sp.mes) && sp.mes <= atual ? sp.mes : atual
   const [cfg, cs, mn, vs, meses, ms] = await Promise.all([config(), caminhoes(), manutencoes(), viagensDoMes(mes), mesesDisponiveis(atual), motoristas()])
-  const aqui = '/admin/frota' + (sp.mes ? `?mes=${mes}` : '')
+  const aqui = `/admin/frota${sp.mes ? `?mes=${mes}` : ''}`
   const sep = aqui.includes('?') ? '&' : '?'
   const ed = sp.editar ? (sp.editar === 'novo' ? 'novo' : cs.find((c) => c.id === Number(sp.editar))) : null
   const em = sp.manut ? (sp.manut === 'nova' ? 'nova' : mn.find((m) => m.id === Number(sp.manut))) : null
@@ -45,7 +45,7 @@ export default async function Frota(props: PageProps<'/admin/frota'>) {
                   <td>{c.descricao}{c.ano ? ` · ${c.ano}` : ''}{!c.ativo && <span className="chip"> parado</span>}</td>
                   <td>{ms.find((m) => m.caminhaoId === c.id)?.nome ?? <span className="muted">—</span>}</td>
                   <td className="r">{num(c.km)}</td>
-                  <td className="r">{falta == null ? '—' : falta <= cfg.kmAvisoRevisao ? <span className={'chip ' + (falta <= cfg.kmAvisoRevisao / 2.5 ? 'bad' : 'warn')}>{falta < 0 ? `passou ${num(-falta)} km` : `faltam ${num(falta)} km`}</span> : `em ${num(falta)} km`}</td>
+                  <td className="r">{falta == null ? '—' : falta <= cfg.kmAvisoRevisao ? <span className={`chip ${falta <= cfg.kmAvisoRevisao / 2.5 ? 'bad' : 'warn'}`}>{falta < 0 ? `passou ${num(-falta)} km` : `faltam ${num(falta)} km`}</span> : `em ${num(falta)} km`}</td>
                   <td><Vence d={c.tacografoAte} hoje={H} aviso={cfg.diasAviso} urgente={cfg.diasUrgente} /></td>
                   <td><Vence d={c.licenciamentoAte} hoje={H} aviso={cfg.diasAviso} urgente={cfg.diasUrgente} /></td>
                   <td className="r">{md ? num(md, 2) : '—'} {md && md < c.metaConsumo ? <span className="chip warn">meta {num(c.metaConsumo, 1)}</span> : null}</td>

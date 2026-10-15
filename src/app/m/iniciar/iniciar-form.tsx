@@ -75,7 +75,7 @@ export function IniciarForm({ hoje, km, placa, comissao, rotas, cidades, cargas 
           <input name="carga" value={carga} onChange={(e) => setCarga(e.target.value)} placeholder="Ex.: Soja 37 t" autoComplete="off" aria-invalid={inv('carga')} />
         </label>
         {cargas.length > 0 && (
-          <div className="sug" aria-label="Cargas usadas antes">
+          <div className="sug" role="group" aria-label="Cargas usadas antes">
             {cargas.map((c) => <button key={c} type="button" onClick={() => setCarga(c)}>{c}</button>)}
           </div>
         )}
@@ -100,12 +100,12 @@ export function IniciarForm({ hoje, km, placa, comissao, rotas, cidades, cargas 
             <input type="date" value={inicio} max={hoje} onChange={(e) => setInicio(e.target.value || hoje)} />
           </label>
         ) : (
-          <p className="row small muted" style={{ gap: 6 }}><CalendarDays className="ico" />{inicio === hoje ? 'Saindo hoje' : 'Saída em ' + dataLonga(inicio)} ·
+          <p className="row small muted" style={{ gap: 6 }}><CalendarDays className="ico" />{inicio === hoje ? 'Saindo hoje' : `Saída em ${dataLonga(inicio)}`} ·
             <button type="button" className="linkbtn" onClick={() => setOutroDia(true)}>saiu em outro dia?</button></p>
         )}
 
         {erro && <p key={erro.t} className="aviso bad" role="alert">{erro.t}</p>}
-        <button className="btn xl pri" disabled={pend} aria-busy={pend}>{pend ? <span className="spin" /> : <Play className="ico" />}{pend ? 'Iniciando…' : 'Iniciar viagem'}</button>
+        <button type="submit" className="btn xl pri" disabled={pend} aria-busy={pend}>{pend ? <span className="spin" /> : <Play className="ico" />}{pend ? 'Iniciando…' : 'Iniciar viagem'}</button>
       </form>
     </>
   )

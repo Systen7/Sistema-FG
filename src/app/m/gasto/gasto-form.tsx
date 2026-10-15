@@ -82,7 +82,7 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
         if (r.rede) return setErro('Sem sinal agora. A correção precisa de internet; tente de novo daqui a pouco.')
         if (r.status >= 300) return setErro(typeof r.json.erro === 'string' ? r.json.erro : 'Não foi possível salvar.')
         navigator.vibrate?.(40)
-        router.push('/m?ok=' + encodeURIComponent('Correção enviada para aprovação'))
+        router.push(`/m?ok=${encodeURIComponent('Correção enviada para aprovação')}`)
         router.refresh()
         return
       }
@@ -108,7 +108,7 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
     if (!r) return setErro('Sem sinal agora. Tente de novo daqui a pouco.')
     const j = await r.json().catch(() => ({}))
     if (!r.ok) return setErro(j.erro ?? 'Não foi possível apagar.')
-    router.push('/m?ok=' + encodeURIComponent('Gasto apagado'))
+    router.push(`/m?ok=${encodeURIComponent('Gasto apagado')}`)
     router.refresh()
   }
 
@@ -130,7 +130,7 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
           : 'Você está sem sinal. O gasto fica guardado e é enviado sozinho quando a internet voltar. Não precisa lançar de novo.'}
       </p>
       <div className="stack" style={{ width: '100%', marginTop: 12 }}>
-        <button className="btn xl pri" onClick={recomecar}>Lançar outro gasto</button>
+        <button type="button" className="btn xl pri" onClick={recomecar}>Lançar outro gasto</button>
         <Link className="btn xl" href="/m">Voltar para a viagem</Link>
       </div>
     </div>
@@ -188,7 +188,6 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
             <input ref={camRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => pegarFoto(e.target.files?.[0])} />
             {fotoUrl && !semFoto ? (
               <div className="foto tem">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={fotoUrl} alt="Comprovante" />
                 <span className="grow">Foto anexada</span>
                 <button type="button" className="btn sm" onClick={() => camRef.current?.click()}>Trocar</button>
@@ -214,13 +213,13 @@ export function GastoForm({ motoristaId, viagemId, rota, hoje: hojeServidor, ini
               <input type="date" value={data} min={inicio} max={hoje} onChange={(e) => setData(e.target.value || hoje)} />
             </label>
           ) : (
-            <p className="row small muted" style={{ gap: 6 }}><CalendarDays className="ico" />{data === hoje ? 'Gasto de hoje' : 'Gasto de ' + dataLonga(data)} ·
+            <p className="row small muted" style={{ gap: 6 }}><CalendarDays className="ico" />{data === hoje ? 'Gasto de hoje' : `Gasto de ${dataLonga(data)}`} ·
               <button type="button" className="linkbtn" onClick={() => setOutroDia(true)}>foi em outro dia?</button></p>
           )}
 
           {erro && <p key={erro} className="aviso bad" role="alert">{erro}</p>}
 
-          <button className="btn xl pri" disabled={enviando} aria-busy={enviando}>
+          <button type="submit" className="btn xl pri" disabled={enviando} aria-busy={enviando}>
             {enviando ? <span className="spin" /> : <Check className="ico" />}
             {progresso != null ? `Enviando foto ${Math.round(progresso * 100)}%` : enviando ? 'Enviando…' : editar ? 'Salvar correção' : 'Enviar gasto'}
             {progresso != null && <span className="progresso" role="progressbar" aria-label="Envio da foto" aria-valuenow={Math.round(progresso * 100)} aria-valuemin={0} aria-valuemax={100}><i style={{ transform: `scaleX(${progresso})` }} /></span>}

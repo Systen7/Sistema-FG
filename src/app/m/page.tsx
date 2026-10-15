@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { eq, and, desc } from 'drizzle-orm'
+import { eq, } from 'drizzle-orm'
 import { Plus, Flag, Play, Fuel, ChevronRight, IdCard, MessageCircle } from 'lucide-react'
 import { db, schema as s } from '@/db'
 import { exigirMotorista } from '@/lib/auth'
@@ -30,7 +30,7 @@ export default async function Viagem() {
       </div>
 
       {docs.map((d) => (
-        <div key={d.n} className={'aviso ' + (d.x <= 7 ? 'bad' : 'warn')}>
+        <div key={d.n} className={`aviso ${d.x <= 7 ? 'bad' : 'warn'}`}>
           <IdCard className="ico" />
           <span>{d.n} {d.x < 0 ? `venceu em ${dataLonga(d.d)}` : d.x === 0 ? 'vence hoje' : `vence em ${d.x} dias (${dataLonga(d.d)})`}. Renove e avise o escritório.</span>
         </div>

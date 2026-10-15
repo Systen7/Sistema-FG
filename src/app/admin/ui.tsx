@@ -24,7 +24,7 @@ export function Periodo({ meses, mes, base, extra = '' }: { meses: string[]; mes
           {meses.map((m) => <option key={m} value={m}>{nomeMes(m)}</option>)}
         </select>
       </label>
-      <noscript><button className="btn sm">Ver</button></noscript>
+      <noscript><button type="submit" className="btn sm">Ver</button></noscript>
     </form>
   )
 }
@@ -38,11 +38,11 @@ export const Valor = ({ v }: { v: number }) => <span className={v < 0 ? 'neg' : 
 export function Vence({ d, hoje, aviso, urgente }: { d: string | null; hoje: string; aviso: number; urgente: number }) {
   if (!d) return <span className="muted">—</span>
   const n = dias(hoje, d)
-  return <span className={'chip ' + (n <= urgente ? 'bad' : n <= aviso ? 'warn' : 'ok')}>{dataLonga(d)}</span>
+  return <span className={`chip ${n <= urgente ? 'bad' : n <= aviso ? 'warn' : 'ok'}`}>{dataLonga(d)}</span>
 }
 
 export function BotaoLink({ href, children, pri }: { href: string; children: React.ReactNode; pri?: boolean }) {
-  return <Link href={href} scroll={false} className={'btn ' + (pri ? 'pri' : '')}>{children}</Link>
+  return <Link href={href} scroll={false} className={`btn ${pri ? 'pri' : ''}`}>{children}</Link>
 }
 
 export function Vazio({ children }: { children: React.ReactNode }) {

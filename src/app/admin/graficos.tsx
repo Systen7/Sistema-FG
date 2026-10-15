@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-const fmt = (c: number) => (c < 0 ? '−' : '') + 'R$ ' + Math.abs(Math.round(c / 100)).toLocaleString('pt-BR')
+const fmt = (c: number) => `${c < 0 ? '−' : ''}R$ ${Math.abs(Math.round(c / 100)).toLocaleString('pt-BR')}`
 const fmt2 = (v: number) => v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 /** Barra 100%: para onde vai cada R$ 100 de frete. Toque numa faixa ou na legenda para ler o valor. */
@@ -13,7 +13,7 @@ export function Distribuicao({ fatias }: { fatias: { nome: string; valor: number
   return (
     <>
       <span className="lbl">Para onde vai cada R$ 100 de frete · toque numa faixa</span>
-      <div className={'stackbar' + (s ? ' has' : '')} role="group" aria-label="Distribuição do faturamento">
+      <div className={`stackbar${s ? ' has' : ''}`} role="group" aria-label="Distribuição do faturamento">
         {fatias.map((f, i) => f.valor > 0 && (
           <button key={f.nome} type="button" style={{ flex: f.valor / tot, background: f.cor }} aria-pressed={sel === i}
             aria-label={`${f.nome}: ${fmt(f.valor)}`} title={f.nome} onClick={() => setSel(sel === i ? null : i)} />
@@ -68,6 +68,7 @@ export function Tendencia({ meses }: { meses: Mes[] }) {
         {meses.map((d, i) => {
           const cx = padL + col * i + col / 2
           return (
+            // biome-ignore lint/a11y/noStaticElementInteractions: destaque visual do mês; os mesmos números estão na tabela da página
             <g key={d.mes} onMouseEnter={() => setHover(i)} onClick={() => setHover(hover === i ? null : i)} style={{ cursor: 'pointer' }}>
               <rect x={padL + col * i} y={padT} width={col} height={H - padT - padB} fill={hover === i ? 'rgba(126,166,255,.06)' : 'transparent'} />
               <Barra x={cx - bw - 1} w={bw} y0={y(0)} y1={y(d.frete)} cor="var(--k1)" opac={d.parcial ? 0.6 : 1} />
@@ -83,7 +84,7 @@ export function Tendencia({ meses }: { meses: Mes[] }) {
           <b>{m.rotulo}{m.parcial ? ' (parcial)' : ''}</b>
           <div className="row between"><span className="muted">Faturamento</span><span className="tnum">{fmt(m.frete)}</span></div>
           <div className="row between"><span className="muted">Lucro líquido</span><span className="tnum" style={{ color: m.lucro < 0 ? 'var(--bad)' : 'var(--good)' }}>{fmt(m.lucro)}</span></div>
-          <div className="row between"><span className="muted">Margem</span><span className="tnum">{m.frete ? ((m.lucro / m.frete) * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%' : '—'}</span></div>
+          <div className="row between"><span className="muted">Margem</span><span className="tnum">{m.frete ? `${((m.lucro / m.frete) * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}%` : '—'}</span></div>
         </div>
       )}
     </div>
@@ -104,12 +105,12 @@ function Barra({ x, w, y0, y1, cor, opac }: { x: number; w: number; y0: number; 
 
 function escala(amplitude: number) {
   const bruto = amplitude / 4
-  const p = Math.pow(10, Math.floor(Math.log10(bruto)))
+  const p = 10 ** Math.floor(Math.log10(bruto))
   const n = bruto / p
   return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p
 }
 function abrev(c: number) {
   const v = c / 100
-  if (Math.abs(v) >= 1000) return (v < 0 ? '−' : '') + 'R$ ' + Math.abs(v / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) + ' mil'
-  return 'R$ ' + v.toLocaleString('pt-BR', { maximumFractionDigits: 0 })
+  if (Math.abs(v) >= 1000) return `${v < 0 ? '−' : ''}R$ ${Math.abs(v / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 0 })} mil`
+  return `R$ ${v.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`
 }

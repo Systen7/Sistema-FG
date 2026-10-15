@@ -11,7 +11,7 @@ export function Situacao({ d }: { d: Documento }) {
   if (d.situacao === 'cancelado') return <span className="chip bad">Cancelado</span>
   if (d.situacao === 'sem_protocolo') return <span className="chip warn">Sem protocolo</span>
   if (d.tipo === 'mdfe') return d.situacao === 'encerrado'
-    ? <span className="chip ok">Encerrado{d.encerradoEm ? ' ' + dataCurta(dataDe(d.encerradoEm)) : ''}</span>
+    ? <span className="chip ok">Encerrado{d.encerradoEm ? ` ${dataCurta(dataDe(d.encerradoEm))}` : ''}</span>
     : <span className="chip run">Aberto</span>
   return <span className="chip ok">Autorizado</span>
 }
@@ -32,7 +32,7 @@ export function TabelaDocumentos({ docs, viagens, voltar, mostrarViagem = true }
             <tr key={d.id}>
               <td>
                 <span className="row" style={{ gap: 6, flexWrap: 'nowrap' }}>
-                  <span className={'chip ' + (d.tipo === 'mdfe' ? 'run' : '')}>{d.tipo === 'cte' ? 'CT-e' : 'MDF-e'}</span><b>nº {d.numero}</b><Situacao d={d} />
+                  <span className={`chip ${d.tipo === 'mdfe' ? 'run' : ''}`}>{d.tipo === 'cte' ? 'CT-e' : 'MDF-e'}</span><b>nº {d.numero}</b><Situacao d={d} />
                 </span>
                 <span className="small muted tnum" title="Chave de acesso" style={{ fontFamily: 'var(--mono)', fontSize: 10.5, display: 'block', marginTop: 4, whiteSpace: 'normal', maxWidth: 250 }}>{formatarChave(d.chave)}</span>
               </td>

@@ -45,7 +45,7 @@ export default async function Painel(props: PageProps<'/admin'>) {
         <div className="row between" style={{ alignItems: 'flex-end', gap: '18px 32px' }}>
           <div>
             <span className="lbl">Lucro líquido · {nomeMes(mes)}</span>
-            <b className={'big' + (g.lucro < 0 ? ' negv' : '')}>{reais(g.lucro)}</b>
+            <b className={`big${g.lucro < 0 ? ' negv' : ''}`}>{reais(g.lucro)}</b>
             <span>{g.frete ? num((g.lucro / g.frete) * 100, 1) : 0}% de {reais(g.frete)} faturados em {g.n} {g.n === 1 ? 'viagem' : 'viagens'}</span>
           </div>
           <div className="minis" style={{ flex: '1 1 380px', maxWidth: 580 }}>

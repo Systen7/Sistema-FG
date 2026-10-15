@@ -32,7 +32,7 @@ export function Rede({ motoristaId }: { motoristaId: number }) {
     const sync = async () => {
       const { enviados: n, recusados } = await sincronizar(motoristaId)
       if (n) toast(n === 1 ? '1 gasto guardado foi enviado' : `${n} gastos guardados foram enviados`)
-      if (recusados.length) toast('Não foi possível enviar: ' + recusados.join(' · ') + '. Fale com o escritório.', 'bad')
+      if (recusados.length) toast(`Não foi possível enviar: ${recusados.join(' · ')}. Fale com o escritório.`, 'bad')
       if ((n || recusados.length) && navigator.onLine) router.refresh()
     }
     const on = () => { setOnline(true); sync() }

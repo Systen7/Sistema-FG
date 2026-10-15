@@ -10,7 +10,7 @@ import { lerNumero, lerReais } from '@/lib/format'
 import { registrar } from '@/lib/audit'
 
 export type Resp = { erro?: string; campo?: string } | undefined
-const okUrl = (t: string) => '/m?ok=' + encodeURIComponent(t)
+const okUrl = (t: string) => `/m?ok=${encodeURIComponent(t)}`
 
 export async function iniciarViagem(f: FormData): Promise<Resp> {
   const m = await exigirMotorista()
@@ -35,7 +35,7 @@ export async function iniciarViagem(f: FormData): Promise<Resp> {
       motoristaId: m.id, caminhaoId: cam.id, origem, destino, carga, frete, comissaoPct: m.comissaoPct, inicio, kmInicial: Math.round(km), status: 'andamento',
     }).returning()
     await db.update(s.caminhoes).set({ km: Math.round(km) }).where(eq(s.caminhoes.id, cam.id))
-    await registrar('motorista:' + m.id, 'iniciou', 'viagem', v.id, { origem, destino, frete })
+    await registrar(`motorista:${m.id}`, 'iniciou', 'viagem', v.id, { origem, destino, frete })
   } catch (e) {
     if (String(e).includes('viagem_ativa_por_motorista')) return { erro: 'Você já tem uma viagem em andamento.' }
     throw e
@@ -58,9 +58,9 @@ export async function encerrarViagem(f: FormData): Promise<Resp> {
   await db.update(s.viagens).set({ kmFinal: Math.round(kmFinal), kmVazio: Math.round(vazio), fim, status: 'encerrada' })
     .where(and(eq(s.viagens.id, v.id), eq(s.viagens.status, 'andamento')))
   await db.update(s.caminhoes).set({ km: Math.round(kmFinal) }).where(eq(s.caminhoes.id, v.caminhaoId))
-  await registrar('motorista:' + m.id, 'encerrou', 'viagem', v.id, { kmFinal, vazio, fim })
+  await registrar(`motorista:${m.id}`, 'encerrou', 'viagem', v.id, { kmFinal, vazio, fim })
   revalidatePath('/m')
-  redirect('/m/extrato?ok=' + encodeURIComponent('Viagem encerrada. Confira seu extrato.'))
+  redirect(`/m/extrato?ok=${encodeURIComponent('Viagem encerrada. Confira seu extrato.')}`)
 }
 
 export async function trocarPin(f: FormData): Promise<Resp> {
@@ -71,6 +71,6 @@ export async function trocarPin(f: FormData): Promise<Resp> {
   if (/^(\d)\1{3}$/.test(novo) || ['1234', '4321', '0123'].includes(novo)) return { erro: 'Escolha um PIN menos óbvio.', campo: 'novo' }
   if (novo !== conf) return { erro: 'A confirmação não bate com o novo PIN.', campo: 'confirma' }
   await db.update(s.motoristas).set({ pinHash: await hash(novo) }).where(eq(s.motoristas.id, m.id))
-  await registrar('motorista:' + m.id, 'trocou o PIN', 'motorista', m.id)
-  redirect('/m/conta?ok=' + encodeURIComponent('PIN alterado'))
+  await registrar(`motorista:${m.id}`, 'trocou o PIN', 'motorista', m.id)
+  redirect(`/m/conta?ok=${encodeURIComponent('PIN alterado')}`)
 }

@@ -23,7 +23,7 @@ export default async function Viagens(props: PageProps<'/admin/viagens'>) {
   const [cfg, ms, cs, meses] = await Promise.all([config(), motoristas(), caminhoes(), mesesDisponiveis(mesAtual())])
   const vs = await viagensFiltradas({ status, motoristaId, mes })
   const q = new URLSearchParams(Object.entries({ status, motorista: motoristaId, mes }).filter(([, v]) => v).map(([k, v]) => [k, String(v)]))
-  const aqui = '/admin/viagens' + (q.size ? '?' + q : '')
+  const aqui = `/admin/viagens${q.size ? `?${q}` : ''}`
   const tot = vs.reduce((a, v) => { const c = calcViagem(v, cfg.retornoPct); a.frete += v.frete; a.desp += c.total; a.com += c.comissao; if (v.status === 'encerrada') a.lucro += c.lucro; return a }, { frete: 0, desp: 0, com: 0, lucro: 0 })
   const optM: [string, string][] = ms.map((m) => [String(m.id), m.nome]), optC: [string, string][] = cs.map((c) => [String(c.id), c.placa])
   const docs = await documentosDasViagens(vs.map((v) => v.id))
@@ -48,7 +48,7 @@ export default async function Viagens(props: PageProps<'/admin/viagens'>) {
   return (
     <>
       <Cabecalho titulo="Viagens" texto="Todas as viagens de todos os motoristas. Clique numa viagem para ver as despesas, as fotos e corrigir o que precisar.">
-        <a className="btn" href={`/api/admin/exportar?tipo=viagens${mes ? '&mes=' + mes : ''}`}><Download className="ico" />Planilha</a>
+        <a className="btn" href={`/api/admin/exportar?tipo=viagens${mes ? `&mes=${mes}` : ''}`}><Download className="ico" />Planilha</a>
         <Link href={`${aqui}${q.size ? '&' : '?'}novo=1`} scroll={false} className="btn pri"><Plus className="ico" />Nova viagem</Link>
       </Cabecalho>
 
@@ -114,7 +114,7 @@ function Fiscais({ docs, encerrada }: { docs: { tipo: string; numero: number; si
   return (
     <span className="small">
       {ctes.length ? `CT-e ${ctes.map((d) => d.numero).join(', ')}` : <span className="chip warn">sem CT-e</span>}
-      {mdfes.length > 0 && <><br />MDF-e {mdfes.map((d) => d.numero).join(', ')} {aberto && <span className={'chip ' + (encerrada ? 'bad' : 'run')}>{encerrada ? 'aberto!' : 'aberto'}</span>}</>}
+      {mdfes.length > 0 && <><br />MDF-e {mdfes.map((d) => d.numero).join(', ')} {aberto && <span className={`chip ${encerrada ? 'bad' : 'run'}`}>{encerrada ? 'aberto!' : 'aberto'}</span>}</>}
     </span>
   )
 }

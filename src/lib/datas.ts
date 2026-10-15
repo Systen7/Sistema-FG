@@ -7,10 +7,10 @@ export function hoje(): string {
 export const mesAtual = () => hoje().slice(0, 7)
 
 export function dias(de: string, ate: string): number {
-  return Math.round((Date.parse(ate + 'T12:00:00Z') - Date.parse(de + 'T12:00:00Z')) / 864e5)
+  return Math.round((Date.parse(`${ate}T12:00:00Z`) - Date.parse(`${de}T12:00:00Z`)) / 864e5)
 }
 export function somaDias(d: string, n: number): string {
-  const x = new Date(d + 'T12:00:00Z')
+  const x = new Date(`${d}T12:00:00Z`)
   x.setUTCDate(x.getUTCDate() + n)
   return x.toISOString().slice(0, 10)
 }
@@ -27,7 +27,7 @@ const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julh
 export function nomeMes(mes: string, curto = false): string {
   const [a, m] = mes.split('-').map(Number)
   const n = MESES[m - 1]
-  return (curto ? n.slice(0, 3) : n[0].toUpperCase() + n.slice(1)) + (curto ? '/' + String(a).slice(2) : ' de ' + a)
+  return (curto ? n.slice(0, 3) : n[0].toUpperCase() + n.slice(1)) + (curto ? `/${String(a).slice(2)}` : ` de ${a}`)
 }
 export function mesValido(m: unknown): m is string {
   return typeof m === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(m)

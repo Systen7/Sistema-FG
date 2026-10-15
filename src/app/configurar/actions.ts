@@ -23,5 +23,5 @@ export async function criarPrimeiroAdmin(_: { erro?: string } | undefined, f: Fo
   if (!linhas.length) redirect('/entrar')
   await db.insert(s.configuracao).values({ id: 1, nomeEmpresa: empresa }).onConflictDoUpdate({ target: s.configuracao.id, set: { nomeEmpresa: empresa } })
   await iniciarSessao({ tipo: 'admin', id: linhas[0].id, v: 1 })
-  redirect('/admin?ok=' + encodeURIComponent('Bem-vindo! Comece cadastrando caminhões e motoristas.'))
+  redirect(`/admin?ok=${encodeURIComponent('Bem-vindo! Comece cadastrando caminhões e motoristas.')}`)
 }

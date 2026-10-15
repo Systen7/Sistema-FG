@@ -39,7 +39,7 @@ export function ListaGastos({ gastos, viagemId }: { gastos: G[]; viagemId: numbe
               <span className="small muted"> · {dataCurta(g.data)}{g.pagoPor === 'motorista' ? ' · do seu bolso' : ''}</span>
               {g.foto && <Camera className="ico" style={{ display: 'inline', width: 15, height: 15, marginLeft: 6, verticalAlign: '-2px', color: 'var(--muted)' }} aria-label="com foto" />}
               <br />
-              <span className={'chip ' + STATUS[g.status].c}>{STATUS[g.status].t}</span>
+              <span className={`chip ${STATUS[g.status].c}`}>{STATUS[g.status].t}</span>
               {g.motivo && <span className="small" style={{ color: 'var(--bad)', display: 'block', marginTop: 4 }}>Motivo: {g.motivo}</span>}
             </span>
           </span>

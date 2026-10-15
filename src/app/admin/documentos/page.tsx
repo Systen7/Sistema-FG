@@ -23,7 +23,7 @@ export default async function Documentos(props: PageProps<'/admin/documentos'>) 
   ])
   const abertos = todos.filter((d) => d.tipo === 'mdfe' && d.situacao === 'autorizado').length
   const semViagem = todos.filter((d) => !d.viagemId).length
-  const aqui = '/admin/documentos' + (filtro ? `?ver=${filtro}` : '')
+  const aqui = `/admin/documentos${filtro ? `?ver=${filtro}` : ''}`
   return (
     <>
       <Cabecalho titulo="Documentos fiscais" texto="CT-e e MDF-e emitidos no seu emissor. Importe os XML: o sistema lê os dados, liga cada documento à viagem e avisa se algum MDF-e ficar sem encerrar." />

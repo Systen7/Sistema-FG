@@ -29,7 +29,7 @@ export default async function Relatorios() {
                 {k !== 'acerto' && <option value="">Todos os meses</option>}
                 {meses.map((m) => <option key={m} value={m}>{nomeMes(m)}</option>)}
               </select>
-              <button className="btn pri"><FileSpreadsheet className="ico" />Baixar planilha</button>
+              <button type="submit" className="btn pri"><FileSpreadsheet className="ico" />Baixar planilha</button>
             </form>
           </section>
         ))}

@@ -13,7 +13,7 @@ for (const [nome, tam, margem] of [['icon-192.png', 192, 30], ['icon-512.png', 5
   await p.setViewportSize({ width: tam, height: tam })
   await p.setContent(marca(tam, margem), { waitUntil: 'networkidle' })
   await p.evaluate(() => document.fonts.ready)
-  await p.screenshot({ path: 'public/' + nome })
-  console.log('public/' + nome)
+  await p.screenshot({ path: `public/${nome}` })
+  console.log(`public/${nome}`)
 }
 await b.close()

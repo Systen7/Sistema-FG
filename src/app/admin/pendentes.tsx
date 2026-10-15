@@ -24,7 +24,7 @@ export function Pendentes({ itens, motoristas, voltar, limite }: { itens: { d: D
               <b>{NOME_TIPO[d.tipo] ?? d.tipo} · {reaisC(d.valor)}</b>{d.litros ? <span className="muted"> · {num(d.litros)} L (R$ {num(d.valor / 100 / d.litros, 2)}/L)</span> : null}<br />
               <span className="small muted">
                 {nome(v.motoristaId)} · <Link href={`/admin/viagens/${v.id}`}>viagem {v.id}</Link> · {dataCurta(d.data)} · {d.pagoPor === 'motorista' ? 'pago do bolso' : 'pago pela empresa'}
-                {d.obs ? ' · ' + d.obs : ''}{!d.fotoId && <> · <Camera className="ico" style={{ display: 'inline', width: 13, height: 13, verticalAlign: '-2px' }} /> sem foto</>}
+                {d.obs ? ` · ${d.obs}` : ''}{!d.fotoId && <> · <Camera className="ico" style={{ display: 'inline', width: 13, height: 13, verticalAlign: '-2px' }} /> sem foto</>}
               </span>
             </span>
           </span>

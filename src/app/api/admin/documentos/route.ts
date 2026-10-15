@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   if (!arquivos.length) return NextResponse.json({ erro: 'Escolha um ou mais arquivos XML ou PDF.' }, { status: 400 })
   if (arquivos.length > 50) return NextResponse.json({ erro: 'Envie no máximo 50 arquivos por vez.' }, { status: 400 })
   const viagemId = Number(f.get('viagemId')) || null
-  const resultados = await importarArquivos(arquivos, viagemId, 'admin:' + a.id)
+  const resultados = await importarArquivos(arquivos, viagemId, `admin:${a.id}`)
   revalidatePath('/admin', 'layout')
   revalidatePath('/m', 'layout')
   return NextResponse.json({ resultados })

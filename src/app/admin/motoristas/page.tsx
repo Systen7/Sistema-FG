@@ -17,7 +17,7 @@ export default async function Motoristas(props: PageProps<'/admin/motoristas'>) 
   const H = hoje(), atual = mesAtual()
   const mes = mesValido(sp.mes) && sp.mes <= atual ? sp.mes : atual
   const [cfg, ms, cs, vs, and, meses] = await Promise.all([config(), motoristas(), caminhoes(), viagensDoMes(mes), emAndamento(), mesesDisponiveis(atual)])
-  const aqui = '/admin/motoristas' + (sp.mes ? `?mes=${mes}` : '')
+  const aqui = `/admin/motoristas${sp.mes ? `?mes=${mes}` : ''}`
   const sep = aqui.includes('?') ? '&' : '?'
   const ed = sp.editar ? (sp.editar === 'novo' ? 'novo' : ms.find((m) => m.id === Number(sp.editar))) : null
   const ac = sp.acesso ? ms.find((m) => m.id === Number(sp.acesso)) : null
@@ -54,7 +54,7 @@ export default async function Motoristas(props: PageProps<'/admin/motoristas'>) 
         <p className="small muted">Resultado de {nomeMes(mes).toLowerCase()}. “Deixou de ganhar”: comissão estimada sobre os km rodados vazios, com frete de retorno a {cfg.retornoPct}% do valor por km da ida (ajuste em Alertas › Regras).</p>
       </section>
       {ed && (
-        <FormModal titulo={ed === 'novo' ? 'Novo motorista' : 'Editar ' + ed.nome} campos={camposMotorista(optC, ed === 'novo')}
+        <FormModal titulo={ed === 'novo' ? 'Novo motorista' : `Editar ${ed.nome}`} campos={camposMotorista(optC, ed === 'novo')}
           valores={ed === 'novo' ? { comissaoPct: 10, ativo: true, caminhaoId: '' } : { ...ed, telefone: telefone(ed.telefone), caminhaoId: ed.caminhaoId ? String(ed.caminhaoId) : '' }}
           acao={salvarMotorista.bind(null, ed === 'novo' ? null : ed.id, aqui)} fechar={aqui}
           excluir={ed === 'novo' ? undefined : excluirMotorista.bind(null, ed.id, aqui)} />

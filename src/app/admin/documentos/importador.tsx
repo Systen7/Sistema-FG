@@ -37,7 +37,7 @@ export function Importador({ viagemId = null, compacto = false }: { viagemId?: n
       for (const l of lotes) {
         const tamLote = l.reduce((t, f) => t + f.size, 0)
         const fd = new FormData()
-        l.forEach((f) => fd.append('arquivos', f))
+        for (const f of l) fd.append('arquivos', f)
         if (viagemId) fd.set('viagemId', String(viagemId))
         setFase(`Enviando ${l.length} ${l.length === 1 ? 'arquivo' : 'arquivos'}`)
         // 85% da barra é o envio; o restante é o servidor lendo os XML.
@@ -61,10 +61,10 @@ export function Importador({ viagemId = null, compacto = false }: { viagemId?: n
   }
 
   // Arquivo escolhido antes da tela terminar de carregar (a seção chega por streaming): envia assim que fica pronta.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: só na montagem
   useEffect(() => {
     const f = input.current?.files
     if (f?.length) enviar(f)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -92,8 +92,8 @@ export function Importador({ viagemId = null, compacto = false }: { viagemId?: n
       {erro && <p key={erro} className="aviso bad" role="alert">{erro}</p>}
       {res.length > 0 && (
         <div className="list surge" role="status">
-          {res.map((r, i) => (
-            <div key={i} style={{ justifyContent: 'flex-start', flexWrap: 'nowrap', gap: 10 }}>
+          {res.map((r) => (
+            <div key={`${r.arquivo}|${r.mensagem}`} style={{ justifyContent: 'flex-start', flexWrap: 'nowrap', gap: 10 }}>
               {r.ok ? <CheckCircle2 className="ico troca" style={{ color: 'var(--good)' }} /> : <XCircle className="ico troca" style={{ color: 'var(--bad)' }} />}
               <span><b className="small">{r.arquivo}</b><br /><span className="small" style={{ color: r.ok ? undefined : 'var(--bad)' }}>{r.mensagem}</span></span>
             </div>

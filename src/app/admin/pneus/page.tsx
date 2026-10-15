@@ -23,12 +23,16 @@ export default async function Pneus(props: PageProps<'/admin/pneus'>) {
   const cls = (p: Pneu) => (p.sulco < cfg.sulcoMinimo ? 'bad' : p.sulco < cfg.sulcoMinimo + 3 ? 'warn' : '')
   const ck = (p: Pneu) => (p.km ? p.custo / 100 / p.km : 0)
   const lado = (ax: number, l: string) => ps.filter((p) => EIXOS[ax] && p.eixo === EIXOS[ax][0] && p.lado === l)
-    .sort((a, b) => (l === 'Esquerdo' ? (a.local === 'externo' ? -1 : 1) : (a.local === 'interno' ? -1 : 1)))
+    // De fora para dentro do caminhão: no lado esquerdo o externo vem primeiro; no direito, o interno.
+    .sort((a, b) => {
+      const primeiro = l === 'Esquerdo' ? 'externo' : 'interno'
+      return Number(b.local === primeiro) - Number(a.local === primeiro)
+    })
     .map((p) => (
-      <Link key={p.id} href={`${aqui}&pneu=${p.id}`} scroll={false} className={'tyre ' + cls(p)} aria-pressed={sel?.id === p.id}
+      <Link key={p.id} href={`${aqui}&pneu=${p.id}`} scroll={false} className={`tyre ${cls(p)}`} aria-pressed={sel?.id === p.id}
         aria-label={`${p.eixo} ${p.lado} ${p.local}, sulco ${num(p.sulco, 1)} mm`} title={`${p.eixo} ${p.lado} ${p.local} · ${num(p.sulco, 1)} mm`} />
     ))
-  const pos = (p: Pneu) => `${p.eixo} · ${p.lado}${p.local ? ' ' + p.local : ''}`
+  const pos = (p: Pneu) => `${p.eixo} · ${p.lado}${p.local ? ` ${p.local}` : ''}`
   return (
     <>
       <Cabecalho titulo="Pneus" texto="Cada pneu por posição. Toque num pneu para ver, corrigir ou registrar troca e recapagem.">
@@ -46,7 +50,7 @@ export default async function Pneus(props: PageProps<'/admin/pneus'>) {
           </header>
           <div className="rig">
             {EIXOS.map(([n], ax) => (
-              <div key={n} className={'axle' + (ax === 3 ? ' gap' : '')}>
+              <div key={n} className={`axle${ax === 3 ? ' gap' : ''}`}>
                 <span className="axn" style={{ textAlign: 'right' }}>{n}</span>{lado(ax, 'Esquerdo')}<span className="shaft" />{lado(ax, 'Direito')}<span className="axn" />
               </div>
             ))}

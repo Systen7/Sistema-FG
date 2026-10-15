@@ -19,7 +19,7 @@ export function DocumentosViagem({ docs }: { docs: D[] }) {
           <div key={d.id} style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '12px 0', borderTop: i ? '1px solid var(--line)' : 0 }}>
             <span className="row between">
               <b>{d.tipo === 'mdfe' ? 'MDF-e' : 'CT-e'} nº {d.numero}</b>
-              {d.tipo === 'mdfe' && <span className={'chip ' + (d.situacao === 'encerrado' ? 'ok' : 'run')}>{d.situacao === 'encerrado' ? 'Encerrado' : 'Em aberto'}</span>}
+              {d.tipo === 'mdfe' && <span className={`chip ${d.situacao === 'encerrado' ? 'ok' : 'run'}`}>{d.situacao === 'encerrado' ? 'Encerrado' : 'Em aberto'}</span>}
             </span>
             <span className="tnum" style={{ fontFamily: 'var(--mono)', fontSize: 15, letterSpacing: '.02em', lineHeight: 1.6, wordBreak: 'break-word' }}>{fmt(d.chave)}</span>
             <span className="duas">

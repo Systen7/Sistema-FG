@@ -2,7 +2,7 @@
 // Só formas neutras, com um brilho lento que passa (desligado com "reduzir movimento"). Leitores de tela ouvem "Carregando".
 
 type P = { w?: string | number; h?: string | number; className?: string; style?: React.CSSProperties }
-export const Esq = ({ w, h, className = '', style }: P) => <span className={'esq ' + className} style={{ width: w, height: h, ...style }} aria-hidden />
+export const Esq = ({ w, h, className = '', style }: P) => <span className={`esq ${className}`} style={{ width: w, height: h, ...style }} aria-hidden />
 
 export function Pagina({ children, rotulo = 'Carregando' }: { children: React.ReactNode; rotulo?: string }) {
   return <div className="esq-pagina" role="status" aria-busy="true" aria-label={rotulo}><span className="sr">{rotulo}…</span>{children}</div>

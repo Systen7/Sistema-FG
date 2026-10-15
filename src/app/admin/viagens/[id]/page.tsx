@@ -41,7 +41,7 @@ export default async function DetalheViagem(props: PageProps<'/admin/viagens/[id
           <Link href="/admin/viagens" className="small row" style={{ gap: 4, textDecoration: 'none' }}><ArrowLeft className="ico" />Viagens</Link>
           <h1 style={{ marginTop: 6 }}>{v.origem} → {v.destino}</h1>
           <p className="row" style={{ gap: 8 }}>
-            Viagem {v.id} · {m?.nome} · <Placas c={cam} /> · {v.carga} · {dataLonga(v.inicio)}{v.fim ? ' a ' + dataLonga(v.fim) : ''}
+            Viagem {v.id} · {m?.nome} · <Placas c={cam} /> · {v.carga} · {dataLonga(v.inicio)}{v.fim ? ` a ${dataLonga(v.fim)}` : ''}
             {v.status === 'andamento' ? <span className="chip run">Em viagem</span> : <span className="chip">Encerrada</span>}
           </p>
         </div>
@@ -56,8 +56,8 @@ export default async function DetalheViagem(props: PageProps<'/admin/viagens/[id
           <div><span className="lbl">Lucro da viagem</span><b><Valor v={c.lucro} /></b>{v.status === 'andamento' && <span className="small muted">parcial</span>}</div>
         </div>
         <div className="minis">
-          <div><span className="lbl">Km rodado</span><b>{c.km != null ? num(c.km) : '—'}</b><span className="small muted">{num(v.kmInicial)}{v.kmFinal ? ' → ' + num(v.kmFinal) : ''}{v.kmVazio ? ` · ${num(v.kmVazio)} vazio` : ''}</span></div>
-          <div><span className="lbl">Consumo</span><b>{c.consumo ? num(c.consumo, 2) + ' km/l' : '—'}</b>{c.consumo && c.consumo < meta ? <span className="chip warn">abaixo da meta {num(meta, 1)}</span> : <span className="small muted">{num(c.litros)} litros</span>}</div>
+          <div><span className="lbl">Km rodado</span><b>{c.km != null ? num(c.km) : '—'}</b><span className="small muted">{num(v.kmInicial)}{v.kmFinal ? ` → ${num(v.kmFinal)}` : ''}{v.kmVazio ? ` · ${num(v.kmVazio)} vazio` : ''}</span></div>
+          <div><span className="lbl">Consumo</span><b>{c.consumo ? `${num(c.consumo, 2)} km/l` : '—'}</b>{c.consumo && c.consumo < meta ? <span className="chip warn">abaixo da meta {num(meta, 1)}</span> : <span className="small muted">{num(c.litros)} litros</span>}</div>
           <div><span className="lbl">Adiantamento</span><b>{reais(v.adiantamento)}</b></div>
           <div><span className="lbl">Deixou de ganhar</span><b>{reais(c.perdido)}</b><span className="small muted">comissão sobre o km vazio</span></div>
         </div>
@@ -83,7 +83,7 @@ export default async function DetalheViagem(props: PageProps<'/admin/viagens/[id
                   <td>{d.pagoPor === 'motorista' ? 'Motorista' : 'Empresa'}</td>
                   <td className="wrap small">{d.obs}{d.kmAbastecimento ? ` · km ${num(d.kmAbastecimento)}` : ''}{d.motivoRecusa ? <span style={{ color: 'var(--bad)' }}> · recusa: {d.motivoRecusa}</span> : ''}</td>
                   <td className="r"><b>{reaisC(d.valor)}</b></td>
-                  <td><span className={'chip ' + STATUS[d.status].c}>{d.status === 'pendente' ? 'Pendente' : STATUS[d.status].t}</span></td>
+                  <td><span className={`chip ${STATUS[d.status].c}`}>{d.status === 'pendente' ? 'Pendente' : STATUS[d.status].t}</span></td>
                   <td>
                     <span className="row" style={{ flexWrap: 'nowrap' }}>
                       <Link href={`${aqui}?despesa=${d.id}`} scroll={false} className="btn sm">Editar</Link>
@@ -139,7 +139,7 @@ async function SecaoDocumentos({ v, placa, aqui }: { v: ViagemC; placa: string |
   return (
     <section className="panel entra">
       <header><h2>CT-e e MDF-e</h2><Link href="/admin/documentos" className="btn sm">Todos os documentos</Link></header>
-      {avisosFiscais.map((t, i) => <p key={i} className="aviso warn">{t}</p>)}
+      {avisosFiscais.map((t) => <p key={t} className="aviso warn">{t}</p>)}
       {freteCte > 0 && freteCte !== v.frete && (
         <form action={usarFreteDosCte.bind(null, v.id, freteCte, aqui)} className="aviso warn row between">
           <span>O frete da viagem ({reais(v.frete)}) é diferente do valor dos CT-e ({reais(freteCte)}).</span>

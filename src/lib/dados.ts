@@ -19,7 +19,7 @@ async function comDespesas(vs: (typeof s.viagens.$inferSelect)[]): Promise<Viage
 
 /** Viagens que começaram no mês (AAAA-MM). */
 export async function viagensDoMes(mes: string, filtro?: { motoristaId?: number; caminhaoId?: number }) {
-  const conds = [gte(s.viagens.inicio, mes + '-01'), lt(s.viagens.inicio, somaMeses(mes, 1) + '-01')]
+  const conds = [gte(s.viagens.inicio, `${mes}-01`), lt(s.viagens.inicio, `${somaMeses(mes, 1)}-01`)]
   if (filtro?.motoristaId) conds.push(eq(s.viagens.motoristaId, filtro.motoristaId))
   if (filtro?.caminhaoId) conds.push(eq(s.viagens.caminhaoId, filtro.caminhaoId))
   return comDespesas(await db.select().from(s.viagens).where(and(...conds)).orderBy(desc(s.viagens.inicio), desc(s.viagens.id)))
@@ -29,7 +29,7 @@ export async function viagensFiltradas(f: { status?: 'andamento' | 'encerrada'; 
   const conds = []
   if (f.status) conds.push(eq(s.viagens.status, f.status))
   if (f.motoristaId) conds.push(eq(s.viagens.motoristaId, f.motoristaId))
-  if (f.mes) conds.push(gte(s.viagens.inicio, f.mes + '-01'), lt(s.viagens.inicio, somaMeses(f.mes, 1) + '-01'))
+  if (f.mes) conds.push(gte(s.viagens.inicio, `${f.mes}-01`), lt(s.viagens.inicio, `${somaMeses(f.mes, 1)}-01`))
   return comDespesas(await db.select().from(s.viagens).where(conds.length ? and(...conds) : undefined).orderBy(desc(s.viagens.inicio), desc(s.viagens.id)).limit(300))
 }
 

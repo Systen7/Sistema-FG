@@ -21,7 +21,7 @@ export function Instalar({ forte = false }: { forte?: boolean }) {
   }, [])
   if (instalado) return forte ? <p className="aviso ok"><Smartphone className="ico" />O app já está na tela inicial do seu celular.</p> : null
   if (evt) return (
-    <button className="acao pri" onClick={async () => { await evt.prompt(); const r = await evt.userChoice; if (r.outcome === 'accepted') setInstalado(true); setEvt(null) }}>
+    <button type="button" className="acao pri" onClick={async () => { await evt.prompt(); const r = await evt.userChoice; if (r.outcome === 'accepted') setInstalado(true); setEvt(null) }}>
       <Download className="ico" /><span>Instalar o app no celular<small>Fica na tela inicial, como um aplicativo</small></span>
     </button>
   )
@@ -47,7 +47,7 @@ export function TrocarPin() {
   const [aberto, setAberto] = useState(false)
   const [erro, setErro] = useState('')
   const [pend, start] = useTransition()
-  if (!aberto) return <button className="acao" onClick={() => setAberto(true)}><KeyRound className="ico" /><span>Trocar meu PIN<small>Os 4 números para entrar</small></span></button>
+  if (!aberto) return <button type="button" className="acao" onClick={() => setAberto(true)}><KeyRound className="ico" /><span>Trocar meu PIN<small>Os 4 números para entrar</small></span></button>
   return (
     <section className="panel">
       <h2>Trocar PIN</h2>
@@ -56,7 +56,7 @@ export function TrocarPin() {
         <label className="campo">Novo PIN (4 números)<input name="novo" type="password" inputMode="numeric" maxLength={4} autoComplete="new-password" required /></label>
         <label className="campo">Repita o novo PIN<input name="confirma" type="password" inputMode="numeric" maxLength={4} autoComplete="new-password" required /></label>
         {erro && <p className="err" role="alert">{erro}</p>}
-        <div className="duas"><button type="button" className="btn lg" onClick={() => setAberto(false)}>Cancelar</button><button className="btn lg pri" disabled={pend}>Salvar</button></div>
+        <div className="duas"><button type="button" className="btn lg" onClick={() => setAberto(false)}>Cancelar</button><button type="submit" className="btn lg pri" disabled={pend}>Salvar</button></div>
       </form>
     </section>
   )
@@ -66,7 +66,7 @@ export function TrocarPin() {
 export function Sair({ acao }: { acao: () => Promise<void> }) {
   const [pend, start] = useTransition()
   return (
-    <button className="btn lg block ghost" disabled={pend} onClick={() => start(async () => {
+    <button type="button" className="btn lg block ghost" disabled={pend} onClick={() => start(async () => {
       try { for (const k of await caches.keys()) if (k.startsWith('fg-paginas')) await caches.delete(k) } catch {}
       await acao()
     })}>

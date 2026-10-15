@@ -1,0 +1,47 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  // Lint e formatação do projeto. Rodar: npm run lint (verifica) · npm run format (corrige).
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": ["**", "!**/drizzle", "!**/docs", "!**/public", "!**/reports", "!**/coverage", "!**/.stryker-tmp", "!**/next-env.d.ts"]
+  },
+  "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2, "lineWidth": 160 },
+  "javascript": {
+    "formatter": { "quoteStyle": "single", "jsxQuoteStyle": "double", "semicolons": "asNeeded", "trailingCommas": "all", "arrowParentheses": "always" }
+  },
+  "assist": { "actions": { "source": { "organizeImports": "off" } } },
+  "linter": {
+    "enabled": true,
+    "domains": { "next": "recommended", "react": "recommended", "test": "recommended" },
+    "rules": {
+      "preset": "recommended",
+      "a11y": {
+        // App do motorista: focar o campo certo e abrir o teclado numérico na hora poupa toques na estrada.
+        "noAutofocus": "off",
+        // Grupos de botões usam role="group" em <div>; <fieldset> traria borda e espaçamento próprios do navegador.
+        "useSemanticElements": "off"
+      },
+      "style": {
+        // O TypeScript estrito já cobre; os "!" do código são em pontos já verificados antes.
+        "noNonNullAssertion": "off"
+      },
+      "performance": {
+        // As imagens são privadas (rota /api/fotos com sessão); o otimizador de imagens do Next não se aplica.
+        "noImgElement": "off"
+      }
+    }
+  },
+  "css": { "linter": { "enabled": true }, "formatter": { "enabled": true } },
+  "overrides": [
+    {
+      // A ordem das regras no CSS é a cascata pensada; "!important" só no bloco de reduzir movimento.
+      "includes": ["**/*.css"],
+      "linter": { "rules": { "style": { "noDescendingSpecificity": "off" }, "complexity": { "noImportantStyles": "off" } } }
+    },
+    {
+      // Esqueletos são listas fixas de formas, sem dados: o índice é a identidade.
+      "includes": ["src/components/esqueleto.tsx", "src/app/**/loading.tsx"],
+      "linter": { "rules": { "suspicious": { "noArrayIndexKey": "off" } } }
+    }
+  ]
+}

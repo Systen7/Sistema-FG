@@ -8,11 +8,11 @@ export function num(v: number | null | undefined, d = 0): string {
 /** R$ 1.234 (sem centavos), para painéis e resumos */
 export function reais(centavos: number): string {
   const v = Math.round(centavos / 100)
-  return (v < 0 ? '−' : '') + 'R$ ' + num(Math.abs(v))
+  return `${v < 0 ? '−' : ''}R$ ${num(Math.abs(v))}`
 }
 /** R$ 1.234,56, para lançamentos e acerto */
 export function reaisC(centavos: number): string {
-  return (centavos < 0 ? '−' : '') + 'R$ ' + num(Math.abs(centavos) / 100, 2)
+  return `${centavos < 0 ? '−' : ''}R$ ${num(Math.abs(centavos) / 100, 2)}`
 }
 export function dataCurta(d: string | null | undefined): string {
   return d ? `${d.slice(8, 10)}/${d.slice(5, 7)}` : '—'

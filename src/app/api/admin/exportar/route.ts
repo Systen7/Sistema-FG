@@ -10,7 +10,7 @@ const cel = (v: unknown) => {
   if (typeof v === 'number') return String(Math.round(v * 100) / 100).replace('.', ',')
   let s = String(v)
   // Texto digitado por usuários começando com = + - @ viraria fórmula no Excel: neutraliza com apóstrofo.
-  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`
   return /[;"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
 }
 const rs = (c: number) => c / 100
@@ -56,11 +56,11 @@ export async function GET(req: Request) {
     for (const d of docs) {
       const em = dataDe(d.emitidoEm)
       if (mes && !em.startsWith(mes)) continue
-      linhas.push([d.tipo === 'cte' ? 'CT-e' : 'MDF-e', d.numero, d.serie, '\u200b' + d.chave, em, d.situacao, d.encerradoEm ? dataDe(d.encerradoEm) : '', d.viagemId, d.origem, d.destino, d.produto, d.pesoKg, d.valor != null ? rs(d.valor) : null, d.placa, d.remetente, d.destinatario])
+      linhas.push([d.tipo === 'cte' ? 'CT-e' : 'MDF-e', d.numero, d.serie, `\u200b${d.chave}`, em, d.situacao, d.encerradoEm ? dataDe(d.encerradoEm) : '', d.viagemId, d.origem, d.destino, d.produto, d.pesoKg, d.valor != null ? rs(d.valor) : null, d.placa, d.remetente, d.destinatario])
     }
   } else return new Response('Tipo inválido', { status: 400 })
 
-  const csv = '﻿' + linhas.map((l) => l.map(cel).join(';')).join('\r\n')
+  const csv = `﻿${linhas.map((l) => l.map(cel).join(';')).join('\r\n')}`
   return new Response(csv, {
     headers: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': `attachment; filename="fg-${tipo}-${mes ?? 'tudo'}.csv"`, 'Cache-Control': 'no-store' },
   })

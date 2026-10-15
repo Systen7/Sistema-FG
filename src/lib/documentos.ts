@@ -5,6 +5,7 @@ import { lerXmlFiscal, chaveValida, type DocLido } from './fiscal'
 import { apagarArquivos, guardarArquivo } from './armazenamento'
 import { dataDe, somaDias } from './datas'
 import { registrar } from './audit'
+import { medir, registrarErro } from './obs/log'
 
 export const MAX_XML = 1024 * 1024
 export const MAX_PDF = 3 * 1024 * 1024
@@ -101,7 +102,10 @@ export async function anexarPdf(nome: string, dados: Buffer, docId: number | nul
 }
 
 /** Processa vários arquivos (XML primeiro, depois PDF, para o PDF achar o documento recém-importado). */
-export async function importarArquivos(arquivos: File[], alvo: number | null, autor: string): Promise<ResultadoArquivo[]> {
+export const importarArquivos = (arquivos: File[], alvo: number | null, autor: string) =>
+  medir('documentos.importar', () => importarTodos(arquivos, alvo, autor), { arquivos: arquivos.length })
+
+async function importarTodos(arquivos: File[], alvo: number | null, autor: string): Promise<ResultadoArquivo[]> {
   const out: ResultadoArquivo[] = []
   const ordem = [...arquivos].sort((a, b) => Number(/\.pdf$/i.test(a.name)) - Number(/\.pdf$/i.test(b.name)))
   for (const f of ordem) {
@@ -112,7 +116,7 @@ export async function importarArquivos(arquivos: File[], alvo: number | null, au
         out.push(await importarXml(f.name, await f.text(), alvo, autor))
       } else out.push({ arquivo: f.name, ok: false, mensagem: 'Envie arquivos .xml (CT-e, MDF-e ou eventos) ou .pdf (DACTE/DAMDFE).' })
     } catch (e) {
-      console.error('Falha ao importar', f.name, e)
+      registrarErro(e, 'Falha ao importar documento', { arquivo: f.name })
       out.push({ arquivo: f.name, ok: false, mensagem: 'Erro inesperado ao processar este arquivo.' })
     }
   }

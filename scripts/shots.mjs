@@ -9,7 +9,7 @@ const p = await ctx.newPage()
 const erros = []
 p.on('pageerror', (e) => erros.push(e.message))
 p.on('console', (m) => { if (m.type() === 'error') erros.push(m.text()) })
-await p.goto(base + '/entrar')
+await p.goto(`${base}/entrar`)
 if (quem === 'admin') {
   await p.getByRole('button', { name: 'Escritório' }).click()
   await p.fill('input[name=usuario]', 'admin'); await p.fill('input[name=senha]', 'fg2026')
@@ -28,5 +28,5 @@ for (const u of urls) {
   await p.screenshot({ path: `screenshots/${nome}.png`, fullPage: true })
   console.log('ok', u, '->', `screenshots/${nome}.png`)
 }
-if (erros.length) console.log('ERROS NO NAVEGADOR:\n' + erros.join('\n'))
+if (erros.length) console.log(`ERROS NO NAVEGADOR:\n${erros.join('\n')}`)
 await b.close()

@@ -71,7 +71,7 @@ export function EncerrarForm(p: {
             <input type="date" value={fim} min={p.inicio} max={p.hoje} onChange={(e) => setFim(e.target.value || p.hoje)} />
           </label>
         ) : (
-          <p className="row small muted" style={{ gap: 6 }}><CalendarDays className="ico" />{fim === p.hoje ? 'Chegou hoje' : 'Chegada em ' + dataLonga(fim)} ·
+          <p className="row small muted" style={{ gap: 6 }}><CalendarDays className="ico" />{fim === p.hoje ? 'Chegou hoje' : `Chegada em ${dataLonga(fim)}`} ·
             <button type="button" className="linkbtn" onClick={() => setOutroDia(true)}>chegou em outro dia?</button></p>
         )}
 
@@ -86,11 +86,13 @@ export function EncerrarForm(p: {
         </section>
 
         {erro && <p key={erro} className="aviso bad" role="alert">{erro}</p>}
-        <button className="btn xl pri"><Flag className="ico" />Encerrar viagem</button>
+        <button type="submit" className="btn xl pri"><Flag className="ico" />Encerrar viagem</button>
       </form>
 
       {confirmar && (
-        <div className={'sheet-ov' + (saindo ? ' saindo' : '')} onClick={(e) => e.target === e.currentTarget && fecharConfirmacao()}>
+        // biome-ignore lint/a11y/noStaticElementInteractions: toque no fundo fecha; os botões da folha fazem o mesmo pelo teclado
+        // biome-ignore lint/a11y/useKeyWithClickEvents: idem
+        <div className={`sheet-ov${saindo ? ' saindo' : ''}`} onClick={(e) => e.target === e.currentTarget && fecharConfirmacao()}>
           <div className="sheet" role="dialog" aria-modal="true" aria-labelledby="conf-t">
             <span className="alca" />
             <h2 id="conf-t">Confere os números?</h2>

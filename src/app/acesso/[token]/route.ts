@@ -11,7 +11,7 @@ export async function GET(req: Request, ctx: RouteContext<'/acesso/[token]'>) {
   const [l] = await db.select().from(s.linksAcesso)
     .where(and(eq(s.linksAcesso.tokenHash, hashToken(token)), gt(s.linksAcesso.expiraEm, new Date())))
   const [m] = l ? await db.select().from(s.motoristas).where(eq(s.motoristas.id, l.motoristaId)) : []
-  if (!l || !m || !m.ativo) return NextResponse.redirect(new URL('/entrar?link=expirado', req.url))
+  if (!l || !m?.ativo) return NextResponse.redirect(new URL('/entrar?link=expirado', req.url))
   await db.update(s.linksAcesso).set({ usadoEm: new Date() }).where(eq(s.linksAcesso.id, l.id))
   await iniciarSessao({ tipo: 'motorista', id: m.id, v: m.versaoSessao })
   const res = NextResponse.redirect(new URL('/m/bem-vindo', req.url))

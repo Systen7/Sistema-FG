@@ -34,7 +34,8 @@ export function FormModal({ titulo, campos, valores, acao, fechar, excluir, extr
   }, [router, fechar])
   const erro = estado?.erro ?? estadoDel?.erro
   return (
-    <div className={'ov' + (saindo ? ' saindo' : '')} onMouseDown={(e) => { if (e.target === e.currentTarget) fecharJanela() }}>
+    // biome-ignore lint/a11y/noStaticElementInteractions: clique no fundo fecha; pelo teclado fecha com Esc ou no botão Fechar
+    <div className={`ov${saindo ? ' saindo' : ''}`} onMouseDown={(e) => { if (e.target === e.currentTarget) fecharJanela() }}>
       <div className="dlg" role="dialog" aria-modal="true" aria-labelledby="dlg-t" ref={ref} aria-busy={pend || pendDel}>
         <header><h2 id="dlg-t">{titulo}</h2><button type="button" onClick={fecharJanela} className="btn sm ghost" aria-label="Fechar"><X className="ico" /></button></header>
         {extra}
@@ -44,11 +45,11 @@ export function FormModal({ titulo, campos, valores, acao, fechar, excluir, extr
           {erro && <p key={erro} className="aviso bad full" role="alert">{erro}</p>}
           <div className="row between full" style={{ marginTop: 4 }}>
             <span className="row">
-              <button className="btn pri" disabled={pend} aria-busy={pend}>{pend && <span className="spin" />}{rotuloSalvar}</button>
+              <button type="submit" className="btn pri" disabled={pend} aria-busy={pend}>{pend && <span className="spin" />}{rotuloSalvar}</button>
               <button type="button" onClick={fecharJanela} className="btn">Cancelar</button>
             </span>
             {excluir && (conf
-              ? <span className="row"><span className="small muted">Tem certeza?</span><button formAction={enviarDel} className="btn del solid" disabled={pendDel} aria-busy={pendDel}>{pendDel && <span className="spin" />}Excluir de vez</button></span>
+              ? <span className="row"><span className="small muted">Tem certeza?</span><button type="submit" formAction={enviarDel} className="btn del solid" disabled={pendDel} aria-busy={pendDel}>{pendDel && <span className="spin" />}Excluir de vez</button></span>
               : <button type="button" className="btn del ghost" onClick={() => setConf(true)}><Trash2 className="ico" />Excluir</button>)}
           </div>
         </form>
@@ -61,7 +62,7 @@ function Entrada({ c, v }: { c: Campo; v: unknown }) {
   const t = c.tipo ?? 'text'
   const val = v == null ? '' : String(v)
   const rot = <>{c.rotulo}{c.obrig === false && <span className="dica"> (opcional)</span>}</>
-  const cls = 'campo' + (c.largo || t === 'area' ? ' full' : '')
+  const cls = `campo${c.largo || t === 'area' ? ' full' : ''}`
   let el: React.ReactNode
   if (t === 'select') el = <select name={c.nome} defaultValue={val}>{c.opcoes!.map(([k, n]) => <option key={k} value={k}>{n}</option>)}</select>
   else if (t === 'bool') el = <select name={c.nome} defaultValue={v ? '1' : '0'}><option value="0">Não</option><option value="1">Sim</option></select>
@@ -73,5 +74,6 @@ function Entrada({ c, v }: { c: Campo; v: unknown }) {
   else if (t === 'dinheiro') el = <input name={c.nome} inputMode="decimal" defaultValue={v == null || v === '' ? '' : (Number(v) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} placeholder={c.placeholder ?? '0,00'} />
   else if (t === 'num') el = <input name={c.nome} inputMode="decimal" defaultValue={val === '' ? '' : String(v).replace('.', ',')} placeholder={c.placeholder} />
   else el = <input name={c.nome} type={t === 'tel' ? 'tel' : 'text'} defaultValue={val} placeholder={c.placeholder} autoComplete="off" />
+  // biome-ignore lint/a11y/noLabelWithoutControl: o campo está em `el`, dentro do próprio label
   return <label className={cls}>{rot}{el}{c.dica && <span className="dica">{c.dica}</span>}</label>
 }

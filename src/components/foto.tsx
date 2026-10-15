@@ -5,7 +5,6 @@ import { useState } from 'react'
 export function Foto({ src, alt = '', className = '', ...resto }: React.ImgHTMLAttributes<HTMLImageElement> & { src: string }) {
   const [ok, setOk] = useState(false)
   return (
-    // eslint-disable-next-line @next/next/no-img-element
     <img
       {...resto} src={src} alt={alt} loading="lazy" decoding="async"
       className={`${className} img-carrega${ok ? ' ok' : ''}`}

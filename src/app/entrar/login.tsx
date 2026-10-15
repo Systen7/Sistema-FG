@@ -94,7 +94,7 @@ function Motorista({ ajuda }: { ajuda: string | null }) {
             placeholder="(00) 00000-0000" value={tel} onChange={(e) => setTel(mascara(e.target.value))} aria-invalid={!!erro} autoFocus />
         </label>
         {erro && <p className="err" role="alert">{erro}</p>}
-        <button className="btn xl pri">Continuar</button>
+        <button type="submit" className="btn xl pri">Continuar</button>
       </form>
       {ajuda && <a className="btn lg ghost" href={ajuda}><MessageCircle className="ico" />Pedir ajuda ao escritório</a>}
     </section>
@@ -111,7 +111,7 @@ function Motorista({ ajuda }: { ajuda: string | null }) {
       </div>
       <div className="stack" style={{ alignItems: 'center', gap: 8 }}>
         <p style={{ fontSize: 18, fontWeight: 600 }}>Digite seu PIN</p>
-        <div className={'pins' + (tremer ? ' erro' : '')} aria-label={`${pin.length} de 4 números digitados`}>
+        <div className={`pins${tremer ? ' erro' : ''}`} role="img" aria-label={`${pin.length} de 4 números digitados`}>
           {[0, 1, 2, 3].map((i) => <i key={i} className={i < pin.length ? 'on' : ''} />)}
         </div>
         <p className="err" role="alert" style={{ minHeight: 24, textAlign: 'center' }}>{pend ? <span className="muted">Entrando…</span> : erro}</p>
@@ -141,7 +141,7 @@ function Admin() {
         <label className="campo">Usuário<input name="usuario" autoComplete="username" autoCapitalize="none" required /></label>
         <label className="campo">Senha<input name="senha" type="password" autoComplete="current-password" required /></label>
         {erro && <p className="err" role="alert">{erro}</p>}
-        <button className="btn lg pri" disabled={pend} aria-busy={pend}>{pend ? <span className="spin" /> : <ShieldCheck className="ico" />}{pend ? 'Entrando…' : 'Entrar'}</button>
+        <button type="submit" className="btn lg pri" disabled={pend} aria-busy={pend}>{pend ? <span className="spin" /> : <ShieldCheck className="ico" />}{pend ? 'Entrando…' : 'Entrar'}</button>
       </form>
     </section>
   )

@@ -12,7 +12,7 @@ export function PrimeiroAcesso() {
       <label className="campo">Senha<input name="senha" type="password" autoComplete="new-password" required /><span className="dica">Pelo menos 8 caracteres.</span></label>
       <label className="campo">Repita a senha<input name="confirma" type="password" autoComplete="new-password" required /></label>
       {st?.erro && <p className="err" role="alert">{st.erro}</p>}
-      <button className="btn lg pri" disabled={pend} aria-busy={pend}>{pend && <span className="spin" />}Criar acesso e entrar</button>
+      <button type="submit" className="btn lg pri" disabled={pend} aria-busy={pend}>{pend && <span className="spin" />}Criar acesso e entrar</button>
     </form>
   )
 }

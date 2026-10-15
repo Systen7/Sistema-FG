@@ -15,14 +15,14 @@ import {
   ErroCampo, ler, camposMotorista, camposCaminhao, camposViagem, camposDespesa, camposManutencao, camposPneu, camposApolice, camposFixo, camposLembrete,
 } from './campos'
 
-const comMsg = (url: string, msg: string, chave = 'ok') => url + (url.includes('?') ? '&' : '?') + chave + '=' + encodeURIComponent(msg)
+const comMsg = (url: string, msg: string, chave = 'ok') => `${url + (url.includes('?') ? '&' : '?') + chave}=${encodeURIComponent(msg)}`
 
 /** Executa uma gravação: erros de preenchimento voltam para o formulário; sucesso volta para a página com aviso. */
 async function gravar(fn: (autor: string) => Promise<string>): Promise<Estado> {
   const a = await exigirAdmin()
   let destino: string
   try {
-    destino = await fn('admin:' + a.id)
+    destino = await fn(`admin:${a.id}`)
   } catch (e) {
     if (e instanceof ErroCampo) return { erro: e.message }
     const m = String((e as { cause?: unknown })?.cause ?? e)
@@ -62,7 +62,7 @@ export async function salvarMotorista(id: number | null, voltar: string, _: Esta
     if (id == null) {
       const [m] = await db.insert(s.motoristas).values({ ...dados, pinHash: dados.pinHash! }).returning()
       await registrar(autor, 'cadastrou', 'motorista', m.id, { nome: m.nome })
-      return comMsg(voltar, 'Motorista cadastrado. Envie o link de acesso pelo WhatsApp.') + '&acesso=' + m.id
+      return `${comMsg(voltar, 'Motorista cadastrado. Envie o link de acesso pelo WhatsApp.')}&acesso=${m.id}`
     }
     await db.update(s.motoristas).set({ ...dados, ...(dados.ativo ? {} : { versaoSessao: sql`${s.motoristas.versaoSessao} + 1` }) }).where(eq(s.motoristas.id, id))
     await registrar(autor, 'alterou', 'motorista', id, { ...dados, pinHash: pin ? 'alterado' : undefined })
@@ -83,14 +83,14 @@ export async function gerarLinkAcesso(id: number): Promise<{ link?: string; erro
   const [m] = await db.select().from(s.motoristas).where(eq(s.motoristas.id, id))
   if (!m?.ativo) return { erro: 'Motorista inativo.' }
   const link = await novoLink(id)
-  await registrar('admin:' + a.id, 'gerou link de acesso', 'motorista', id)
+  await registrar(`admin:${a.id}`, 'gerou link de acesso', 'motorista', id)
   return { link }
 }
 export async function desconectarMotorista(id: number, voltar: string) {
   const a = await exigirAdmin()
   await db.update(s.motoristas).set({ versaoSessao: sql`${s.motoristas.versaoSessao} + 1` }).where(eq(s.motoristas.id, id))
   await db.delete(s.linksAcesso).where(eq(s.linksAcesso.motoristaId, id))
-  await registrar('admin:' + a.id, 'desconectou aparelhos', 'motorista', id)
+  await registrar(`admin:${a.id}`, 'desconectou aparelhos', 'motorista', id)
   redirect(comMsg(voltar, 'Motorista desconectado de todos os aparelhos'))
 }
 
@@ -211,7 +211,7 @@ export async function excluirDespesa(id: number, voltar: string) {
 export async function aprovarDespesa(id: number, voltar: string) {
   const a = await exigirAdmin()
   await db.update(s.despesas).set({ status: 'aprovada', motivoRecusa: null }).where(eq(s.despesas.id, id))
-  await registrar('admin:' + a.id, 'aprovou', 'despesa', id)
+  await registrar(`admin:${a.id}`, 'aprovou', 'despesa', id)
   revalidatePath('/admin', 'layout')
   redirect(comMsg(voltar, 'Despesa aprovada'))
 }
@@ -219,7 +219,7 @@ export async function recusarDespesa(id: number, voltar: string, f: FormData) {
   const a = await exigirAdmin()
   const motivo = String(f.get('motivo') ?? '').trim().slice(0, 200) || null
   await db.update(s.despesas).set({ status: 'recusada', motivoRecusa: motivo }).where(eq(s.despesas.id, id))
-  await registrar('admin:' + a.id, 'recusou', 'despesa', id, { motivo })
+  await registrar(`admin:${a.id}`, 'recusou', 'despesa', id, { motivo })
   revalidatePath('/admin', 'layout')
   redirect(comMsg(voltar, 'Despesa recusada'))
 }
@@ -228,7 +228,7 @@ export async function aprovarVarias(ids: number[], voltar: string) {
   for (const id of ids) {
     await db.update(s.despesas).set({ status: 'aprovada', motivoRecusa: null }).where(and(eq(s.despesas.id, id), eq(s.despesas.status, 'pendente')))
   }
-  await registrar('admin:' + a.id, 'aprovou em lote', 'despesa', null, { ids })
+  await registrar(`admin:${a.id}`, 'aprovou em lote', 'despesa', null, { ids })
   revalidatePath('/admin', 'layout')
   redirect(comMsg(voltar, ids.length === 1 ? 'Despesa aprovada' : `${ids.length} despesas aprovadas`))
 }
@@ -268,7 +268,7 @@ export async function trocarPneu(id: number, voltar: string, f: FormData) {
   await db.update(s.pneus).set(recapar
     ? { sulco: 12, recapagens: p.recapagens + 1, custo: p.custo + 78000 }
     : { sulco: SULCO_NOVO, recapagens: 0, km: 0, custo: CUSTO_PNEU_NOVO }).where(eq(s.pneus.id, id))
-  await registrar('admin:' + a.id, recapar ? 'recapou' : 'trocou', 'pneu', id, { antes: p })
+  await registrar(`admin:${a.id}`, recapar ? 'recapou' : 'trocou', 'pneu', id, { antes: p })
   revalidatePath('/admin', 'layout')
   redirect(comMsg(voltar, recapar ? 'Recapagem registrada' : 'Pneu novo registrado'))
 }
@@ -360,7 +360,7 @@ export async function salvarConfig(_: Estado, f: FormData): Promise<Estado> {
     await db.update(s.configuracao).set(dados).where(eq(s.configuracao.id, 1))
     await registrar(autor, 'alterou', 'configurações', 1, dados)
     const v = String(f.get('voltar') ?? '')
-    return (v.startsWith('/admin') ? v : '/admin/config') + '?ok=' + encodeURIComponent('Configurações salvas')
+    return `${v.startsWith('/admin') ? v : '/admin/config'}?ok=${encodeURIComponent('Configurações salvas')}`
   })
 }
 export async function trocarSenha(_: Estado, f: FormData): Promise<Estado> {
@@ -370,8 +370,8 @@ export async function trocarSenha(_: Estado, f: FormData): Promise<Estado> {
   if (nova.length < 8) return { erro: 'A nova senha precisa ter pelo menos 8 caracteres.' }
   if (nova !== String(f.get('confirma') ?? '')) return { erro: 'A confirmação não bate com a nova senha.' }
   await db.update(s.administradores).set({ senhaHash: await hash(nova) }).where(eq(s.administradores.id, a.id))
-  await registrar('admin:' + a.id, 'trocou a senha', 'administrador', a.id)
-  redirect('/admin/config?ok=' + encodeURIComponent('Senha alterada'))
+  await registrar(`admin:${a.id}`, 'trocou a senha', 'administrador', a.id)
+  redirect(`/admin/config?ok=${encodeURIComponent('Senha alterada')}`)
 }
 export async function novoAdmin(_: Estado, f: FormData): Promise<Estado> {
   return gravar(async (autor) => {
@@ -382,29 +382,29 @@ export async function novoAdmin(_: Estado, f: FormData): Promise<Estado> {
     if (x) throw new ErroCampo('Este usuário já existe.')
     await db.insert(s.administradores).values({ nome, usuario, senhaHash: await hash(senha) })
     await registrar(autor, 'cadastrou', 'administrador', usuario)
-    return '/admin/config?ok=' + encodeURIComponent('Acesso criado para ' + nome)
+    return `/admin/config?ok=${encodeURIComponent(`Acesso criado para ${nome}`)}`
   })
 }
 export async function removerAdmin(id: number) {
   const a = await exigirAdmin()
-  if (id === a.id) redirect('/admin/config?erro=' + encodeURIComponent('Você não pode remover o próprio acesso.'))
+  if (id === a.id) redirect(`/admin/config?erro=${encodeURIComponent('Você não pode remover o próprio acesso.')}`)
   await db.delete(s.administradores).where(and(eq(s.administradores.id, id), ne(s.administradores.id, a.id)))
-  await registrar('admin:' + a.id, 'removeu', 'administrador', id)
-  redirect('/admin/config?ok=' + encodeURIComponent('Acesso removido'))
+  await registrar(`admin:${a.id}`, 'removeu', 'administrador', id)
+  redirect(`/admin/config?ok=${encodeURIComponent('Acesso removido')}`)
 }
 
 // ---------- acerto ----------
 export async function marcarPago(motoristaId: number, mes: string, valor: number, voltar: string) {
   const a = await exigirAdmin()
   await db.insert(s.acertos).values({ motoristaId, mes, valor }).onConflictDoUpdate({ target: [s.acertos.motoristaId, s.acertos.mes], set: { valor, pagoEm: new Date() } })
-  await registrar('admin:' + a.id, 'marcou acerto como pago', 'acerto', `${motoristaId}/${mes}`, { valor })
+  await registrar(`admin:${a.id}`, 'marcou acerto como pago', 'acerto', `${motoristaId}/${mes}`, { valor })
   revalidatePath('/admin', 'layout')
   redirect(comMsg(voltar, 'Acerto marcado como pago'))
 }
 export async function desfazerPago(motoristaId: number, mes: string, voltar: string) {
   const a = await exigirAdmin()
   await db.delete(s.acertos).where(and(eq(s.acertos.motoristaId, motoristaId), eq(s.acertos.mes, mes)))
-  await registrar('admin:' + a.id, 'desfez pagamento do acerto', 'acerto', `${motoristaId}/${mes}`)
+  await registrar(`admin:${a.id}`, 'desfez pagamento do acerto', 'acerto', `${motoristaId}/${mes}`)
   revalidatePath('/admin', 'layout')
   redirect(comMsg(voltar, 'Pagamento desfeito'))
 }

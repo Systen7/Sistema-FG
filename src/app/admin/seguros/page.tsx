@@ -37,7 +37,7 @@ export default async function Seguros(props: PageProps<'/admin/seguros'>) {
           <div><span className="lbl">Seguros por mês</span><b>{reais(ts)}</b></div>
           <div><span className="lbl">Demais fixos por mês</span><b>{reais(tf)}</b></div>
           <div><span className="lbl">Fixo por caminhão</span><b>{reais((ts + tf) / (cs.filter((c) => c.ativo).length || 1))}</b></div>
-          <div><span className="lbl">Fixo por km em {nomeMes(ant, true)}</span><b>{km ? 'R$ ' + num((ts + tf) / 100 / km, 2) : '—'}</b></div>
+          <div><span className="lbl">Fixo por km em {nomeMes(ant, true)}</span><b>{km ? `R$ ${num((ts + tf) / 100 / km, 2)}` : '—'}</b></div>
         </div>
       </section>
       <section className="panel">

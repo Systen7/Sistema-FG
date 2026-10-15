@@ -5,6 +5,7 @@ import { motoristaDaApi } from '@/lib/auth'
 import { lerDespesa, salvarFoto } from '@/lib/despesa-entrada'
 import { hoje } from '@/lib/datas'
 import { registrar } from '@/lib/audit'
+import { log } from '@/lib/obs/log'
 
 // Lançamento de gasto pelo motorista. Aceita reenvio: o mesmo clientId nunca vira dois lançamentos.
 export async function POST(req: Request) {
@@ -29,7 +30,8 @@ export async function POST(req: Request) {
       viagemId: v.id, tipo: e.tipo, valor: e.valor, litros: e.litros, kmAbastecimento: e.kmAbastecimento, obs: e.obs, pagoPor: e.pagoPor,
       data: e.data ?? hoje(), status: 'pendente', fotoId: foto, clientId,
     }).returning()
-    await registrar('motorista:' + m.id, 'lançou', 'despesa', d.id, { viagem: v.id, tipo: d.tipo, valor: d.valor })
+    await registrar(`motorista:${m.id}`, 'lançou', 'despesa', d.id, { viagem: v.id, tipo: d.tipo, valor: d.valor })
+    log('info', 'gasto lançado', { motorista: m.id, viagem: v.id, despesa: d.id, comFoto: !!foto })
     return NextResponse.json({ ok: true, id: d.id })
   } catch (err) {
     // Duas tentativas chegando juntas com o mesmo clientId: a segunda só confirma.

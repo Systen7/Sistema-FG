@@ -9,11 +9,11 @@ export const metadata = { title: 'Lançar gasto' }
 export default async function Gasto(props: PageProps<'/m/gasto'>) {
   const m = await exigirMotorista()
   const v = await viagemAtiva(m.id)
-  if (!v) redirect('/m?erro=' + encodeURIComponent('Inicie uma viagem antes de lançar gastos.'))
+  if (!v) redirect(`/m?erro=${encodeURIComponent('Inicie uma viagem antes de lançar gastos.')}`)
   const sp = await props.searchParams
   const id = Number(sp.id)
   const d = id ? v.despesas.find((x) => x.id === id) : null
-  if (id && !d) redirect('/m?erro=' + encodeURIComponent('Gasto não encontrado nesta viagem.'))
+  if (id && !d) redirect(`/m?erro=${encodeURIComponent('Gasto não encontrado nesta viagem.')}`)
   return (
     <GastoForm
       motoristaId={m.id} viagemId={v.id} rota={`${v.origem.split('/')[0]} → ${v.destino.split('/')[0]}`} hoje={hoje()} inicio={v.inicio}

@@ -57,7 +57,7 @@ export async function exigirMotorista() {
   const s = await sessaoAtual()
   if (s?.tipo !== 'motorista') redirect('/entrar')
   const [m] = await db.select().from(schema.motoristas).where(eq(schema.motoristas.id, s.id))
-  if (!m || !m.ativo || m.versaoSessao !== s.v) redirect('/entrar?saiu=1')
+  if (!m?.ativo || m.versaoSessao !== s.v) redirect('/entrar?saiu=1')
   return m
 }
 
@@ -66,7 +66,7 @@ export async function motoristaDaApi() {
   const s = await sessaoAtual()
   if (s?.tipo !== 'motorista') return null
   const [m] = await db.select().from(schema.motoristas).where(eq(schema.motoristas.id, s.id))
-  return m && m.ativo && m.versaoSessao === s.v ? m : null
+  return m?.ativo && m.versaoSessao === s.v ? m : null
 }
 export async function adminDaApi() {
   const s = await sessaoAtual()

@@ -16,7 +16,7 @@ export function Toast() {
     if (ok) navigator.vibrate?.(40)
     const q = new URLSearchParams(sp.toString())
     q.delete('ok'); q.delete('erro')
-    router.replace(path + (q.size ? '?' + q : ''), { scroll: false })
+    router.replace(path + (q.size ? `?${q}` : ''), { scroll: false })
   }, [sp, router, path])
   const [saindo, setSaindo] = useState(false)
   useEffect(() => {
@@ -34,7 +34,8 @@ export function Toast() {
   }, [])
   if (!msg) return null
   return (
-    <div key={msg.t} className={'toast ' + msg.tipo + (saindo ? ' saindo' : '')} role="status" aria-live="polite" onClick={() => setSaindo(true)}>
+    // biome-ignore lint/a11y/useKeyWithClickEvents: atalho de toque para dispensar; o aviso some sozinho
+    <div key={msg.t} className={`toast ${msg.tipo}${saindo ? ' saindo' : ''}`} role="status" aria-live="polite" onClick={() => setSaindo(true)}>
       {msg.tipo === 'ok' ? <CheckCircle2 className="ico" style={{ color: 'var(--good)' }} /> : <AlertTriangle className="ico" style={{ color: 'var(--bad)' }} />}
       {msg.t}
     </div>
