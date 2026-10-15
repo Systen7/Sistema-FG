@@ -107,6 +107,10 @@ Coloque um proxy com HTTPS na frente (Caddy, Nginx ou Cloudflare).
 
 As fotos dos comprovantes ficam no próprio banco (reduzidas para cerca de 150 KB cada), então não há outro serviço para configurar. **Faça cópia de segurança do banco** (`pg_dump`) com frequência.
 
+## Como trabalhar neste projeto
+
+Toda mudança segue o fluxo **Issue → branch → Pull Request (mencionando a Issue) → merge**, e o merge na `main` publica em produção. O passo a passo e as regras estão no **[AGENTS.md](./AGENTS.md)**, que vale para pessoas e para qualquer agente de IA.
+
 ## Comandos
 
 | Comando | Para quê |
@@ -117,6 +121,7 @@ As fotos dos comprovantes ficam no próprio banco (reduzidas para cerca de 150 K
 | `npm run db:migrate` | Aplica as migrações |
 | `npm run db:seed -- --limpar` | Apaga tudo e recria os exemplos |
 | `npm run db:admin -- usuario "Nome" senha` | Cria acesso do escritório ou redefine a senha |
+| `npm run check` | Tipos e testes de unidade (rode antes de abrir um PR) |
 | `npm test` | Testes das regras de cálculo |
 | `npm run e2e` | Teste completo no navegador: motorista + escritório, inclusive sem sinal |
 
